@@ -42,6 +42,7 @@
       <li><a href="#architecture">Architecture</a></li>
       <li><a href="#rubric">Review</a></li>
       <li><a href="#faq">FAQ</a></li>
+      <li><a href="#changelog">Feedback</a></li>
     </ul>
   </div>
   <div class="nav-right" style="display:flex;align-items:center;gap:12px;">
@@ -99,10 +100,10 @@
         <div style="display:flex;flex-direction:column;gap:7px;">
           <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--gray-50);border-radius:6px;border-left:3px solid var(--azure);font-size:12px;font-weight:700;color:var(--navy-dark);">🏛️ Civil Registry</div>
           <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--gray-50);border-radius:6px;border-left:3px solid var(--navy);font-size:12px;font-weight:700;color:var(--navy);">💼 Business Registry</div>
-          <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--gray-50);border-radius:6px;border-left:3px solid var(--green);font-size:12px;font-weight:700;color:var(--navy);">🏠 Land Registry</div>
-          <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--gray-50);border-radius:6px;border-left:3px solid var(--amber);font-size:12px;font-weight:700;color:var(--navy);">🚗 Vehicle Registry</div>
-          <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--gray-50);border-radius:6px;border-left:3px solid #6B4FA8;font-size:12px;font-weight:700;color:var(--navy);">💊 Health Registry</div>
-          <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--gray-50);border-radius:6px;border-left:3px solid #C55A00;font-size:12px;font-weight:700;color:var(--navy);">🎓 Education Registry</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--gray-50);border-radius:6px;border-left:3px solid var(--green);font-size:12px;font-weight:700;color:var(--navy);">📍 Address Registry</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--gray-50);border-radius:6px;border-left:3px solid var(--amber);font-size:12px;font-weight:700;color:var(--navy);">🧾 TaxPayer Registry</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--gray-50);border-radius:6px;border-left:3px solid #6B4FA8;font-size:12px;font-weight:700;color:var(--navy);">📋 Business License Registry</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--gray-50);border-radius:6px;border-left:3px solid #C55A00;font-size:12px;font-weight:700;color:var(--navy);">🏠 Land Registry</div>
         </div>
       </div>
     </div>
@@ -166,7 +167,7 @@
       <div class="principle-card reveal reveal-delay-4" onclick="openPrincipleDetail(3)">
         <div class="principle-icon">♻️</div>
         <div class="principle-title">Reuse Before Build</div>
-        <div class="principle-desc">Shared services: <span class="pa">Comm. Services, Logic Apps, Form Recognizer, AI Search</span> consumed by all six registries. No per-service duplication.</div>
+        <div class="principle-desc">Shared services built once, consumed by all registries: <span class="pa">Notifications, Identity (SSO), Document Generation, Search, Payment Service</span>. No per-registry duplication.</div>
         <div class="principle-click-hint">▶ Click for full details</div>
       </div>
       <div class="principle-card reveal reveal-delay-1" style="border-top-color:var(--navy);" onclick="openPrincipleDetail(4)">
@@ -369,6 +370,48 @@
   </div>
 </section>
 
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- CUSTOMER FEEDBACK ADDRESSED -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section id="changelog">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <div class="section-tag">Customer Feedback Addressed</div>
+      <h2 class="section-title">What We Fixed Based on Your Input</h2>
+      <p class="section-desc">Every change was made in direct response to stakeholder feedback. <span id="cl-lock-hint" style="color:var(--amber);font-weight:700;">🔒 Access restricted — click to unlock</span></p>
+    </div>
+
+    <!-- Lock gate -->
+    <div id="cl-gate" class="faq-gate reveal">
+      <div class="faq-gate-card">
+        <div class="faq-gate-icon">🔒</div>
+        <div class="faq-gate-title">Feedback Log Access</div>
+        <div class="faq-gate-sub">This section is restricted. Please enter the access credentials.</div>
+        <div id="cl-gate-error" class="faq-gate-error" style="display:none;">Incorrect username or password. Please try again.</div>
+        <div class="faq-gate-field">
+          <label class="faq-gate-label" for="cl-username">Username</label>
+          <input id="cl-username" class="faq-gate-input" type="text" autocomplete="username"
+            placeholder="Enter username" onkeydown="if(event.key==='Enter')document.getElementById('cl-password').focus()"/>
+        </div>
+        <div class="faq-gate-field">
+          <label class="faq-gate-label" for="cl-password">Password</label>
+          <div style="position:relative;">
+            <input id="cl-password" class="faq-gate-input" type="password" autocomplete="current-password"
+              placeholder="Enter password" onkeydown="if(event.key==='Enter')clLogin()"/>
+            <button class="faq-eye-btn" onclick="toggleClPwd()" title="Show/hide password">👁</button>
+          </div>
+        </div>
+        <button class="faq-gate-btn" onclick="clLogin()">Unlock Feedback Log →</button>
+        <div class="faq-gate-hint">Credentials available from the presenter</div>
+      </div>
+    </div>
+
+    <!-- Content — hidden until authenticated -->
+    <div id="changelog-list" class="reveal" style="display:none;"></div>
+  </div>
+</section>
+
 </div><!-- #page -->
 
 <!-- FOOTER -->
@@ -413,6 +456,7 @@ function toggleLayer(layer) { layer.classList.toggle('open'); }
 <script src="js/pipeline.js"></script>
 <script src="js/kpi.js"></script>
 <script src="js/app.js"></script>
+<script src="js/changelog.js"></script>
 <script src="js/faq.js"></script>
 <script src="js/legend.js"></script>
 
@@ -631,6 +675,65 @@ document.addEventListener('DOMContentLoaded', function() {
     const faqSection = document.getElementById('faq');
     if (faqSection) observer.observe(faqSection);
   });
+})();
+</script>
+
+
+<script>
+/* ── CHANGELOG ACCESS GATE ───────────────────────────────────────── */
+(function() {
+  const _cu = btoa('orange');
+  const _cp = btoa('orange2244');
+
+  window.clLogin = function() {
+    const u = document.getElementById('cl-username');
+    const p = document.getElementById('cl-password');
+    const err = document.getElementById('cl-gate-error');
+    if (!u || !p) return;
+
+    if (btoa(u.value.trim().toLowerCase()) === _cu && btoa(p.value.trim()) === _cp) {
+      const gate = document.getElementById('cl-gate');
+      const list = document.getElementById('changelog-list');
+      const hint = document.getElementById('cl-lock-hint');
+      if (gate) { gate.style.transition='opacity 0.3s'; gate.style.opacity='0'; setTimeout(()=>gate.style.display='none',300); }
+      if (hint) hint.innerHTML='<span style="color:var(--green);font-weight:700;">🔓 Feedback log unlocked</span>';
+      if (list) {
+        list.style.display='block';
+        list.classList.add('faq-unlocked');
+        if (typeof buildChangelog==='function') buildChangelog();
+        setTimeout(()=>list.scrollIntoView({behavior:'smooth',block:'start'}),350);
+      }
+      try {
+        const ctx=new(window.AudioContext||window.webkitAudioContext)();
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.type='sine';o.frequency.setValueAtTime(440,ctx.currentTime);
+        o.frequency.linearRampToValueAtTime(880,ctx.currentTime+0.15);
+        g.gain.setValueAtTime(0.15,ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.35);
+        o.start(ctx.currentTime);o.stop(ctx.currentTime+0.4);
+      } catch(e){}
+    } else {
+      if (err) { err.style.display='block'; err.style.animation='none'; void err.offsetWidth; err.style.animation='errShake 0.35s ease'; }
+      if (p) { p.value=''; p.focus(); }
+      try {
+        const ctx=new(window.AudioContext||window.webkitAudioContext)();
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.type='square';o.frequency.setValueAtTime(220,ctx.currentTime);
+        g.gain.setValueAtTime(0.12,ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.25);
+        o.start(ctx.currentTime);o.stop(ctx.currentTime+0.3);
+      } catch(e){}
+    }
+  };
+
+  window.toggleClPwd = function() {
+    const p=document.getElementById('cl-password');
+    if(p) p.type=p.type==='password'?'text':'password';
+  };
+
+  // Also prevent buildChangelog from auto-running on DOM load
 })();
 </script>
 

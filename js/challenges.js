@@ -9,7 +9,7 @@ const CHALLENGES = [
     icon: '🗂️', label: 'Fragmented\nLegacy Systems',
     color: '#A4262C', colorLight: '#FDE7E9',
     impact: 'High', effort: 'Extreme',
-    problem: 'Government data exists in isolated silos across six registries, each using proprietary formats, aged APIs, or paper-based records. No single view of a citizen exists across departments.',
+    problem: 'Government data exists in isolated silos across six registries (Civil, Business, Address, TaxPayer, Business License, Land), each using proprietary formats, aged APIs, or paper-based records. No single view of a citizen exists across departments.',
     consequence: 'Average integration effort: 3–4 months per registry using traditional sequential methods. Citizens must visit multiple offices, submit duplicate paperwork, and wait weeks for cross-departmental data validation.',
     solution: 'Azure API Management acts as the unified interoperability gateway. OpenAPI 3.0 contracts defined for all six registries before a single line of code is written. Azure Service Bus decouples registry updates from portal services.',
     azureTools: ['Azure API Management', 'Azure Service Bus', 'Azure Logic Apps', 'Azure Data Factory'],
@@ -22,8 +22,8 @@ const CHALLENGES = [
     impact: 'High', effort: 'High',
     problem: 'Current government workflows are entirely paper-based: citizens complete forms → staff manually enter data → supervisors sign off → documents filed physically. Zero automation in place.',
     consequence: 'Service delivery times average 6–12 weeks for common transactions. Error rates from manual entry reach 12–15%. Rework absorbs 30% of staff capacity. Citizens must return for corrections.',
-    solution: 'Azure Logic Apps automates multi-step approval workflows. Azure Form Recognizer (Document Intelligence) performs OCR on legacy paper forms. Azure AI eliminates manual data entry for common service types.',
-    azureTools: ['Azure Logic Apps', 'Document Intelligence', 'Azure Form Recognizer', 'Azure Automation'],
+    solution: 'Azure Logic Apps automates multi-step approval workflows. Government documents are generated as structured digital outputs (certificates, licences, receipts) via a shared Document Generation Service. Azure AI eliminates manual data entry for common service types.',
+    azureTools: ['Azure Logic Apps', 'Document Generation Service', 'Azure Automation', 'Azure App Configuration'],
     kpis: [{ l: 'Current Delivery', v: '6–12 weeks' }, { l: 'Target Delivery', v: '< 2 days' }, { l: 'Error Reduction', v: '95%' }]
   },
   {
@@ -191,7 +191,7 @@ function buildChallengesFigure() {
   <rect x="${panelX + 10}" y="${by}" width="4" height="${bH - 6}" rx="2" fill="${p.col}"/>
   <text x="${panelX + 24}" y="${by + 16}" font-size="13">${p.icon}</text>
   <text x="${panelX + 42}" y="${by + 16}" font-size="11" font-weight="700" fill="#1A2332">${p.lbl}</text>
-  <text x="${panelX + 42}" y="${by + 30}" font-size="9" fill="#7A8C9A">Solves: ${p.solves.split(',').map(s=>'Challenge '+(CHALLENGES.findIndex(c=>c.id===s)+1)).join(', ')}</text>
+  <text x="${panelX + 42}" y="${by + 30}" font-size="9" fill="#7A8C9A">Solves: ${p.solves.split(',').map(s=>{ const ch=CHALLENGES.find(c=>c.id===s); return ch?ch.label.replace('\\n',' '):s; }).join(', ')}</text>
   <text x="${panelX + bW + 4}" y="${by + 24}" text-anchor="end" font-size="10" fill="${p.col}">▶</text>
 </g>`;
   });
@@ -584,15 +584,16 @@ const PRINCIPLES_VIZ = [
         { id:'s8', x:145, y:260, w:150, h:40, label:'All 6 registries:\nsame pattern ✓',fill:'#DFF6DD', stroke:'#107C10', tip:`The result: all six government registry integrations look and behave the same way. A new developer joining the programme can be productive on any service within hours, not weeks of learning a unique approach.`},
       ],
       arrows: [
-        { x1:220, y1:55,  x2:75,  y2:95,  curve:true },
-        { x1:220, y1:55,  x2:203, y2:95  },
-        { x1:220, y1:55,  x2:331, y2:95,  curve:true },
-        { x1:75,  y1:133, x2:75,  y2:180 },
-        { x1:203, y1:133, x2:203, y2:180 },
-        { x1:331, y1:133, x2:331, y2:180 },
-        { x1:75,  y1:218, x2:220, y2:260, curve:true },
-        { x1:203, y1:218, x2:220, y2:260 },
-        { x1:331, y1:218, x2:220, y2:260, curve:true },
+        { x1:220, y1:55,  x2:55,  y2:95,  curve:true },
+        { x1:220, y1:55,  x2:153, y2:95  },
+        { x1:220, y1:55,  x2:251, y2:95  },
+        { x1:220, y1:55,  x2:349, y2:95,  curve:true },
+        { x1:55,  y1:133, x2:55,  y2:160 },
+        { x1:153, y1:133, x2:153, y2:160 },
+        { x1:55,  y1:198, x2:220, y2:255, curve:true },
+        { x1:153, y1:198, x2:220, y2:255 },
+        { x1:251, y1:133, x2:220, y2:255, curve:true },
+        { x1:349, y1:133, x2:220, y2:255, curve:true },
       ],
       labels: []
     },
@@ -608,38 +609,49 @@ const PRINCIPLES_VIZ = [
     color: '#107C10',
     flow: {
       nodes: [
-        { id:'r1', x:140, y:15,  w:160, h:40, label:'Shared Platform\nBuilt Once',fill:'#107C10', stroke:'#107C10', white:true, tip:`Four capabilities are built once and shared by all six registries. Think of it like a hotel kitchen: built once, serves every room. Each shared service is owned by one team but consumed by all.`},
-        { id:'r2', x:10,  y:95,  w:100, h:38, label:'🔔 Notifications\nEmail/SMS/WhatsApp',fill:'#DFF6DD', stroke:'#107C10', tip:`Azure Communication Services. One notification service handles all government alerts — application approved, registration renewed, payment confirmed — for all six registries. New notification channel? Added once, works everywhere.`},
-        { id:'r3', x:125, y:95,  w:100, h:38, label:'🔑 Identity\nOne login for all',fill:'#DFF6DD', stroke:'#107C10', tip:`Microsoft Entra External ID. Citizens create one account and it works for every government service. The login page, MFA, password reset, and session management are built once. No per-service authentication code.`},
-        { id:'r4', x:240, y:95,  w:100, h:38, label:'📄 Documents\nOCR + extraction',fill:'#DFF6DD', stroke:'#107C10', tip:`Azure Document Intelligence. When a citizen uploads a birth certificate, business licence, or land deed, the same AI-powered document reader extracts the relevant fields. All registries benefit from accuracy improvements instantly.`},
-        { id:'r5', x:355, y:95,  w:100, h:38, label:'🔍 Search\nAcross all data',fill:'#DFF6DD', stroke:'#107C10', tip:`Azure AI Search. Citizens can search across all six registries from one search box — property records, business licences, vehicle registrations. Built once, connected to all.`},
-        { id:'r6', x:10,  y:195, w:100, h:32, label:'Civil Registry\nuses it',fill:'#E8ECF4', stroke:'#003087', tip:`The Civil Registry integration calls the shared notification service instead of building its own email system. It uses the same identity platform. It reuses the document reader. Zero duplication.`},
-        { id:'r7', x:125, y:195, w:100, h:32, label:'Business Reg\nuses it',fill:'#E8ECF4', stroke:'#003087', tip:`Business Registry reuses all four shared capabilities. When Azure Communication Services adds WhatsApp support, businesses automatically receive WhatsApp notifications — no code change needed in the Business Registry service.`},
-        { id:'r8', x:240, y:195, w:100, h:32, label:'Land Registry\nuses it',fill:'#E8ECF4', stroke:'#003087', tip:`Same pattern for Land Registry. A property title search automatically benefits from the AI Search improvements, the shared identity login, and standardized document handling.`},
-        { id:'r9', x:355, y:195, w:100, h:32, label:'+ 3 more\nregistries',fill:'#E8ECF4', stroke:'#003087', tip:`Vehicle, Health, and Education registries all consume the same four shared services. Six registries, four shared capabilities, built once. Any improvement ripples across all six instantly.`},
+        /* ── TOP ROW: 5 shared services ── */
+        { id:'r1', x:10,  y:10,  w:82, h:40, label:'🔔 Notifications\nEmail / SMS',  fill:'#DFF6DD', stroke:'#107C10', tip:`Azure Communication Services sends all government notifications — application approved, document ready, payment confirmed — across all six registries. Built once, works for all.`},
+        { id:'r2', x:100, y:10,  w:82, h:40, label:'🔑 Identity\nSingle Sign-On',    fill:'#DFF6DD', stroke:'#107C10', tip:`Microsoft Entra External ID. Citizens log in once and access all six registry services. MFA, password reset, and session management built once — used by all.`},
+        { id:'r3', x:190, y:10,  w:82, h:40, label:'📄 Document\nGeneration',         fill:'#DFF6DD', stroke:'#107C10', tip:`Documents are outputs of services — certificates, licences, receipts, official letters. One shared service produces all output documents using approved government templates.`},
+        { id:'r4', x:280, y:10,  w:82, h:40, label:'🔍 Search\nAll Registries',        fill:'#DFF6DD', stroke:'#107C10', tip:`Azure AI Search enables citizens to search across all six registries from one search box. Built once, connected to all registry data simultaneously.`},
+        { id:'r5', x:370, y:10,  w:82, h:40, label:'💳 Payment\nService',              fill:'#DFF6DD', stroke:'#107C10', tip:`One Payment Service handles all government fee transactions — licence fees, registration fees, certificate fees — across all registries. One familiar, secure checkout interface.`},
+        /* ── MIDDLE: Azure Service Bus backbone ── */
+        { id:'bus', x:30, y:85,  w:400,h:38, label:'Azure Service Bus — Shared Integration Backbone',  fill:'#0078D4', stroke:'#0078D4', white:true, tip:`Azure Service Bus is the shared messaging backbone. Every registry integration and every shared service communicates through it. When a service sends a notification or triggers a document generation, it publishes a message to the bus — and the right service picks it up. This decoupling means no direct dependencies between registries and services.`},
+        /* ── BOTTOM ROW: all 6 named registries ── */
+        { id:'g1', x:5,   y:158, w:73, h:34, label:'🏛️ Civil\nRegistry',               fill:'#E8ECF4', stroke:'#003087', tip:`Civil Registry publishes citizen events (registration updates, document requests) to the Service Bus. The Notification, Document Generation, and Payment services pick them up and respond — no direct coupling.`},
+        { id:'g2', x:83,  y:158, w:73, h:34, label:'💼 Business\nRegistry',             fill:'#E8ECF4', stroke:'#003087', tip:`Business Registry uses all five shared services: notifications for application updates, SSO for business owner login, document generation for licences, search for business lookup, and payment for registration fees.`},
+        { id:'g3', x:161, y:158, w:73, h:34, label:'📍 Address\nRegistry',              fill:'#E8ECF4', stroke:'#003087', tip:`Address Registry publishes address validation events. The shared Search service indexes all address data. Citizens find any address through the one shared search interface.`},
+        { id:'g4', x:239, y:158, w:73, h:34, label:'🧾 TaxPayer\nRegistry',             fill:'#E8ECF4', stroke:'#003087', tip:`TaxPayer Registry uses the shared Payment Service for tax fee collection and the shared Document Generation service for tax certificates and receipts.`},
+        { id:'g5', x:317, y:158, w:79, h:34, label:'📋 Business\nLicense Reg',          fill:'#E8ECF4', stroke:'#003087', tip:`Business License Registry issues digital licences via the shared Document Generation service. Renewal notifications go through the shared Notification service. Fees collected via shared Payment service.`},
+        { id:'g6', x:401, y:158, w:55, h:34, label:'🏠 Land\nRegistry',                 fill:'#E8ECF4', stroke:'#003087', tip:`Land Registry publishes title and ownership events to the Service Bus. Title documents are generated by the shared Document Generation service. Searches are handled by shared Search.`},
       ],
       arrows: [
-        { x1:220, y1:55,  x2:60,  y2:95  },
-        { x1:220, y1:55,  x2:175, y2:95  },
-        { x1:220, y1:55,  x2:290, y2:95  },
-        { x1:220, y1:55,  x2:405, y2:95  },
-        { x1:60,  y1:133, x2:60,  y2:195 },
-        { x1:175, y1:133, x2:175, y2:195 },
-        { x1:290, y1:133, x2:290, y2:195 },
-        { x1:405, y1:133, x2:405, y2:195 },
+        /* 5 services → Service Bus (down arrows) */
+        { x1:51,  y1:50,  x2:130, y2:85  },
+        { x1:141, y1:50,  x2:175, y2:85  },
+        { x1:231, y1:50,  x2:230, y2:85  },
+        { x1:321, y1:50,  x2:285, y2:85  },
+        { x1:411, y1:50,  x2:340, y2:85  },
+        /* Service Bus → 6 registries (down arrows) */
+        { x1:110, y1:123, x2:41,  y2:158, curve:true },
+        { x1:160, y1:123, x2:119, y2:158 },
+        { x1:210, y1:123, x2:197, y2:158 },
+        { x1:260, y1:123, x2:275, y2:158 },
+        { x1:310, y1:123, x2:356, y2:158, curve:true },
+        { x1:360, y1:123, x2:428, y2:158, curve:true },
       ],
       labels: [
-        { x:10, y:178, text:'← All registries consume these shared services ↓', color:'#107C10' },
+        { x:5, y:80,  text:'5 shared services ↓ via Service Bus ↓ to all 6 registries', color:'#0078D4' },
       ]
     },
     metrics: [
-      { label:'Shared services\nbuilt once', value:'4',    color:'#107C10' },
-      { label:'Duplicate code\neliminated', value:'~60%', color:'#107C10' },
-      { label:'Time to add\nnew registry', value:'Weeks',color:'#0078D4' },
-      { label:'Upgrade benefits\nall 6 registries', value:'Auto', color:'#107C10' },
+      { label:'Shared services\nbuilt once', value:'5',    color:'#107C10' },
+      { label:'All 6 registries\nfully named', value:'✓', color:'#107C10' },
+      { label:'Duplicate code\neliminated',  value:'~60%', color:'#107C10' },
+      { label:'Upgrade benefits\nall registries', value:'Auto', color:'#107C10' },
     ]
   },
-  /* 4 — PARALLEL EXECUTION */
+    /* 4 — PARALLEL EXECUTION */
   {
     color: '#6B4FA8',
     flow: {
@@ -962,7 +974,7 @@ const PRINCIPLE_DETAILS_BRIEF = [
   { title:'Shift Left',               sub:'Catch issues at the beginning — not the end',              tools:['Defender for DevOps','Azure Policy CI Gates','Azure Repos Branch Policy','Playwright Accessibility Scan'] },
   { title:'Automate Everything',      sub:'Zero manual steps from commit to production',               tools:['Azure Pipelines YAML','Azure Bicep IaC','Azure Test Plans','Azure Container Registry'] },
   { title:'Standardize Patterns',     sub:'Decide once, reuse everywhere',                             tools:['Azure API Management Developer Portal','Azure Bicep Module Library','Helm Charts','OpenAPI 3.0'] },
-  { title:'Reuse Before Build',       sub:'One shared service consumed by all six registries',         tools:['Azure Communication Services','Entra External ID','Azure Document Intelligence','Azure AI Search'] },
+  { title:'Reuse Before Build',       sub:'Five shared services consumed by all six registries',        tools:['Azure Communication Services','Entra External ID','Document Generation Service','Azure AI Search','Payment Service'] },
   { title:'Parallel Execution',       sub:'Six teams working simultaneously from Day 1',               tools:['Azure API Management Mocks','Azure DevOps Delivery Plans','Azure DevOps Multi-Team','Postman Newman'] },
   { title:'Incremental Delivery',     sub:'Working software every two weeks — not once at the end',    tools:['Azure Pipelines Release Gates','Azure App Configuration Feature Flags','Azure DevOps Sprint Boards','Azure DevOps Analytics'] },
   { title:'Governance by Design',     sub:'Compliance and audit trails happen automatically',           tools:['Azure Policy Deny Effects','Azure DevOps Audit Log','Defender for Cloud Compliance','Azure Log Analytics 2yr'] },

@@ -13,7 +13,7 @@ const FAQ_DATA = [
     items: [
       {
         q: 'What exactly is the scope of the DGTP e-Services programme?',
-        a: 'The programme covers the design and development of selected e-government services delivered via multiple channels — including an online citizen portal accessible via web browser and mobile app. It also includes the implementation of an interoperability platform that integrates six key Sint Maarten government registries: Civil, Business, Land, Vehicle, Health, and Education. The entire platform is deployed exclusively on Microsoft Azure.',
+        a: 'The programme covers the design and development of selected e-government services delivered via multiple channels — including an online citizen portal accessible via web browser and mobile app. It also includes the implementation of an interoperability platform that integrates six key Sint Maarten government registries: Civil, Business, Address, TaxPayer, Business License, and Land. The entire platform is deployed exclusively on Microsoft Azure.',
         tags: ['Programme Scope', 'Six Registries', 'Online Portal', 'Azure-Only']
       },
       {
@@ -88,9 +88,9 @@ const FAQ_DATA = [
         tags: ['Zero Registry Changes', 'Abstraction Layer', 'APIM Gateway', 'Read-Only Phase 1']
       },
       {
-        q: 'How is sensitive health data protected in the Health Registry integration?',
-        a: 'Health Registry data receives the highest sensitivity tier in Azure Purview. Azure Data Factory anonymizes health data before it enters the DGTP platform — no identifiable patient data is stored in DGTP services. Access to health-linked citizen records requires Entra ID Privileged Identity Management just-in-time approval. All health data is stored in a dedicated Cosmos DB collection with an independent Customer-Managed Key in Key Vault. NSG rules restrict Health Service pods to a separate AKS namespace with stricter network policies.',
-        tags: ['Health Registry', 'Azure Purview', 'Data Anonymization', 'PIM JIT Access', 'Separate Namespace']
+        q: 'How is sensitive TaxPayer data protected in the TaxPayer Registry integration?',
+        a: 'TaxPayer Registry data receives the highest sensitivity tier in Azure Purview. Strict data minimisation means only the data required to deliver the specific service is ever accessed — no bulk tax record queries are permitted. Access requires Entra ID Privileged Identity Management just-in-time approval. All TaxPayer data is stored in a dedicated Cosmos DB collection with an independent Customer-Managed Key in Key Vault. NSG rules restrict the TaxPayer Service pods to a separate AKS namespace with stricter network policies.',
+        tags: ['TaxPayer Registry', 'Azure Purview', 'Data Minimisation', 'PIM JIT Access', 'Separate Namespace']
       },
       {
         q: 'What happens if a registry system is unavailable — does the portal go down?',
@@ -186,7 +186,7 @@ const FAQ_DATA = [
     items: [
       {
         q: 'What e-services will citizens be able to access through the portal?',
-        a: 'The initial release includes digitised versions of the most frequently requested government services across the six registry domains: civil identity document requests (Civil Registry), business licence applications and renewals (Business Registry), property title searches (Land Registry), vehicle registration renewals (Vehicle Registry), health professional licence verification (Health Registry), and academic credential verification (Education Registry). Each service is fully online — citizens can apply, track status, pay fees, and receive digital documents without visiting a government office.',
+        a: 'The initial release includes digitised versions of the most frequently requested government services across the six registry domains: civil identity document requests (Civil Registry), business registration and renewals (Business Registry), address lookups and updates (Address Registry), taxpayer account services (TaxPayer Registry), business licence applications and renewals (Business License Registry), and property title searches (Land Registry). Each service is fully online — citizens can apply, track status, pay fees, and receive digital documents without visiting a government office.',
         tags: ['Citizen Services', 'Digital Documents', 'Online Payments', 'Status Tracking', 'No Office Visit']
       },
       {
