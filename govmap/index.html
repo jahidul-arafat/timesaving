@@ -631,6 +631,137 @@ html,body{background:#1a1a1c;font-family:var(--sans);height:100vh;overflow:hidde
 }
 .fp-solution-text strong { color: #4ade80; }
 
+
+/* ════ LOGIN GATE ════════════════════════════════════════════════════ */
+#login-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #0e1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+#login-gate.hidden {
+  display: none;
+}
+.lg-card {
+  width: 360px;
+  background: #16191f;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 40px 36px 36px;
+  box-shadow: 0 40px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.lg-logo {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .22em;
+  font-weight: 700;
+  color: #c8510a;
+  margin-bottom: 24px;
+}
+.lg-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 26px;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.lg-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,.35);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+.lg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.lg-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .14em;
+  font-weight: 700;
+  color: rgba(255,255,255,.35);
+}
+.lg-input {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  color: #fff;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  outline: none;
+  transition: border-color .15s, background .15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.lg-input:focus {
+  border-color: rgba(200,81,10,.6);
+  background: rgba(200,81,10,.06);
+}
+.lg-input::placeholder {
+  color: rgba(255,255,255,.18);
+}
+.lg-error {
+  font-size: 11px;
+  color: #e05470;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .06em;
+  height: 16px;
+  margin-bottom: 8px;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.lg-error.show { opacity: 1; }
+.lg-btn {
+  width: 100%;
+  padding: 12px;
+  background: #c8510a;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background .15s, transform .12s;
+  letter-spacing: .02em;
+}
+.lg-btn:hover { background: #e8722a; transform: translateY(-1px); }
+.lg-btn:active { transform: translateY(0); }
+.lg-btn.shaking {
+  animation: lg-shake .35s ease;
+}
+@keyframes lg-shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+.lg-divider {
+  height: 1px;
+  background: rgba(255,255,255,.06);
+  margin: 28px 0 20px;
+}
+.lg-footer {
+  font-size: 10px;
+  color: rgba(255,255,255,.18);
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .06em;
+}
+
 </style>
 </head>
 <body>
@@ -2070,9 +2201,82 @@ html,body{background:#1a1a1c;font-family:var(--sans);height:100vh;overflow:hidde
 
 </div><!-- end stage -->
 
+
+<!-- ════ LOGIN GATE ════════════════════════════════════════════════════ -->
+<div id="login-gate">
+  <div class="lg-card">
+    <div class="lg-logo">GOVMAP · DGTP SINT MAARTEN</div>
+    <div class="lg-title">Restricted Access</div>
+    <div class="lg-sub">This document is confidential. Enter your credentials to continue.</div>
+    <div class="lg-field">
+      <div class="lg-label">USERNAME</div>
+      <input id="lg-user" class="lg-input" type="text" placeholder="Enter username" autocomplete="username" spellcheck="false"/>
+    </div>
+    <div class="lg-field">
+      <div class="lg-label">PASSWORD</div>
+      <input id="lg-pass" class="lg-input" type="password" placeholder="Enter password" autocomplete="current-password"/>
+    </div>
+    <div class="lg-error" id="lg-error">Incorrect username or password</div>
+    <button class="lg-btn" id="lg-btn" onclick="lgSubmit()">Access Document →</button>
+    <div class="lg-divider"></div>
+    <div class="lg-footer">ORANGE BD · ARCHITECTURE DECISION BRIEF · 2025</div>
+  </div>
+</div>
+
 <div id="kbhint">← → Space to navigate</div>
 
 <script>
+
+// ── Login Gate ────────────────────────────────────────────────────────
+(function(){
+  // Block all interaction until authenticated
+  document.getElementById('stage').style.pointerEvents = 'none';
+  document.getElementById('stage').style.userSelect = 'none';
+
+  function lgSubmit(){
+    const user = document.getElementById('lg-user').value.trim();
+    const pass = document.getElementById('lg-pass').value;
+    const err  = document.getElementById('lg-error');
+    const btn  = document.getElementById('lg-btn');
+
+    if(user === 'orange' && pass === 'integration'){
+      // Correct — fade out gate
+      const gate = document.getElementById('login-gate');
+      gate.style.transition = 'opacity .4s ease';
+      gate.style.opacity = '0';
+      setTimeout(() => {
+        gate.classList.add('hidden');
+        document.getElementById('stage').style.pointerEvents = '';
+        document.getElementById('stage').style.userSelect = '';
+      }, 400);
+    } else {
+      // Wrong — shake + show error
+      err.classList.add('show');
+      btn.classList.remove('shaking');
+      void btn.offsetWidth; // reflow to restart animation
+      btn.classList.add('shaking');
+      document.getElementById('lg-pass').value = '';
+      document.getElementById('lg-pass').focus();
+    }
+  }
+
+  // Allow Enter key to submit
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && !document.getElementById('login-gate').classList.contains('hidden')){
+      lgSubmit();
+    }
+  });
+
+  // Expose globally
+  window.lgSubmit = lgSubmit;
+
+  // Focus username on load
+  window.addEventListener('load', function(){
+    document.getElementById('lg-user').focus();
+  });
+})();
+
+
 // ── SVG BLOCKS (injected by data attr approach) ──────────────────────
 // SVGs injected directly as HTML
 // SVG injection deferred to DOMContentLoaded (IDs not in DOM yet at parse time)
