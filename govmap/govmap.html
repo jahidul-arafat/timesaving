@@ -1126,7 +1126,7 @@ html,body{background:#1a1a1c;font-family:var(--sans);height:100vh;overflow:hidde
 </div>
 <div class="sbar"></div>
 <span class="footer-stage">PROPOSED STAGE</span>
-  <span class="footer-slide" style="color:rgba(255,255,255,.3)">1 / 16</span>
+  <span class="footer-slide" style="color:rgba(255,255,255,.3)">1 / 17</span>
   <button class="nav-arrow" onclick="next()" style="border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.4)" title="Next">&#8594;</button>
 </div>
 </div>
@@ -3574,7 +3574,7 @@ document.addEventListener('DOMContentLoaded', initGapSlide2);
 <div class="id-bar" style="background:linear-gradient(90deg,#0078d4,#00b4d8)"></div>
 <div class="slide-header" style="padding-bottom:4px">
   <div class="eyebrow a1">
-    <span class="etag" style="color:#0078d4;border-color:#0078d4">Infrastructure · 16 of 16</span>
+    <span class="etag" style="color:#0078d4;border-color:#0078d4">Infrastructure · 16 of 17</span>
     <span class="enum">DGTP Sint Maarten · Azure Cloud Architecture</span>
   </div>
   <h2 class="slide-h1 a2">Azure Cloud Architecture — DGTP</h2>
@@ -3735,6 +3735,199 @@ window.s17HideRef = s17HideRef;
 
 </div>
 <!-- ════ END S17 ════ -->
+
+
+
+<!-- ════ S-APPENDIX: ABBREVIATIONS ════ -->
+<div class="slide" id="s-appendix">
+<div class="prog"><div class="prog-fill" style="width:100%"></div></div>
+<div class="id-bar" style="background:var(--ink)"></div>
+
+<div class="slide-header" style="padding-bottom:4px">
+  <div class="eyebrow a1">
+    <span class="etag">Appendix · 17 of 17</span>
+    <span class="enum">Key Terminology &amp; Abbreviations</span>
+  </div>
+  <h2 class="slide-h1 a2" style="font-size:17px">Abbreviations &amp; Key Terms</h2>
+  <p class="slide-sub a3" style="font-size:9px">Click any category to expand. All acronyms and terms used throughout this deck.</p>
+</div>
+
+<div class="slide-body a4" style="padding:4px 0 0;overflow-y:auto;overflow-x:hidden;display:flex;justify-content:center">
+<div style="width:70%;display:flex;flex-direction:column;gap:6px;padding-bottom:8px">
+
+  <!-- Category 1 -->
+  <div class="apx-group" id="apx-g0">
+    <div class="apx-head" onclick="apxToggle(0)">
+      <span class="apx-num">01</span>
+      <span class="apx-title">Programme &amp; Architecture</span>
+      <span class="apx-sub">DGTP · OGF · GovMap · EA · Q1–Q6 · CXI · NPS · SLA · BPMN · DTO</span>
+      <span class="apx-chev">▾</span>
+    </div>
+    <div class="apx-body">
+      <div class="apx-row"><span class="apx-term">DGTP</span><span class="apx-def">Digital Government Transformation Project — the overarching programme for Sint Maarten's government digitalisation</span></div>
+      <div class="apx-row"><span class="apx-term">OGF</span><span class="apx-def">OneGov Framework — Orange BD's whole-of-government digital platform powering citizen and officer portals</span></div>
+      <div class="apx-row"><span class="apx-term">GovMap</span><span class="apx-def">The DGTP architecture decision brief — this document. Maps six architectural decisions to outcomes.</span></div>
+      <div class="apx-row"><span class="apx-term">EA</span><span class="apx-def">Enterprise Architecture — the practice of aligning technology decisions with business strategy and governance</span></div>
+      <div class="apx-row"><span class="apx-term">Q1–Q6</span><span class="apx-def">The six architecture decisions: Data Bus · Appointments · Notifications · Traceability · Lifecycle · Happiness</span></div>
+      <div class="apx-row"><span class="apx-term">CXI</span><span class="apx-def">Citizen Experience Index — composite daily score: NPS 35% + APM 25% + SLA 25% + AI Acceptance 15%</span></div>
+      <div class="apx-row"><span class="apx-term">NPS</span><span class="apx-def">Net Promoter Score — citizen satisfaction survey sent 2 hours post-service completion via SMS</span></div>
+      <div class="apx-row"><span class="apx-term">SLA</span><span class="apx-def">Service Level Agreement — time-bound commitment for processing a government service application</span></div>
+      <div class="apx-row"><span class="apx-term">BPMN</span><span class="apx-def">Business Process Model and Notation — standard used to model the 8-state application lifecycle (Q5)</span></div>
+      <div class="apx-row"><span class="apx-term">DTO</span><span class="apx-def">Data Transfer Object — canonical data model normalising registry responses across all 6 protocols</span></div>
+    </div>
+  </div>
+
+  <!-- Category 2 -->
+  <div class="apx-group" id="apx-g1">
+    <div class="apx-head" onclick="apxToggle(1)">
+      <span class="apx-num">02</span>
+      <span class="apx-title">Azure &amp; Integration Stack</span>
+      <span class="apx-sub">APIM · Service Bus · ACS · AKS · WAF · WORM · DLQ · PIM · SSE · IaC</span>
+      <span class="apx-chev">▾</span>
+    </div>
+    <div class="apx-body">
+      <div class="apx-row"><span class="apx-term">APIM</span><span class="apx-def">Azure API Management — Q1 gateway. JWT/PKCE validation, rate limiting, SOAP→REST transform, mock policies</span></div>
+      <div class="apx-row"><span class="apx-term">Service Bus</span><span class="apx-def">Azure Service Bus Premium — Q1 event backbone. Ordered delivery, retry, DLQ, circuit breaker, ETag invalidation. No Kafka/RabbitMQ.</span></div>
+      <div class="apx-row"><span class="apx-term">ACS</span><span class="apx-def">Azure Communication Services — Q3 notification engine. Email (@gov.sx), SMS (two-way), FCM Push, In-App SSE</span></div>
+      <div class="apx-row"><span class="apx-term">AKS</span><span class="apx-def">Azure Kubernetes Service — container orchestration platform hosting all DGTP microservices</span></div>
+      <div class="apx-row"><span class="apx-term">WAF</span><span class="apx-def">Web Application Firewall — OWASP ruleset at Azure Front Door. Blocks injection, XSS, OWASP Top 10</span></div>
+      <div class="apx-row"><span class="apx-term">WORM</span><span class="apx-def">Write-Once Read-Many — Q4 immutable audit storage. 7-year legal retention. No deletion by anyone, ever.</span></div>
+      <div class="apx-row"><span class="apx-term">DLQ</span><span class="apx-def">Dead-Letter Queue — Service Bus queue for messages that fail after maximum retry attempts</span></div>
+      <div class="apx-row"><span class="apx-term">PIM</span><span class="apx-def">Privileged Identity Management — Entra ID JIT access for officers. No standing admin privileges.</span></div>
+      <div class="apx-row"><span class="apx-term">SSE</span><span class="apx-def">Server-Sent Events — pull-based notification channel. Citizen portal subscribes to /live endpoint for real-time updates</span></div>
+      <div class="apx-row"><span class="apx-term">IaC</span><span class="apx-def">Infrastructure as Code — all Azure environments in Bicep + Terraform, deployed via GitHub Actions CI/CD</span></div>
+    </div>
+  </div>
+
+  <!-- Category 3 -->
+  <div class="apx-group" id="apx-g2">
+    <div class="apx-head" onclick="apxToggle(2)">
+      <span class="apx-num">03</span>
+      <span class="apx-title">Registries, Protocols &amp; Patterns</span>
+      <span class="apx-sub">CASBES · COCI · BLISS · SIAH · StUF-BG · NSN · CRIB · ABAC · correlationId · QConnect</span>
+      <span class="apx-chev">▾</span>
+    </div>
+    <div class="apx-body">
+      <div class="apx-row"><span class="apx-term">CASBES</span><span class="apx-def">Civil Affairs System — Sint Maarten Civil Registry. StUF-BG SOAP protocol. NSN is the primary citizen key.</span></div>
+      <div class="apx-row"><span class="apx-term">COCI</span><span class="apx-def">Chamber of Commerce — Business Registry. Oracle OData REST. CRIB number is the primary business identifier.</span></div>
+      <div class="apx-row"><span class="apx-term">BLISS</span><span class="apx-def">Business Licence Information System — Dynamics 365 OData v4. Statuses: ACTIVE · SUSPENDED · EXPIRED · PENDING</span></div>
+      <div class="apx-row"><span class="apx-term">SIAH</span><span class="apx-def">Tax Administration — SFTP daily batch file processed via Azure Logic Apps. CRIB cross-reference active.</span></div>
+      <div class="apx-row"><span class="apx-term">StUF-BG</span><span class="apx-def">Standard Exchange Format Municipalities — Dutch SOAP standard used by Civil Registry. Transformed to REST at APIM.</span></div>
+      <div class="apx-row"><span class="apx-term">NSN</span><span class="apx-def">National Service Number — primary citizen identifier (P1). Carried in JWT and all correlationId chains.</span></div>
+      <div class="apx-row"><span class="apx-term">CRIB</span><span class="apx-def">Business identifier (B8) used across Business Registry and Tax Administration cross-references</span></div>
+      <div class="apx-row"><span class="apx-term">ABAC</span><span class="apx-def">Attribute-Based Access Control — enforced at BFF. NSN in JWT must match the application being accessed.</span></div>
+      <div class="apx-row"><span class="apx-term">correlationId</span><span class="apx-def">Unique UUID assigned at submission. Links every event, registry call, notification, and audit record across one citizen journey.</span></div>
+      <div class="apx-row"><span class="apx-term">QConnect</span><span class="apx-def">Q2 bridge to Qmatic. Adds SMS two-way rescheduling, QR kiosk check-in, D-1 reminders. Qmatic itself is not replaced.</span></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<style>
+.apx-group {
+  border: 1.5px solid var(--paper3);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--paper);
+  flex-shrink: 0;
+}
+.apx-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--ink);
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s;
+}
+.apx-head:hover { background: var(--ink2); }
+.apx-num {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255,255,255,.12);
+  padding: 1px 7px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.apx-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.apx-sub {
+  font-size: 8.5px;
+  color: rgba(255,255,255,.4);
+  font-family: var(--mono);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.apx-chev {
+  font-size: 11px;
+  color: rgba(255,255,255,.4);
+  flex-shrink: 0;
+  transition: transform .25s;
+}
+.apx-group.open .apx-chev { transform: rotate(180deg); }
+.apx-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .38s cubic-bezier(.22,1,.36,1);
+}
+.apx-group.open .apx-body { max-height: 600px; }
+.apx-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 0;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--paper3);
+  align-items: baseline;
+}
+.apx-row:last-child { border-bottom: none; }
+.apx-row:hover { background: var(--paper2); }
+.apx-term {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent);
+  padding-right: 10px;
+  line-height: 1.6;
+}
+.apx-def {
+  font-size: 9px;
+  color: var(--ink3);
+  line-height: 1.6;
+}
+</style>
+
+<script>
+function apxToggle(i) {
+  var el = document.getElementById('apx-g' + i);
+  if (el) el.classList.toggle('open');
+}
+window.apxToggle = apxToggle;
+// Auto-open first on slide entry
+(function() {
+  var slide = document.getElementById('s-appendix');
+  if (!slide) return;
+  new MutationObserver(function() {
+    if (slide.classList.contains('active')) {
+      var g0 = document.getElementById('apx-g0');
+      if (g0 && !g0.classList.contains('open')) g0.classList.add('open');
+    }
+  }).observe(slide, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+
+</div>
+<!-- ════ END S-APPENDIX ════ -->
+
 </div><!-- end stage -->
 
 
