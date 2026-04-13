@@ -1478,7 +1478,7 @@ function toggleOGFSec(id, ev) {
     ══════════════════════════════════════ -->
     <g id="sn0">
       <rect x="420" y="10" width="260" height="52" rx="10" fill="#0e1117" stroke="#c8510a" stroke-width="2"/>
-      <text x="550" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="DM Sans">Sint Maarten Government 2024</text>
+      <text x="550" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="DM Sans">Sint Maarten Government </text>
       <text x="550" y="50" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.55)" font-family="DM Sans">Needs digital public services for 50,000+ citizens</text>
     </g>
 
@@ -3255,142 +3255,158 @@ document.addEventListener('DOMContentLoaded', initGapSlide2);
 <div class="slide-header">
   <div class="eyebrow a1"><span class="etag" style="color:var(--accent);border-color:var(--accent)">Summary</span><span class="enum">All six decisions compared</span></div>
   <h2 class="slide-h1 a2">Decision Matrix — Six Questions at a Glance</h2>
-  <p class="slide-sub a3">All options remain open. Criteria to guide the final decision with DGTP stakeholders.</p>
+  <p class="slide-sub a3">All options remain open. Updated to reflect QConnect for Q2, pull-based notifications in Q3, and revised implementation sequencing.</p>
 </div>
-<div class="slide-body" style="padding-top:8px">
+<div class="slide-body" style="padding-top:6px">
 
-  <!-- FULL MATRIX TABLE -->
-  <table class="mtbl a4" style="width:100%;margin-bottom:12px">
+  <table class="mtbl a4" style="width:100%;margin-bottom:10px">
     <thead>
       <tr style="background:var(--ink)">
-        <th style="color:rgba(255,255,255,.5);border-radius:8px 0 0 0;padding:8px 13px;width:12%">DECISION</th>
-        <th style="color:rgba(255,255,255,.5);padding:8px 13px;width:14%">OPTION A</th>
-        <th style="color:rgba(255,255,255,.5);padding:8px 13px;width:14%">OPTION B</th>
-        <th style="color:rgba(255,255,255,.5);padding:8px 13px;width:14%">OPTION C</th>
-        <th style="color:rgba(255,255,255,.5);padding:8px 13px;width:18%">KEY CRITERIA</th>
-        <th style="color:rgba(255,255,255,.5);padding:8px 13px;width:9%">COMPLEXITY</th>
-        <th style="color:rgba(255,255,255,.5);padding:8px 13px;width:9%">OPS BURDEN</th>
-        <th style="color:rgba(255,255,255,.5);border-radius:0 8px 0 0;padding:8px 13px;width:10%">PROPOSED</th>
+        <th style="color:rgba(255,255,255,.5);border-radius:8px 0 0 0;padding:7px 10px;width:11%">DECISION</th>
+        <th style="color:rgba(255,255,255,.5);padding:7px 10px;width:14%">OPTION A</th>
+        <th style="color:rgba(255,255,255,.5);padding:7px 10px;width:14%">OPTION B</th>
+        <th style="color:rgba(255,255,255,.5);padding:7px 10px;width:14%">OPTION C</th>
+        <th style="color:rgba(255,255,255,.5);padding:7px 10px;width:19%">KEY CRITERIA</th>
+        <th style="color:rgba(255,255,255,.5);padding:7px 10px;width:8%">COMPLEXITY</th>
+        <th style="color:rgba(255,255,255,.5);padding:7px 10px;width:8%">OPS BURDEN</th>
+        <th style="color:rgba(255,255,255,.5);border-radius:0 8px 0 0;padding:7px 10px;width:12%">PROPOSED</th>
       </tr>
     </thead>
     <tbody>
+
+      <!-- Q1 Data Bus -->
       <tr>
         <td><span class="dlbl" style="background:var(--bp);color:var(--blue)">01 Data Bus</span></td>
-        <td class="crit">X-Road</td>
         <td class="crit"><span style="color:var(--green);font-weight:700">★ Azure APIM + SB</span></td>
         <td class="crit">WSO2 APIM</td>
-        <td class="crit">Cloud strategy · Ops capacity · Vendor diversity</td>
+        <td class="crit">X-Road</td>
+        <td class="crit">Cloud strategy · Ops capacity · No RabbitMQ/Kafka — Azure SB only</td>
         <td><span class="mx-badge mx-med">Medium</span></td>
         <td><span class="mx-badge mx-low">Low</span></td>
-        <td><span class="mx-badge mx-prop">Azure APIM</span></td>
+        <td><span class="mx-badge mx-prop">Azure APIM + Service Bus</span></td>
       </tr>
+
+      <!-- Q2 Appointments — updated to QConnect -->
       <tr style="background:var(--paper2)">
         <td><span class="dlbl" style="background:var(--amp);color:var(--amber)">02 Appointments</span></td>
-        <td class="crit"><span style="color:var(--green);font-weight:700">★ MS Bookings</span></td>
+        <td class="crit"><span style="color:var(--green);font-weight:700">★ QConnect (Qmatic)</span></td>
+        <td class="crit">MS Bookings</td>
         <td class="crit">Custom Booking API</td>
-        <td class="crit">3rd-party SaaS</td>
-        <td class="crit">M365 licence · Dev capacity · Case integration</td>
+        <td class="crit">Qmatic already in place · SMS two-way · QR kiosk · Case linkage via correlationId</td>
         <td><span class="mx-badge mx-low">Low</span></td>
         <td><span class="mx-badge mx-low">Low</span></td>
-        <td><span class="mx-badge mx-prop">MS Bookings</span></td>
+        <td><span class="mx-badge mx-prop">QConnect Bridge</span></td>
       </tr>
+
+      <!-- Q3 Notifications — updated with pull-based -->
       <tr>
         <td><span class="dlbl" style="background:var(--gp);color:var(--green)">03 Notifications</span></td>
         <td class="crit"><span style="color:var(--green);font-weight:700">★ Azure ACS</span></td>
         <td class="crit">Twilio / SendGrid</td>
         <td class="crit">Gov Notify Module</td>
-        <td class="crit">Cloud strategy · Audit trail · EN + PAP</td>
+        <td class="crit">Push (Email · SMS · FCM) + Pull (In-App SSE /live) · Audit trail · EN + PAP</td>
         <td><span class="mx-badge mx-low">Low</span></td>
         <td><span class="mx-badge mx-low">Low</span></td>
-        <td><span class="mx-badge mx-prop">Azure ACS</span></td>
+        <td><span class="mx-badge mx-prop">Azure ACS + SSE Pull</span></td>
       </tr>
+
+      <!-- Q4 Traceability -->
       <tr style="background:var(--paper2)">
         <td><span class="dlbl" style="background:var(--rp);color:var(--red)">04 Traceability</span></td>
         <td class="crit"><span style="color:var(--green);font-weight:700">★ Event Sourcing + WORM</span></td>
         <td class="crit">RDBMS Audit Table</td>
         <td class="crit">DLT / Blockchain</td>
-        <td class="crit">Legal immutability · Storage cost</td>
+        <td class="crit">Legal immutability · correlationId end-to-end · 7-yr retention</td>
         <td><span class="mx-badge mx-high">High</span></td>
         <td><span class="mx-badge mx-low">Low</span></td>
         <td><span class="mx-badge mx-prop">WORM + App Insights</span></td>
       </tr>
+
+      <!-- Q5 Lifecycle -->
       <tr>
         <td><span class="dlbl" style="background:var(--pp);color:var(--purple)">05 Lifecycle</span></td>
         <td class="crit"><span style="color:var(--green);font-weight:700">★ BPMN Engine</span></td>
         <td class="crit">Durable Functions</td>
         <td class="crit">CRM Workflow</td>
-        <td class="crit">Team skill · Process stability</td>
+        <td class="crit">8-state lifecycle · SLA clocks · Auto-escalation · Team BPMN skill</td>
         <td><span class="mx-badge mx-med">Medium</span></td>
         <td><span class="mx-badge mx-med">Medium</span></td>
         <td><span class="mx-badge mx-prop">BPMN / Durable Fn</span></td>
       </tr>
+
+      <!-- Q6 Happiness -->
       <tr style="background:var(--paper2)">
         <td><span class="dlbl" style="background:var(--tp);color:var(--teal)">06 Happiness</span></td>
         <td class="crit"><span style="color:var(--green);font-weight:700">★ Multi-signal CXI</span></td>
         <td class="crit">NPS Only</td>
         <td class="crit">Annual Survey</td>
-        <td class="crit">Data maturity · APM adoption</td>
+        <td class="crit">NPS 35% · APM 25% · SLA 25% · AI 15% · Target ≥ 80</td>
         <td><span class="mx-badge mx-med">Medium</span></td>
         <td><span class="mx-badge mx-low">Low</span></td>
         <td><span class="mx-badge mx-prop">Power BI + App Insights</span></td>
       </tr>
+
     </tbody>
   </table>
 
-  <!-- BOTTOM ROW: 3 insight panels -->
+  <!-- BOTTOM 3 PANELS -->
   <div class="a5" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
 
-    <!-- Sequencing -->
+    <!-- Updated Sequencing -->
     <div style="background:var(--bp);border:1px solid var(--bg2);border-radius:9px;padding:10px 12px">
-      <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--blue);margin-bottom:7px">SEQUENCING — WHAT TO DECIDE FIRST</div>
+      <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--blue);margin-bottom:7px">REVISED SEQUENCING — WHAT TO DECIDE FIRST</div>
       <div style="display:flex;flex-direction:column;gap:5px">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-family:var(--mono);font-size:9px;font-weight:700;color:#fff;background:var(--blue);border-radius:3px;padding:1px 6px;flex-shrink:0">1ST</span>
-          <span style="font-size:10px;color:var(--ink2)"><strong>Q1 Data Bus</strong> — everything else routes through it</span>
+          <span style="font-size:10px;color:var(--ink2)"><strong>Q1 Data Bus</strong> — APIM + Service Bus. Everything else routes through it</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-family:var(--mono);font-size:9px;font-weight:700;color:#fff;background:var(--blue);border-radius:3px;padding:1px 6px;flex-shrink:0">2ND</span>
-          <span style="font-size:10px;color:var(--ink2)"><strong>Q5 Lifecycle</strong> — defines application states Q4 events track</span>
+          <span style="font-size:10px;color:var(--ink2)"><strong>Q5 Lifecycle</strong> — BPMN defines the 8 states that Q4 events track</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-family:var(--mono);font-size:9px;font-weight:700;color:#fff;background:var(--blue);border-radius:3px;padding:1px 6px;flex-shrink:0">3RD</span>
-          <span style="font-size:10px;color:var(--ink2)"><strong>Q3 + Q4</strong> — notifications and audit share the event bus</span>
+          <span style="font-size:10px;color:var(--ink2)"><strong>Q3 + Q4</strong> — Push + Pull notifications and WORM audit share the event bus</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-family:var(--mono);font-size:9px;font-weight:700;color:#fff;background:var(--blue);border-radius:3px;padding:1px 6px;flex-shrink:0">4TH</span>
-          <span style="font-size:10px;color:var(--ink2)"><strong>Q2 Appointments</strong> — tactical, can run in parallel</span>
+          <span style="font-size:10px;color:var(--ink2)"><strong>Q2 QConnect</strong> — Qmatic bridge, can run in parallel after Q1</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-family:var(--mono);font-size:9px;font-weight:700;color:#fff;background:var(--blue);border-radius:3px;padding:1px 6px;flex-shrink:0">5TH</span>
-          <span style="font-size:10px;color:var(--ink2)"><strong>Q6 CXI</strong> — needs live data from Q3, Q4, Q5 first</span>
+          <span style="font-size:10px;color:var(--ink2)"><strong>Q6 CXI</strong> — needs live signals from Q3, Q4, Q5 first</span>
         </div>
       </div>
     </div>
 
-    <!-- Dependencies map -->
+    <!-- Updated Dependencies -->
     <div style="background:var(--pp);border:1px solid var(--pg);border-radius:9px;padding:10px 12px">
       <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--purple);margin-bottom:7px">DECISION INTERDEPENDENCIES</div>
       <div style="display:flex;flex-direction:column;gap:4px">
-        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--blue)">Q1</strong> → Q3 (notification routing) · Q4 (event bus) · Q5 (orchestration)</div>
-        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--purple)">Q5</strong> → Q4 (state transitions emit events) · Q6 (SLA signal)</div>
-        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--green)">Q3</strong> → Q6 (NPS survey via notification) · Q2 (reminders)</div>
-        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--red)">Q4</strong> → Q6 (behavioural APM signal) · Q5 (audit per transition)</div>
-        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--amber)">Q2</strong> → Q3 (booking reminders) · Q5 (appointment advances case)</div>
-        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--teal)">Q6</strong> requires Q1+Q3+Q4+Q5 all live to produce a meaningful score</div>
+        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--blue)">Q1</strong> → Q2 (QConnect via APIM) · Q3 (notification routing) · Q4 (event bus) · Q5 (orchestration)</div>
+        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--purple)">Q5</strong> → Q4 (state transitions emit WORM events) · Q6 (SLA compliance signal)</div>
+        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--green)">Q3</strong> → Push (ACS) + Pull (SSE /live) · Q6 (NPS via SMS) · Q2 (QConnect reminders)</div>
+        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--red)">Q4</strong> → Q6 (behavioural APM signal) · Q5 (WORM event per state transition)</div>
+        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--amber)">Q2</strong> QConnect → Q3 (booking reminders via ACS) · Q5 (appointment advances case state)</div>
+        <div style="font-size:10px;color:var(--ink2);padding:4px 7px;background:rgba(255,255,255,.5);border-radius:5px"><strong style="color:var(--teal)">Q6</strong> requires Q1 + Q3 (push+pull) + Q4 + Q5 all live to produce a meaningful CXI score</div>
       </div>
     </div>
 
-    <!-- Stakeholder actions needed -->
+    <!-- Updated Actions -->
     <div style="background:var(--ap);border:1px solid var(--ag);border-radius:9px;padding:10px 12px">
       <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--accent);margin-bottom:7px">ACTIONS NEEDED FROM DGTP TODAY</div>
       <div style="display:flex;flex-direction:column;gap:5px">
         <div style="display:flex;align-items:flex-start;gap:7px">
           <span style="font-size:10px;color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px">□</span>
-          <span style="font-size:10px;color:var(--ink2)">Confirm cloud strategy — Azure-native, multi-cloud, or open-source self-hosted</span>
+          <span style="font-size:10px;color:var(--ink2)">Confirm cloud strategy — Azure-native confirmed; no RabbitMQ/Kafka</span>
         </div>
         <div style="display:flex;align-items:flex-start;gap:7px">
           <span style="font-size:10px;color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px">□</span>
-          <span style="font-size:10px;color:var(--ink2)">Check M365 licence tier — determines whether Q2 Option A is zero-cost</span>
+          <span style="font-size:10px;color:var(--ink2)">Confirm Qmatic API access for QConnect bridge (Q2) integration</span>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:7px">
+          <span style="font-size:10px;color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px">□</span>
+          <span style="font-size:10px;color:var(--ink2)">Sign off pull-based SSE /live endpoint for citizen portal (Q3)</span>
         </div>
         <div style="display:flex;align-items:flex-start;gap:7px">
           <span style="font-size:10px;color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px">□</span>
@@ -3398,25 +3414,17 @@ document.addEventListener('DOMContentLoaded', initGapSlide2);
         </div>
         <div style="display:flex;align-items:flex-start;gap:7px">
           <span style="font-size:10px;color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px">□</span>
-          <span style="font-size:10px;color:var(--ink2)">Confirm dev team capability on BPMN vs Durable Functions for Q5</span>
+          <span style="font-size:10px;color:var(--ink2)">Confirm BPMN vs Durable Functions skill set for Q5 team</span>
         </div>
         <div style="display:flex;align-items:flex-start;gap:7px">
           <span style="font-size:10px;color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px">□</span>
-          <span style="font-size:10px;color:var(--ink2)">Agree CXI signal weights and ≥80 target for Q6 before baseline starts</span>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:7px">
-          <span style="font-size:10px;color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px">□</span>
-          <span style="font-size:10px;color:var(--ink2)">Approve budget allocation per decision area for Sprint 1–2 commitments</span>
+          <span style="font-size:10px;color:var(--ink2)">Agree CXI signal weights and ≥ 80 target before baseline starts (Q6)</span>
         </div>
       </div>
     </div>
 
   </div>
 
-
-<span class="footer-stage">PROPOSED STAGE</span>
-  <span class="footer-slide">10 / 10</span>
-  <button class="nav-arrow" onclick="next()" title="Next slide">&#8594;</button>
 <button class="fp-trigger" onclick="openFP('s9')" aria-label="View failure paths">
   <span class="fp-pulse"></span>⚡&nbsp; Decision Risk Matrix
 </button>
