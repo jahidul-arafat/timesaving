@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Azure Cloud Architecture — DGTP Sint Maarten</title>
+<style>
+:root {
+  --bg: #f8f9fb;
+  --lane-bg: #fff;
+  --lane-border: #e2e6ea;
+  --node-border: #d0d5dd;
+  --node-shadow: 0 2px 8px rgba(0,0,0,.08);
+  --text: #111;
+  --muted: #888;
+  --mono: 'Courier New', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100vh; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--text); }
+
+/* ── App shell ── */
+.app { display: grid; grid-template-rows: 48px 1fr; height: 100vh; }
+
+/* ── Topbar ── */
+.topbar {
+  background: #fff; border-bottom: 1px solid var(--lane-border);
+  display: flex; align-items: center; gap: 14px; padding: 0 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.tb-badge { background: #0078d4; color: #fff; font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 4px; letter-spacing: .1em; }
+.tb-title { font-size: 14px; font-weight: 700; }
+.tb-sub { font-size: 9.5px; color: var(--muted); margin-top: 1px; }
+.tb-hint { margin-left: auto; font-size: 9px; color: #bbb; font-family: var(--mono); }
+
+/* ── Main layout: diagram + sidebar ── */
+.main { display: grid; grid-template-columns: 1fr 280px; overflow: hidden; }
+
+/* ── Diagram area ── */
+.diagram { overflow: hidden; position: relative; background: var(--bg); }
+
+/* ── Swim lane wrapper ── */
+.lanes-wrap {
+  display: flex;
+  gap: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Single swim lane ── */
+.lane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  border-right: 1px solid var(--lane-border);
+  position: relative;
+}
+.lane:last-child { border-right: none; }
+
+.lane-header {
+  height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 8.5px; font-weight: 700;
+  letter-spacing: .12em; color: #fff;
+  border-radius: 6px 6px 0 0;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.lane-body {
+  flex: 1;
+  border: 1px solid var(--lane-border);
+  border-top: none;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Node cards ── */
+.node {
+  position: absolute;
+  background: #fff;
+  border: 1.5px solid var(--node-border);
+  border-radius: 7px;
+  box-shadow: var(--node-shadow);
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow .15s, border-color .15s;
+  z-index: 2;
+}
+.node:active { cursor: grabbing; }
+.node:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+.node.selected { border-width: 2px; box-shadow: 0 4px 20px rgba(0,0,0,.14); z-index: 10; }
+
+.node-head {
+  border-radius: 6px 6px 0 0;
+  padding: 7px 10px 6px;
+  display: flex; align-items: flex-start; gap: 7px;
+}
+.node-icon { font-size: 14px; flex-shrink: 0; line-height: 1.1; }
+.node-title { font-size: 10px; font-weight: 700; color: #fff; line-height: 1.25; }
+.node-sub { font-size: 7.5px; color: rgba(255,255,255,.65); margin-top: 1px; }
+
+.node-chips { padding: 6px 8px 7px; display: flex; flex-wrap: wrap; gap: 3px; }
+.chip {
+  font-family: var(--mono); font-size: 7px; font-weight: 700;
+  padding: 1px 5px; border-radius: 2px;
+  background: #f3f4f6; border: 1px solid #e4e4e4; color: #555;
+}
+.chip.q { background: #111; color: #fff; border-color: #111; }
+
+/* ── SVG connector canvas ── */
+#conn-svg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  background: #fff;
+  border-left: 1px solid var(--lane-border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.sb-header { padding: 14px 16px 10px; border-bottom: 1px solid #eee; flex-shrink: 0; }
+.sb-header-t { font-size: 12px; font-weight: 700; }
+.sb-header-s { font-size: 9px; color: var(--muted); margin-top: 2px; }
+.sb-empty { padding: 28px 18px; text-align: center; color: #bbb; font-size: 10.5px; line-height: 1.8; }
+.sb-node-name {
+  padding: 11px 16px 8px; font-size: 13px; font-weight: 700;
+  border-bottom: 1px solid #eee; flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px;
+}
+.sb-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.story-list { flex: 1; overflow-y: auto; }
+.story { padding: 10px 16px 11px; border-bottom: 1px solid #f3f3f3; }
+.story-lbl {
+  font-family: var(--mono); font-size: 7.5px; font-weight: 700;
+  letter-spacing: .1em; color: var(--muted); margin-bottom: 4px;
+}
+.story-t { font-size: 10px; color: #333; line-height: 1.65; }
+.story-t strong { font-weight: 700; color: #0078d4; }
+.story-conns { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px; }
+.story-conn { font-family: var(--mono); font-size: 7px; border: 1px solid #e0e0e0; border-radius: 2px; padding: 1px 5px; color: var(--muted); }
+.legend { padding: 9px 14px; border-top: 1px solid #eee; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.lg-item { display: flex; align-items: center; gap: 5px; font-size: 9px; color: #666; }
+.lg-line { width: 18px; height: 2px; border-radius: 1px; }
+
+/* flow animation */
+@keyframes flow { to { stroke-dashoffset: -22; } }
+.animated { stroke-dasharray: 7 5; animation: flow 1.6s linear infinite; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="tb-badge">☁ AZURE</div>
+    <div>
+      <div class="tb-title">Azure Cloud Architecture — DGTP Sint Maarten</div>
+      <div class="tb-sub">Drag any node to reposition · Click to see user stories · Edges follow automatically</div>
+    </div>
+    <div class="tb-hint">6 layers · 14 nodes · Q1–Q6 mapped</div>
+  </div>
+
+  <div class="main">
+
+    <!-- Diagram -->
+    <div class="diagram" id="diagram" style="overflow:hidden">
+      <div class="lanes-wrap" id="lanes-wrap">
+
+        <!-- Lane headers rendered by JS -->
+        <!-- SVG connector layer -->
+        <svg id="conn-svg"></svg>
+
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sb-header">
+        <div class="sb-header-t">User Stories</div>
+        <div class="sb-header-s">Click any node to view stories</div>
+      </div>
+      <div id="sb-empty" class="sb-empty">← Select any component<br>to view user stories<br>and interactions</div>
+      <div id="sb-content" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+        <div class="sb-node-name" id="sb-name">
+          <div class="sb-dot" id="sb-dot"></div>
+          <span id="sb-title"></span>
+        </div>
+        <div class="story-list" id="sb-stories"></div>
+      </div>
+      <div class="legend">
+        <div class="lg-item"><div class="lg-line" style="background:#0078d4"></div>HTTPS</div>
+        <div class="lg-item"><div class="lg-line" style="background:#7c3aed"></div>Events</div>
+        <div class="lg-item"><div class="lg-line" style="background:#059669"></div>Data</div>
+        <div class="lg-item"><div class="lg-line" style="background:#dc2626"></div>Audit</div>
+        <div class="lg-item"><div class="lg-line" style="background:#b45309;border-top:1px dashed #b45309;height:0"></div>Telemetry</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════════════ */
+
+var LANES = [
+  { id:'l1', label:'1 · Client',        color:'#0078d4', w:200 },
+  { id:'l2', label:'2 · Security',      color:'#0f766e', w:200 },
+  { id:'l3', label:'3 · Platform',      color:'#7c3aed', w:220 },
+  { id:'l4', label:'4 · Data',          color:'#b45309', w:200 },
+  { id:'l5', label:'5 · Registries',    color:'#0078d4', w:200 },
+  { id:'l6', label:'6 · Observe',       color:'#1e3a5f', w:200 },
+];
+
+/* node: lane index (0-based), y offset inside lane */
+var NODES = [
+  { id:'client',     lane:0, y:60,  color:'#0078d4', icon:'👤', title:'Client Layer',         sub:'Web · Mobile · API',
+    chips:['Web Portal','Mobile App','API Clients','Entra ID + eID'],
+    stories:[
+      { lbl:'CITIZEN — APPLY',    t:'"As a <strong>citizen</strong>, I sign in once with eID. My data pre-fills from Civil Registry — I never re-enter what government already holds."', to:['frontdoor'] },
+      { lbl:'OFFICER — BRIEF',    t:'"As an <strong>officer</strong>, I open Gov Interface on mobile. The next appointment pre-loads the citizen case and required documents."', to:['frontdoor'] },
+    ]
+  },
+  { id:'sentinel',   lane:0, y:240, color:'#374151', icon:'🔍', title:'Sentinel + Defender',   sub:'SIEM · Security Posture',
+    chips:['SIEM','Anomaly Detection','Incident Playbooks','CVE Blocking'],
+    stories:[
+      { lbl:'SECURITY — SIEM',    t:'"As <strong>Sentinel</strong>, I detect an officer account accessed 140 records in 4 minutes — 10× normal. I trigger a playbook that disables the account and notifies the CISO."', to:['worm'] },
+    ]
+  },
+  { id:'frontdoor',  lane:1, y:60,  color:'#0078d4', icon:'🛡', title:'Front Door + WAF',      sub:'SSL · OWASP WAF · DDoS',
+    chips:['SSL Termination','WAF Ruleset','DDoS Standard','Geo-routing'],
+    stories:[
+      { lbl:'SECURITY — BLOCK',   t:'"As the <strong>WAF</strong>, I inspect every inbound request. SQL injection and OWASP Top 10 attacks are blocked at the edge before reaching any backend."', to:['apim'] },
+      { lbl:'RESILIENCE — ROUTE', t:'"As the <strong>global LB</strong>, I route each request to the nearest APIM instance — sub-200ms response regardless of location."', to:['apim'] },
+    ]
+  },
+  { id:'apim',       lane:1, y:240, color:'#0f766e', icon:'☁', title:'API Management',         sub:'Q1 Gateway Decision',
+    chips:['Q1','JWT/PKCE','Rate Limiting','SOAP→REST','Mock Policies'],
+    stories:[
+      { lbl:'Q1 — GATEWAY (CORE)',  t:'"As <strong>APIM</strong>, I am the Q1 decision. I transform Civil Registry SOAP/StUF-BG to REST. Sprint 2 mock policies let all 6 registry dev streams run in parallel — 8–12 weeks saved."', to:['appgw','redis'] },
+      { lbl:'DEVELOPER — SPRINT 2', t:'"As a <strong>developer</strong>, I build against mock policies from Day 1. All 6 adapters are unblocked simultaneously."', to:['appgw'] },
+    ]
+  },
+  { id:'redis',      lane:1, y:420, color:'#dc2626', icon:'⚡', title:'Redis Cache',            sub:'APIM Response Cache',
+    chips:['ETag Invalidation','Response Cache','Low Latency'],
+    stories:[
+      { lbl:'PERFORMANCE — HIT', t:'"As <strong>Redis</strong>, I serve the Civil Registry lookup from cache. Citizens see pre-filled forms in 40ms vs 400ms. Registry load drops 70% at peak hours."', to:['apim'] },
+    ]
+  },
+  { id:'appgw',      lane:2, y:60,  color:'#0f766e', icon:'🔀', title:'App Gateway',            sub:'L7 LB · AKS Ingress',
+    chips:['Path Routing','TLS Termination','AKS Ingress','WAF Layer 2'],
+    stories:[
+      { lbl:'ROUTING — PATH',  t:'"As the <strong>ingress controller</strong>, I route /api/workflow → BPMN engine, /api/notify → ACS, /api/civil → Civil adapter. Each request lands on exactly the right microservice."', to:['aks'] },
+    ]
+  },
+  { id:'aks',        lane:2, y:230, color:'#7c3aed', icon:'☸', title:'AKS Microservices',      sub:'Q2 · Q3 · Q5 · Q6',
+    chips:['Q2 QConnect','Q3 Notifications','Q5 Workflow','Q6 CXI','Adapters ×6','OGF Core'],
+    stories:[
+      { lbl:'Q5 — LIFECYCLE',   t:'"As the <strong>BPMN Workflow Engine</strong>, I execute the 8-state lifecycle. The SLA clock starts on each transition. At 75% elapsed the officer is alerted. At 100% the case auto-escalates."', to:['servicebus','cosmos'] },
+      { lbl:'Q3 — NOTIFY',      t:'"As the <strong>Notification Engine</strong>, I fire on every state change — Email, SMS, Push, In-App — within 5 seconds. WORM stores every delivery receipt with the correlationId."', to:['servicebus','worm'] },
+      { lbl:'Q2 — APPOINTMENT', t:'"As <strong>QConnect</strong>, I intercept the SMS reply RESCHEDULE, query Qmatic live slots, offer 3 options, and book on the citizen\'s next reply — Qmatic is never replaced."', to:['servicebus'] },
+      { lbl:'Q6 — CXI SCORE',   t:'"As the <strong>CXI Engine</strong>, I combine NPS + APM + SLA + AI signals into today\'s composite score. If below 60 for 3 days, the director is alerted."', to:['sql','appinsights'] },
+      { lbl:'Q1 — ADAPTER',     t:'"As a <strong>Registry Adapter</strong>, I translate REST calls to StUF-BG SOAP for Civil Registry. If CASBES is down, the circuit breaker fires and the event routes to DLQ."', to:['servicebus','registries'] },
+    ]
+  },
+  { id:'servicebus', lane:3, y:60,  color:'#7c3aed', icon:'📨', title:'Azure Service Bus',     sub:'Q1 Event Backbone',
+    chips:['Q1','Ordered Delivery','Retry + DLQ','Circuit Breaker'],
+    stories:[
+      { lbl:'RESILIENCE — CIRCUIT', t:'"As the <strong>Service Bus</strong>, I detect 3 adapter failures in 30 seconds. I open the circuit breaker and route to DLQ. Citizens see a graceful degraded response."', to:['worm','cosmos'] },
+      { lbl:'AUDIT — EVENTS',       t:'"As the <strong>event backbone</strong>, every state transition and registry access flows through me with a correlationId. WORM gets an immutable append-only copy."', to:['worm'] },
+    ]
+  },
+  { id:'worm',       lane:3, y:240, color:'#dc2626', icon:'🔒', title:'WORM Blob Storage',     sub:'Q4 Immutable Audit',
+    chips:['Q4','Write-Once','7-yr Retention','GRS Replicated','Legal Hold'],
+    stories:[
+      { lbl:'Q4 — AUDIT TRAIL', t:'"As <strong>WORM storage</strong>, I am write-once. Not even the admin can delete me. In 3 years, when a citizen appeals, government produces a court-admissible log of every action."', to:['sentinel'] },
+    ]
+  },
+  { id:'cosmos',     lane:3, y:420, color:'#059669', icon:'🌐', title:'Cosmos DB',             sub:'State · Sessions',
+    chips:['correlationId','99.999% SLA','CQRS Read Model'],
+    stories:[
+      { lbl:'PERFORMANCE — STATE', t:'"As <strong>Cosmos DB</strong>, I store application state partitioned by correlationId. Citizen live status loads in under 50ms — the read model is always fresh."', to:[] },
+    ]
+  },
+  { id:'sql',        lane:3, y:570, color:'#059669', icon:'📊', title:'Azure SQL + Synapse',   sub:'Analytics · Power BI',
+    chips:['Power BI RLS','CXI Reports','Synapse Analytics'],
+    stories:[
+      { lbl:'Q6 — DASHBOARD',  t:'"As <strong>Power BI</strong>, I show the SteerCo a national CXI of 74. The Minister sees which registry drags the score down. Row-level security means each officer sees only their service."', to:['appinsights'] },
+    ]
+  },
+  { id:'registries', lane:4, y:180, color:'#0078d4', icon:'🗄', title:'6 Registries',          sub:'Civil · Business · Tax · Land · Address · Licence',
+    chips:['Civil (StUF-BG)','Business (OData)','Tax (SFTP)','Land (ArcGIS)','Address (REST)','Licence (D365)'],
+    stories:[
+      { lbl:'Q1 — PRE-FILL',     t:'"As <strong>Civil Registry</strong> (CASBES/SOAP), I return the citizen\'s name and address to the adapter. The permit form pre-fills automatically — the citizen confirms, not re-enters."', to:[] },
+      { lbl:'Q1 — CROSS-CHECK',  t:'"As <strong>Land Registry</strong> (Kadaster/ArcGIS), I verify property ownership. Before Q1 this was a 3-day manual process. Now it resolves in 800ms."', to:[] },
+    ]
+  },
+  { id:'monitor',    lane:5, y:80,  color:'#1e3a5f', icon:'📡', title:'Azure Monitor',         sub:'Metrics · Alerts',
+    chips:['Service Bus DLQ','APIM Errors','AKS Restarts','PagerDuty'],
+    stories:[
+      { lbl:'OPS — ALERT', t:'"As <strong>Azure Monitor</strong>, I detect the Service Bus DLQ received its first message. Within 90 seconds the on-call engineer gets a PagerDuty alert with the correlationId."', to:[] },
+    ]
+  },
+  { id:'appinsights',lane:5, y:260, color:'#1e3a5f', icon:'💡', title:'App Insights',          sub:'APM · Distributed Trace',
+    chips:['correlationId Trace','Q6 APM Signal','P95/P99','Form Abandonment'],
+    stories:[
+      { lbl:'Q6 — BEHAVIOUR',  t:'"As <strong>App Insights</strong>, I track that 34% of citizens abandon the licence form at step 3. This feeds the Q6 behavioural signal (25% of CXI). The UX team gets a ticket."', to:['monitor'] },
+      { lbl:'INCIDENT — TRACE',t:'"As the <strong>distributed tracer</strong>, I reconstruct citizen journey #CORR-8821 across 14 service calls in 3 registries — in a single query using the correlationId."', to:['monitor'] },
+    ]
+  },
+];
+
+/* ── Edges ── */
+var EDGES = [
+  { a:'client',     b:'frontdoor',  col:'#0078d4', lbl:'HTTPS + JWT',     anim:true  },
+  { a:'frontdoor',  b:'apim',       col:'#0078d4', lbl:'HTTPS',           anim:true  },
+  { a:'apim',       b:'redis',      col:'#dc2626', lbl:'cache',           anim:false, dash:true },
+  { a:'apim',       b:'appgw',      col:'#0078d4', lbl:'HTTPS',           anim:true  },
+  { a:'appgw',      b:'aks',        col:'#0078d4', lbl:'HTTPS → AKS',    anim:true  },
+  { a:'aks',        b:'servicebus', col:'#7c3aed', lbl:'events',          anim:true  },
+  { a:'aks',        b:'registries', col:'#059669', lbl:'registry calls',  anim:true  },
+  { a:'servicebus', b:'worm',       col:'#dc2626', lbl:'audit events',    anim:true  },
+  { a:'servicebus', b:'cosmos',     col:'#059669', lbl:'state writes',    anim:false },
+  { a:'aks',        b:'sql',        col:'#059669', lbl:'analytics',       anim:false, dash:true },
+  { a:'aks',        b:'appinsights',col:'#b45309', lbl:'telemetry',       anim:false, dash:true },
+  { a:'monitor',    b:'appinsights',col:'#1e3a5f', lbl:'',                anim:false },
+  { a:'worm',       b:'sentinel',   col:'#374151', lbl:'audit logs',      anim:false, dash:true },
+  { a:'appinsights',b:'sql',        col:'#1e3a5f', lbl:'CXI signal',      anim:false, dash:true },
+];
+
+/* ══════════════════════════════════════════════════════
+   BUILD LANES
+══════════════════════════════════════════════════════ */
+var laneEls = {};   // id → DOM element of lane-body
+var nodePos = {};   // nodeId → {x, y} absolute in lanes-wrap
+
+function buildLanes() {
+  var wrap = document.getElementById('lanes-wrap');
+  LANES.forEach(function(lane) {
+    var laneEl = document.createElement('div');
+    laneEl.className = 'lane';
+    laneEl.style.width = lane.w + 'px';
+
+    var header = document.createElement('div');
+    header.className = 'lane-header';
+    header.style.background = lane.color;
+    header.textContent = lane.label;
+    laneEl.appendChild(header);
+
+    var body = document.createElement('div');
+    body.className = 'lane-body';
+    body.id = 'lb-' + lane.id;
+    laneEl.appendChild(body);
+
+    wrap.appendChild(laneEl);
+    laneEls[lane.id] = body;
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   BUILD NODES
+══════════════════════════════════════════════════════ */
+function buildNodes() {
+  NODES.forEach(function(n) {
+    var laneId = LANES[n.lane].id;
+    var body = laneEls[laneId];
+    var laneW = laneEls[laneId].offsetWidth || LANES[n.lane].w;
+
+    var el = document.createElement('div');
+    el.className = 'node';
+    el.id = 'nd-' + n.id;
+    var nodeW = Math.max(140, laneW - 24);
+    el.style.width = nodeW + 'px';
+    el.style.left = 12 + 'px';
+    el.style.top  = n.y + 'px';
+
+    el.innerHTML =
+      '<div class="node-head" style="background:'+n.color+'">'+
+        '<span class="node-icon">'+n.icon+'</span>'+
+        '<div><div class="node-title">'+n.title+'</div><div class="node-sub">'+n.sub+'</div></div>'+
+      '</div>'+
+      '<div class="node-chips">'+
+        n.chips.map(function(c){ var q=/^Q\d/.test(c); return '<span class="chip'+(q?' q':'')+'">'+c+'</span>'; }).join('')+
+      '</div>';
+
+    el.addEventListener('click', function(e){ if(!wasDragged) selectNode(n.id); });
+    makeDraggable(el, n.id);
+    body.appendChild(el);
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   DRAG
+══════════════════════════════════════════════════════ */
+var wasDragged = false;
+
+function makeDraggable(el, nodeId) {
+  var startX, startY, origLeft, origTop, dragging = false;
+
+  el.addEventListener('mousedown', function(e) {
+    if (e.target.closest('.chip')) return;
+    e.preventDefault();
+    dragging = true; wasDragged = false;
+    startX = e.clientX; startY = e.clientY;
+    origLeft = parseInt(el.style.left) || 0;
+    origTop  = parseInt(el.style.top)  || 0;
+    el.style.zIndex = 100;
+    el.style.cursor = 'grabbing';
+
+    function onMove(e) {
+      var dx = e.clientX - startX;
+      var dy = e.clientY - startY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) wasDragged = true;
+      el.style.left = (origLeft + dx) + 'px';
+      el.style.top  = (origTop  + dy) + 'px';
+      drawEdges();
+    }
+    function onUp() {
+      dragging = false;
+      el.style.cursor = 'grab';
+      el.style.zIndex = 2;
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   GET NODE CENTRE (absolute within lanes-wrap)
+══════════════════════════════════════════════════════ */
+function getNodeRect(nodeId) {
+  var el = document.getElementById('nd-' + nodeId);
+  var n  = NODES.find(function(n){ return n.id === nodeId; });
+  if (!el || !n) return null;
+  var body = laneEls[LANES[n.lane].id];
+  // Position of lane-body relative to lanes-wrap
+  var wrapEl  = document.getElementById('lanes-wrap');
+  var wrapRect = wrapEl.getBoundingClientRect();
+  var bodyRect = body.getBoundingClientRect();
+  var bx = bodyRect.left - wrapRect.left;
+  var by = bodyRect.top  - wrapRect.top;
+  var l = parseInt(el.style.left) || 0;
+  var t = parseInt(el.style.top)  || 0;
+  var w = el.offsetWidth, h = el.offsetHeight;
+  return { l:bx+l, t:by+t, r:bx+l+w, b:by+t+h, cx:bx+l+w/2, cy:by+t+h/2, w:w, h:h };
+}
+
+/* ══════════════════════════════════════════════════════
+   DRAW EDGES
+══════════════════════════════════════════════════════ */
+function drawEdges() {
+  var svg = document.getElementById('conn-svg');
+  var wrap = document.getElementById('lanes-wrap');
+
+  // Size SVG to match wrap
+  svg.style.width  = wrap.scrollWidth + 'px';
+  svg.style.height = wrap.scrollHeight + 'px';
+  svg.setAttribute('viewBox', '0 0 '+wrap.scrollWidth+' '+wrap.scrollHeight);
+
+  svg.innerHTML = '';
+
+  // Defs
+  var defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+  var colors = ['#0078d4','#7c3aed','#059669','#dc2626','#b45309','#1e3a5f','#374151'];
+  colors.forEach(function(c, i) {
+    defs.innerHTML += '<marker id="arr'+i+'" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">'+
+      '<path d="M2 2L8 5L2 8" fill="none" stroke="'+c+'" stroke-width="1.5" stroke-linecap="round"/></marker>';
+  });
+  svg.appendChild(defs);
+
+  var cmap = {};
+  colors.forEach(function(c,i){ cmap[c] = 'arr'+i; });
+
+  EDGES.forEach(function(e, ei) {
+    var rA = getNodeRect(e.a), rB = getNodeRect(e.b);
+    if (!rA || !rB) return;
+
+    var dx = rB.cx - rA.cx, dy = rB.cy - rA.cy;
+    var x1, y1, x2, y2;
+
+    // Connect from edge closest to target
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      x1 = dx > 0 ? rA.r : rA.l;  y1 = rA.cy;
+      x2 = dx > 0 ? rB.l : rB.r;  y2 = rB.cy;
+    } else {
+      x1 = rA.cx; y1 = dy > 0 ? rA.b : rA.t;
+      x2 = rB.cx; y2 = dy > 0 ? rB.t : rB.b;
+    }
+
+    var cpx1 = x1 + dx * 0.45, cpy1 = y1;
+    var cpx2 = x2 - dx * 0.45, cpy2 = y2;
+    var d = 'M'+x1+','+y1+' C'+cpx1+','+cpy1+' '+cpx2+','+cpy2+' '+x2+','+y2;
+    var mk = cmap[e.col] || 'arr0';
+
+    // Path
+    var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', d);
+    path.setAttribute('stroke', e.col);
+    path.setAttribute('stroke-width', e.anim ? '2' : '1.2');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('opacity', e.anim ? '0.85' : '0.3');
+    path.setAttribute('marker-end', 'url(#'+mk+')');
+    if (e.dash) path.setAttribute('stroke-dasharray','5 4');
+    if (e.anim) path.classList.add('animated');
+    svg.appendChild(path);
+
+    // Animated particle
+    if (e.anim) {
+      var dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('r','4'); dot.setAttribute('fill', e.col); dot.setAttribute('opacity','0.9');
+      var am = document.createElementNS('http://www.w3.org/2000/svg','animateMotion');
+      am.setAttribute('dur','2s'); am.setAttribute('repeatCount','indefinite');
+      am.setAttribute('begin',(ei*0.28)+'s'); am.setAttribute('path',d);
+      dot.appendChild(am); svg.appendChild(dot);
+    }
+
+    // Edge label on white pill
+    if (e.lbl) {
+      var mx = (x1+x2)/2, my = (y1+y2)/2;
+      var tw = e.lbl.length * 5 + 12;
+      var bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      bg.setAttribute('x', mx - tw/2); bg.setAttribute('y', my - 11);
+      bg.setAttribute('width', tw); bg.setAttribute('height', 13);
+      bg.setAttribute('rx','4'); bg.setAttribute('fill','#fff');
+      bg.setAttribute('stroke','#ddd'); bg.setAttribute('stroke-width','1'); bg.setAttribute('opacity','0.95');
+      svg.appendChild(bg);
+      var t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x', mx); t.setAttribute('y', my - 2);
+      t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','8');
+      t.setAttribute('font-family','Courier New'); t.setAttribute('font-weight','700');
+      t.setAttribute('fill', e.col); t.textContent = e.lbl;
+      svg.appendChild(t);
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════════ */
+function selectNode(id) {
+  document.querySelectorAll('.node').forEach(function(el){ el.classList.remove('selected'); });
+  var el = document.getElementById('nd-'+id);
+  var n  = NODES.find(function(n){ return n.id===id; });
+  if (!el||!n) return;
+  el.classList.add('selected'); el.style.borderColor = n.color;
+
+  document.getElementById('sb-empty').style.display = 'none';
+  var sc = document.getElementById('sb-content');
+  sc.style.display = 'flex'; sc.style.flexDirection = 'column';
+  document.getElementById('sb-dot').style.background = n.color;
+  document.getElementById('sb-title').textContent = n.title;
+
+  document.getElementById('sb-stories').innerHTML = n.stories.map(function(s){
+    var conns = (s.to||[]).map(function(id2){
+      var n2 = NODES.find(function(nn){ return nn.id===id2; });
+      return n2 ? '<span class="story-conn">→ '+n2.title+'</span>' : '';
+    }).join('');
+    return '<div class="story">'+
+      '<div class="story-lbl">'+s.lbl+'</div>'+
+      '<div class="story-t">'+s.t+'</div>'+
+      (conns?'<div class="story-conns">'+conns+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════ */
+window.onload = function() {
+  buildLanes();
+  buildNodes();
+  setTimeout(function(){ drawEdges(); }, 120);
+  window.addEventListener('resize', function(){
+    // Recompute node widths on resize
+    NODES.forEach(function(n){
+      var el = document.getElementById('nd-'+n.id);
+      var body = laneEls[LANES[n.lane].id];
+      if (el && body) {
+        var nw = Math.max(140, body.offsetWidth - 24);
+        el.style.width = nw + 'px';
+        el.style.left  = '12px';
+      }
+    });
+    setTimeout(drawEdges, 60);
+  });
+};
+</script>
+</body>
+</html>
