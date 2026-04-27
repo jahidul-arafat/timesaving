@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GoSXM API Catalog — DGTP Sint Maarten</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#0e1117;--ink2:#2d3340;--ink3:#6b7280;--ink4:#9ca3af;
+  --paper:#f8f7f4;--paper2:#f1efe9;--paper3:#e5e2da;--paper4:#d4cfc5;
+  --accent:#c8510a;--accent2:#e8722a;--ap:rgba(200,81,10,.1);--ag:rgba(200,81,10,.25);
+  --blue:#1a4f8a;--bp:rgba(26,79,138,.1);--bg2:rgba(26,79,138,.2);
+  --green:#1a6b3c;--gp:rgba(26,107,60,.1);--gg2:rgba(26,107,60,.22);
+  --red:#8a1a2e;--rp:rgba(138,26,46,.1);--rg2:rgba(138,26,46,.22);
+  --amber:#7a5200;--amp:rgba(122,82,0,.1);--amg:rgba(122,82,0,.22);
+  --purple:#4a1a7a;--pp:rgba(74,26,122,.1);--pg:rgba(74,26,122,.22);
+  --teal:#1a5c6b;--tp:rgba(26,92,107,.1);--tg:rgba(26,92,107,.22);
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#1a1a1c;font-family:var(--sans);height:100vh;overflow:hidden;
+  display:block;margin:0;padding:0}
+#kbhint{color:rgba(255,255,255,.28);font-size:11px;font-family:var(--mono);
+  position:fixed;bottom:10px;right:14px;letter-spacing:.05em}
+#stage{width:100vw;height:100vh;position:relative;overflow:hidden;}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;background:var(--paper);overflow:hidden;isolation:isolate}
+.slide.active{display:flex}
+
+/* ── ENTRANCE ANIMATIONS ── */
+@keyframes slideIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.slide.active .a1{animation:slideIn .38s cubic-bezier(.22,1,.36,1) both}
+.slide.active .a2{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .07s both}
+.slide.active .a3{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .14s both}
+.slide.active .a4{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .21s both}
+.slide.active .a5{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .28s both}
+@media(prefers-reduced-motion:reduce){.slide.active [class*="a"]{animation:none}}
+
+/* ── PROGRESS BAR ── */
+.prog{position:absolute;top:0;left:0;right:0;height:3px;background:var(--paper3);z-index:20}
+.prog-fill{height:100%;background:var(--accent);border-radius:0 2px 2px 0}
+
+/* ── COLOUR ID BAR ── */
+.id-bar{height:3px;flex-shrink:0}
+
+/* ── SLIDE STRUCTURE ── */
+.slide-header{padding:24px 56px 0;flex-shrink:0;position:relative;z-index:1}
+.eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.etag{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.13em;
+  padding:4px 10px;border-radius:4px;border:1px solid currentColor}
+.enum{font-family:var(--mono);font-size:10px;color:var(--ink4);letter-spacing:.06em}
+.slide-h1{font-family:var(--serif);font-size:30px;line-height:1.1;color:var(--ink);
+  margin-bottom:2px;letter-spacing:-.01em}
+.slide-sub{font-size:13px;color:var(--ink3);line-height:1.65;max-width:680px}
+.slide-body{flex:1;padding:10px 56px 78px;overflow:hidden;position:relative;z-index:1}
+.slide-footer{display:none}
+.footer-brand{font-family:var(--mono);font-size:10px;color:var(--ink4);letter-spacing:.06em}
+.footer-stage{font-size:10px;color:var(--accent);background:var(--ap);
+  border:1px solid var(--ag);border-radius:4px;padding:3px 10px;
+  font-family:var(--mono);letter-spacing:.06em}
+.footer-slide{font-family:var(--mono);font-size:10px;color:var(--ink4)}
+.footnote{display:none}
+#global-footnote{position:fixed;bottom:50px;left:0;right:0;height:22px;
+  background:rgba(248,247,244,.92);backdrop-filter:blur(8px);
+  border-top:1px solid var(--paper3);
+  display:flex;align-items:center;gap:10px;z-index:50;
+  padding:0 56px}
+.fn-logo{font-family:var(--mono);font-size:9px;font-weight:600;
+  color:var(--accent);white-space:nowrap;letter-spacing:.07em}
+.fn-text{font-size:10px;color:var(--ink3);font-style:italic;flex:1}
+.fn-link{font-family:var(--mono);font-size:9px;color:var(--accent);text-decoration:none}
+.fn-link:hover{text-decoration:underline}
+
+/* ══ SLIDE 1 TITLE ══ */
+#s1{background:var(--ink)}
+#s1 .geo{position:absolute;inset:0;overflow:hidden}
+#s1 .content{position:relative;flex:1;display:flex;flex-direction:column;
+  justify-content:center;padding:60px 80px}
+#s1 .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--accent2);
+  margin-bottom:20px;display:flex;align-items:center;gap:14px}
+#s1 .lbl::before{content:'';width:40px;height:1.5px;background:var(--accent2)}
+#s1 h1{font-family:var(--serif);font-size:62px;line-height:1.06;color:#fff;
+  margin-bottom:18px;letter-spacing:-.02em}
+#s1 h1 em{color:var(--accent2);font-style:italic}
+#s1 .tg{font-size:15px;color:rgba(255,255,255,.42);max-width:520px;line-height:1.78;
+  font-weight:300}
+#s1 .meta{margin-top:48px;display:flex;gap:38px;flex-wrap:wrap}
+#s1 .ml{font-family:var(--mono);font-size:9px;letter-spacing:.16em;
+  color:rgba(255,255,255,.22);margin-bottom:4px}
+#s1 .mv{font-size:13px;color:rgba(255,255,255,.62);font-weight:500}
+#s1 .six{position:absolute;right:78px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:8px}
+#s1 .sn{width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:11px;
+  color:rgba(255,255,255,.22)}
+#s1 .sn.on{border-color:var(--accent);color:var(--accent2);background:rgba(200,81,10,.14)}
+#s1 .sbar{position:absolute;bottom:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2))}
+
+/* ══ OVERVIEW ══ */
+.ov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.ov-card{background:var(--paper2);border:1px solid var(--paper3);border-radius:10px;
+  padding:12px;display:flex;flex-direction:column;gap:4px;
+  position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.ov-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.07)}
+.ov-top-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.ov-num{font-family:var(--mono);font-size:11px;font-weight:500;opacity:.22;line-height:1;margin-top:2px}
+.ov-title{font-size:13.5px;font-weight:600;color:var(--ink)}
+.ov-desc{font-size:11px;color:var(--ink3);line-height:1.6;flex:1}
+.ov-badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 8px;
+  border-radius:3px;width:fit-content;margin-top:6px;letter-spacing:.06em}
+.note-bar{background:var(--ap);border:1px solid var(--ag);border-radius:8px;
+  padding:7px 12px;margin-bottom:8px;font-size:11px;color:var(--ink2);line-height:1.5}
+.note-bar strong{color:var(--accent)}
+
+/* ══ QUESTION LAYOUT ══ */
+.q-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;height:100%;min-height:0}
+.q-left,.q-right{display:flex;flex-direction:column;gap:6px;overflow:hidden;min-height:0}
+.q-story{border-left:3px solid;border-radius:0 8px 8px 0;padding:7px 11px;
+  font-size:11px;color:var(--ink2);line-height:1.55;font-style:italic;flex-shrink:0}
+.q-story strong{font-style:normal;font-size:9px;font-family:var(--mono);
+  letter-spacing:.13em;display:block;margin-bottom:3px}
+.opts-label{font-family:var(--mono);font-size:9px;letter-spacing:.13em;
+  color:var(--ink4);margin-bottom:1px;font-weight:500}
+.opt{border-radius:7px;padding:6px 10px;margin-bottom:3px;border:1px solid transparent}
+.opt-head{display:flex;align-items:baseline;gap:7px;margin-bottom:3px}
+.opt-badge{font-size:9px;font-weight:700;font-family:var(--mono);
+  padding:2px 7px;border-radius:3px;letter-spacing:.06em;flex-shrink:0;color:#fff}
+.opt-name{font-size:11.5px;font-weight:600;line-height:1.2}
+.opt-pc{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.pro,.con{font-size:10px;line-height:1.4;padding-left:13px;position:relative;color:var(--ink3)}
+.pro::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700;font-size:10px}
+.con::before{content:'✗';position:absolute;left:0;color:var(--red);font-weight:700;font-size:10px}
+.opt-a{background:var(--bp)}.opt-a .opt-name{color:var(--blue)}.opt-a .opt-badge{background:var(--blue)}
+.opt-b{background:var(--gp)}.opt-b .opt-name{color:var(--green)}.opt-b .opt-badge{background:var(--green)}
+.opt-c{background:var(--pp)}.opt-c .opt-name{color:var(--purple)}.opt-c .opt-badge{background:var(--purple)}
+
+/* KPI row */
+.kpi-row{display:flex;gap:7px;flex-shrink:0}
+.kpi{background:var(--paper2);border:1px solid var(--paper3);border-radius:7px;
+  padding:5px 8px;text-align:center;flex:1;position:relative;overflow:hidden}
+.kpi-top{position:absolute;top:0;left:0;right:0;height:2px}
+.kpi-v{font-size:17px;font-weight:600;font-family:var(--mono);
+  color:var(--ink);line-height:1.1;margin-bottom:1px}
+.kpi-l{font-size:9px;color:var(--ink3)}
+
+/* Rec pill */
+.rec-pill{display:flex;align-items:center;gap:8px;background:var(--ink);
+  color:#fff;border-radius:7px;padding:6px 11px;font-size:10.5px;
+  font-weight:500;flex-shrink:0}
+.rec-pill span{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.38);
+  letter-spacing:.08em;white-space:nowrap}
+
+/* Arch SVG */
+.arch-svg-wrap{background:var(--paper2);border:1px solid var(--paper3);
+  border-radius:10px;padding:9px;flex:1;overflow:visible;min-height:100px;position:relative}
+.arch-svg-title{font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  color:var(--ink4);margin-bottom:5px;font-weight:500}
+.arch-svg-wrap svg{width:100%;height:auto;display:block}
+
+/* ══ SLIDE 9 MATRIX ══ */
+.mtbl{width:100%;border-collapse:collapse;font-size:12px}
+.mtbl th{padding:9px 13px;text-align:left;font-size:9px;font-weight:700;
+  font-family:var(--mono);letter-spacing:.1em;border-bottom:2px solid var(--paper3);
+  color:var(--ink3)}
+.mtbl td{padding:9px 13px;border-bottom:1px solid var(--paper3);
+  color:var(--ink2);vertical-align:middle}
+.mtbl tr:last-child td{border-bottom:none}
+.mtbl tr:nth-child(even) td{background:var(--paper2)}
+.mtbl tr:hover td{background:var(--paper3)}
+.dlbl{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:4px;
+  display:inline-block;font-family:var(--mono);letter-spacing:.04em}
+.crit{font-size:10.5px;color:var(--ink3);font-style:italic;line-height:1.5}
+
+/* ══ SLIDE 10 NEXT STEPS ══ */
+.ns-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:12px}
+.ns-card{background:var(--paper2);border:1px solid var(--paper3);border-radius:10px;
+  padding:14px;position:relative;overflow:hidden}
+.ns-top{position:absolute;top:0;left:0;right:0;height:3px}
+.ns-sprint{font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  color:var(--ink4);margin-bottom:6px;font-weight:500}
+.ns-title{font-size:13px;font-weight:600;margin-bottom:7px}
+.ns-items{display:flex;flex-direction:column;gap:4px}
+.ns-item{font-size:11px;color:var(--ink2);padding-left:13px;
+  position:relative;line-height:1.5}
+.ns-item::before{content:'→';position:absolute;left:0;color:var(--accent);
+  font-size:10px;font-weight:700}
+.ns-tline{height:3px;background:var(--paper3);border-radius:2px;margin-top:9px;overflow:hidden}
+.ns-tfill{height:100%;border-radius:2px}
+.closing-row{display:flex;gap:11px}
+.cbox{flex:1;border-radius:8px;padding:13px;border:1px solid transparent}
+.cbox-title{font-family:var(--mono);font-size:9px;letter-spacing:.13em;
+  font-weight:700;margin-bottom:6px}
+.cbox-text{font-size:11.5px;line-height:1.65}
+
+/* ── NAV ── */
+#nav{display:flex;align-items:center;gap:9px;margin-top:13px}
+.ndot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.18);
+  cursor:pointer;transition:all .2s}
+.ndot.on{background:#fff;transform:scale(1.4)}
+.nbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  color:rgba(255,255,255,.65);border-radius:6px;padding:6px 18px;
+  cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:500;
+  transition:all .2s}
+.nbtn:hover{background:rgba(255,255,255,.2);color:#fff}
+#sc{color:rgba(255,255,255,.32);font-family:var(--mono);font-size:11px;margin:0 5px}
+
+/* ════ FULLSCREEN + TOOLTIP ════ */
+.fs-btn{position:absolute;top:6px;right:6px;width:26px;height:26px;
+  border-radius:6px;border:1px solid var(--paper3);background:var(--paper);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:13px;z-index:5;transition:all .15s;color:var(--ink3)}
+.fs-btn:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.arch-svg-wrap{position:relative}
+#svg-tip{position:fixed;z-index:10001;background:var(--ink);color:#fff;
+  border-radius:10px;padding:12px 14px;max-width:310px;
+  pointer-events:none;display:none;
+  box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.08);
+  opacity:0;transform:translateY(4px);
+  transition:opacity .12s ease,transform .12s ease;
+  will-change:transform,opacity}
+#svg-tip .tip-title{font-size:12px;font-weight:600;margin-bottom:5px;line-height:1.3}
+#svg-tip .tip-body{font-size:11px;color:rgba(255,255,255,.65);line-height:1.65}
+#svg-tip .tip-tag{font-size:9px;font-family:var(--mono);letter-spacing:.1em;
+  font-weight:700;padding:2px 7px;border-radius:3px;display:inline-block;margin-bottom:7px}
+#fs-overlay{position:fixed;inset:0;background:rgba(10,10,14,.92);
+  backdrop-filter:blur(12px);z-index:10000;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:14px}
+#fs-overlay.open{display:flex}
+#fs-wrap{background:var(--paper);border-radius:14px;
+  border:1px solid var(--paper3);overflow:hidden;
+  width:min(92vw,1200px);max-height:88vh;display:flex;flex-direction:column;
+  box-shadow:0 48px 100px rgba(0,0,0,.6)}
+#fs-header{padding:14px 18px;border-bottom:1px solid var(--paper3);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#fs-htitle{font-size:12px;font-weight:600;color:var(--ink);
+  font-family:var(--mono);letter-spacing:.06em}
+#fs-close{width:30px;height:30px;border-radius:50%;border:1px solid var(--paper3);
+  background:transparent;cursor:pointer;font-size:16px;
+  color:var(--ink3);display:flex;align-items:center;justify-content:center;transition:all .15s}
+#fs-close:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+#fs-body{flex:1;overflow:auto;padding:20px}
+#fs-body svg{width:100%;height:auto;display:block}
+#fs-legend{display:flex;gap:10px;flex-wrap:wrap;padding:10px 18px 14px;
+  border-top:1px solid var(--paper3);flex-shrink:0}
+.fsl{display:flex;align-items:center;gap:5px;font-size:10px;
+  font-family:var(--mono);color:var(--ink3)}
+.fsld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* ── SLIDE BACKGROUND IMAGE ── */
+.slide::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:url('');
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  opacity:0.5;
+  z-index:0;
+  pointer-events:none;
+  z-index:-1;
+}
+/* Ensure all slide content sits above the bg */
+.slide-header,.slide-body,.slide-footer,.footnote,
+.prog,.id-bar,.slide-progress{position:relative;z-index:2}
+#s1 .content,#s1 .geo,#s1 .six,#s1 .sbar{z-index:2}
+
+/* ── IN-FOOTER NAVIGATION ARROWS ── */
+.nav-arrow{width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--paper3);background:transparent;
+  cursor:pointer;font-size:16px;color:var(--ink3);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;flex-shrink:0;line-height:1}
+.nav-arrow:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.footer-dots{display:flex;gap:5px;align-items:center;flex:1;justify-content:center}
+.footer-dot{width:6px;height:6px;border-radius:50%;
+  background:var(--paper3);cursor:pointer;transition:all .2s;border:none;padding:0}
+.footer-dot.on{background:var(--accent);transform:scale(1.3)}
+/* Hide old external nav */
+#dots-bar{display:none}
+#kbhint{color:rgba(255,255,255,.28);font-size:11px;font-family:var(--mono);
+  position:fixed;bottom:10px;right:14px;letter-spacing:.05em}
+
+/* ── INSIGHT PANEL (after rec-pill) ── */
+.insight-panel{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;flex-shrink:0}
+.insight-card{border-radius:7px;padding:7px 9px;border:1px solid transparent}
+.insight-card-title{font-size:9px;font-weight:700;font-family:var(--mono);
+  letter-spacing:.1em;margin-bottom:4px}
+.insight-card-text{font-size:10px;color:var(--ink2);line-height:1.55}
+.ic-risk{background:var(--rp);border-color:var(--rg2)}
+.ic-risk .insight-card-title{color:var(--red)}
+.ic-win{background:var(--gp);border-color:var(--gg2)}
+.ic-win .insight-card-title{color:var(--green)}
+.ic-ctx{background:var(--bp);border-color:var(--bg2)}
+.ic-ctx .insight-card-title{color:var(--blue)}
+.ic-dep{background:var(--amp);border-color:var(--amg)}
+.ic-dep .insight-card-title{color:var(--amber)}
+.ic-note{background:var(--pp);border-color:var(--pg)}
+.ic-note .insight-card-title{color:var(--purple)}
+
+.mx-badge{font-size:9px;font-family:var(--mono);font-weight:700;padding:2px 7px;
+  border-radius:3px;display:inline-block;letter-spacing:.04em;white-space:nowrap}
+.mx-low{background:rgba(26,107,60,.12);color:var(--green)}
+.mx-med{background:rgba(122,82,0,.12);color:var(--amber)}
+.mx-high{background:rgba(138,26,46,.12);color:var(--red)}
+.mx-prop{background:rgba(26,79,138,.12);color:var(--blue)}
+
+#global-footer{position:fixed;bottom:0;left:0;right:0;height:50px;
+  background:rgba(248,247,244,.96);backdrop-filter:blur(10px);
+  border-top:1px solid var(--paper3);
+  display:flex;align-items:center;padding:0 56px;
+  justify-content:space-between;z-index:100}
+#gf-dots{display:flex;gap:5px;align-items:center;position:absolute;
+  left:50%;transform:translateX(-50%)}
+.gf-dot{width:6px;height:6px;border-radius:50%;background:var(--paper3);
+  border:none;cursor:pointer;padding:0;transition:all .2s}
+.gf-dot.on{background:var(--accent);transform:scale(1.35)}
+#gf-left{display:flex;align-items:center;gap:12px}
+#gf-right{display:flex;align-items:center;gap:12px}
+.gf-arrow{width:32px;height:32px;border-radius:50%;border:1px solid var(--paper3);
+  background:transparent;cursor:pointer;font-size:16px;color:var(--ink3);
+  display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1}
+.gf-arrow:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+#gf-brand{font-family:var(--mono);font-size:10px;color:var(--ink4);letter-spacing:.06em}
+#gf-stage{font-size:10px;color:var(--accent);background:var(--ap);
+  border:1px solid var(--ag);border-radius:4px;padding:3px 10px;
+  font-family:var(--mono);letter-spacing:.06em}
+#gf-counter{font-family:var(--mono);font-size:10px;color:var(--ink4)}
+
+.cxi-legend-row{display:flex;align-items:center;gap:7px;padding:4px 7px;border-radius:5px;transition:background .15s}
+.cxi-legend-row:hover{background:var(--paper3)}
+.cxi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cxi-label{font-size:10px;color:var(--ink2);flex:1}
+.cxi-pct{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink)}
+.cxi-range{font-size:9px;color:var(--ink3);font-family:var(--mono);white-space:nowrap}
+.score-pref td{background:rgba(26,107,60,.07)!important}
+.score-pref .score-val{color:var(--green);font-weight:700}
+.score-bar{height:5px;border-radius:3px;background:var(--paper3);margin-top:3px}
+.score-bar-fill{height:100%;border-radius:3px}
+
+/* ── STORY SLIDE ── */
+.st-dot{width:6px;height:6px;border-radius:50%;background:var(--paper3);transition:all .2s}
+.st-dot.on{background:var(--accent);transform:scale(1.3)}
+
+/* ════ FAILURE PATH PANEL ════════════════════════════════════════════ */
+.fp-trigger {
+  position: fixed;
+  bottom: 82px; /* above footer (50px) + footnote bar (22px) + 10px gap */
+  right: 18px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 7px 14px 7px 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,.28), 0 0 0 1px rgba(255,255,255,.06);
+  transition: transform .18s, box-shadow .18s, background .18s;
+  white-space: nowrap;
+}
+.fp-trigger:hover {
+  background: #c8510a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(200,81,10,.4), 0 0 0 1px rgba(255,255,255,.10);
+}
+.fp-trigger .fp-pulse {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #e8722a;
+  animation: fp-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes fp-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(232,114,42,.6); }
+  50%      { box-shadow: 0 0 0 5px rgba(232,114,42,0); }
+}
+
+/* Overlay backdrop */
+#fp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,14,.55);
+  backdrop-filter: blur(6px);
+  z-index: 900;
+  display: none;
+  opacity: 0;
+  transition: opacity .25s;
+}
+#fp-overlay.open { display: block; }
+#fp-overlay.visible { opacity: 1; }
+
+/* Panel */
+#fp-panel {
+  position: fixed;
+  right: 0; top: 0; bottom: 0;
+  width: min(680px, 94vw);
+  background: #0e1117;
+  border-left: 1px solid rgba(255,255,255,.08);
+  z-index: 901;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .32s cubic-bezier(.22,1,.36,1);
+  overflow: hidden;
+}
+#fp-panel.open {
+  transform: translateX(0);
+}
+
+.fp-panel-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.fp-header-left { flex: 1; min-width: 0; }
+.fp-eyebrow {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .16em;
+  color: #c8510a;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.fp-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 20px;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.fp-subtitle {
+  font-size: 11px;
+  color: rgba(255,255,255,.42);
+  line-height: 1.5;
+}
+.fp-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  color: rgba(255,255,255,.6);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s, color .15s;
+}
+.fp-close:hover { background: rgba(255,255,255,.14); color: #fff; }
+
+/* Scrollable body */
+.fp-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.fp-body::-webkit-scrollbar { width: 4px; }
+.fp-body::-webkit-scrollbar-track { background: transparent; }
+.fp-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 2px; }
+
+/* Animated flowchart nodes */
+.fp-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.fp-node {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .4s ease, transform .4s ease;
+  padding: 0 0 0 2px;
+}
+.fp-node.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fp-node-spine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 28px;
+}
+.fp-node-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--mono);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.fp-node-line {
+  width: 1px;
+  flex: 1;
+  min-height: 20px;
+  background: linear-gradient(to bottom, rgba(255,255,255,.15), rgba(255,255,255,.04));
+}
+.fp-node:last-child .fp-node-line { display: none; }
+
+.fp-node-content {
+  flex: 1;
+  padding-bottom: 20px;
+}
+.fp-node-label {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: .12em;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.fp-node-heading {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 5px;
+  line-height: 1.3;
+}
+.fp-node-body {
+  font-size: 11px;
+  color: rgba(255,255,255,.58);
+  line-height: 1.65;
+}
+.fp-node-impact {
+  margin-top: 7px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.fp-impact-chip {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.45);
+  border: 1px solid rgba(255,255,255,.09);
+}
+
+/* Node type colours */
+.fp-node-failure .fp-node-dot  { background: rgba(138,26,46,.25); color: #e05470; border: 1.5px solid rgba(138,26,46,.5); }
+.fp-node-failure .fp-node-label { background: rgba(138,26,46,.2); color: #e05470; }
+.fp-node-cause   .fp-node-dot  { background: rgba(122,82,0,.25); color: #f0a500; border: 1.5px solid rgba(122,82,0,.5); }
+.fp-node-cause   .fp-node-label { background: rgba(122,82,0,.2); color: #f0a500; }
+.fp-node-impact-type .fp-node-dot { background: rgba(200,81,10,.22); color: #e8722a; border: 1.5px solid rgba(200,81,10,.45); }
+.fp-node-impact-type .fp-node-label { background: rgba(200,81,10,.18); color: #e8722a; }
+.fp-node-resolve .fp-node-dot  { background: rgba(26,107,60,.25); color: #4ade80; border: 1.5px solid rgba(26,107,60,.5); }
+.fp-node-resolve .fp-node-label { background: rgba(26,107,60,.2); color: #4ade80; }
+
+/* Branch connector for multi-path */
+.fp-branch {
+  margin: 4px 0 4px 42px;
+  border-left: 1px dashed rgba(255,255,255,.1);
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .35s ease, transform .35s ease;
+}
+.fp-branch.visible { opacity: 1; transform: translateY(0); }
+.fp-branch-item {
+  font-size: 10.5px;
+  color: rgba(255,255,255,.5);
+  line-height: 1.55;
+  position: relative;
+  padding-left: 12px;
+}
+.fp-branch-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 7px;
+  width: 6px; height: 1px;
+  background: rgba(255,255,255,.2);
+}
+.fp-branch-item strong { color: rgba(255,255,255,.75); font-weight: 600; }
+
+/* Solution footer */
+.fp-solution {
+  margin-top: 8px;
+  background: rgba(26,107,60,.12);
+  border: 1px solid rgba(26,107,60,.25);
+  border-radius: 10px;
+  padding: 14px 16px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .4s ease .1s, transform .4s ease .1s;
+}
+.fp-solution.visible { opacity: 1; transform: translateY(0); }
+.fp-solution-tag {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: .12em;
+  font-weight: 700;
+  color: #4ade80;
+  margin-bottom: 7px;
+}
+.fp-solution-text {
+  font-size: 11.5px;
+  color: rgba(255,255,255,.72);
+  line-height: 1.65;
+}
+.fp-solution-text strong { color: #4ade80; }
+
+
+/* ════ LOGIN GATE ════════════════════════════════════════════════════ */
+#login-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #0e1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+#login-gate.hidden {
+  display: none;
+}
+.lg-card {
+  width: 360px;
+  background: #16191f;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 40px 36px 36px;
+  box-shadow: 0 40px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.lg-logo {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .22em;
+  font-weight: 700;
+  color: #c8510a;
+  margin-bottom: 24px;
+}
+.lg-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 26px;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.lg-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,.35);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+.lg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.lg-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .14em;
+  font-weight: 700;
+  color: rgba(255,255,255,.35);
+}
+.lg-input {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  color: #fff;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  outline: none;
+  transition: border-color .15s, background .15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.lg-input:focus {
+  border-color: rgba(200,81,10,.6);
+  background: rgba(200,81,10,.06);
+}
+.lg-input::placeholder {
+  color: rgba(255,255,255,.18);
+}
+.lg-error {
+  font-size: 11px;
+  color: #e05470;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .06em;
+  height: 16px;
+  margin-bottom: 8px;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.lg-error.show { opacity: 1; }
+.lg-btn {
+  width: 100%;
+  padding: 12px;
+  background: #c8510a;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background .15s, transform .12s;
+  letter-spacing: .02em;
+}
+.lg-btn:hover { background: #e8722a; transform: translateY(-1px); }
+.lg-btn:active { transform: translateY(0); }
+.lg-btn.shaking {
+  animation: lg-shake .35s ease;
+}
+@keyframes lg-shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+.lg-divider {
+  height: 1px;
+  background: rgba(255,255,255,.06);
+  margin: 28px 0 20px;
+}
+.lg-footer {
+  font-size: 10px;
+  color: rgba(255,255,255,.18);
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .06em;
+}
+
+
+
+
+/* ════ GAP ANALYSIS SLIDE ════════════════════════════════════════════ */
+/* Uses the deck's standard --paper bg, --ink text, --paper2/3 cards  */
+
+#s-gap { background: var(--paper); }
+
+/* Summary stats */
+.gap-summary-bar {
+  display:flex; gap:7px; margin-bottom:10px; flex-shrink:0;
+}
+.gap-stat {
+  flex:1; background:var(--paper2);
+  border:1px solid var(--paper3); border-radius:8px;
+  padding:7px 10px; display:flex; flex-direction:column; gap:2px;
+  position:relative; overflow:hidden;
+}
+.gap-stat-bar { position:absolute; top:0; left:0; right:0; height:3px; border-radius:8px 8px 0 0; }
+.gap-stat-v {
+  font-family:var(--mono); font-size:18px; font-weight:700;
+  line-height:1; color:var(--ink);
+}
+.gap-stat-l { font-size:8.5px; color:var(--ink4); letter-spacing:.06em; font-family:var(--mono); }
+
+/* Two-column layout */
+.gap-flow {
+  display:grid; grid-template-columns:1fr 20px 1fr;
+  gap:0; flex:1; min-height:0; overflow:hidden;
+}
+
+/* Column labels */
+.gap-col-label {
+  font-family:var(--mono); font-size:8.5px; font-weight:700;
+  letter-spacing:.13em; color:var(--ink4);
+  margin-bottom:5px; flex-shrink:0;
+}
+
+/* ── Finding cards (left col) ── */
+.gap-findings-list {
+  display:flex; flex-direction:column; gap:5px;
+  overflow-y:auto; padding-right:4px;
+}
+.gap-findings-list::-webkit-scrollbar { width:3px; }
+.gap-findings-list::-webkit-scrollbar-track { background:transparent; }
+.gap-findings-list::-webkit-scrollbar-thumb { background:var(--paper3); border-radius:2px; }
+
+.gap-card {
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:9px; padding:9px 10px;
+  cursor:pointer; position:relative; overflow:hidden;
+  transition:border-color .18s, background .18s, box-shadow .18s;
+  flex-shrink:0;
+}
+.gap-card:hover {
+  border-color:var(--paper4);
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+.gap-card.expanded {
+  border-color:var(--card-color, var(--accent));
+  background:var(--paper);
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+}
+.gap-card-accent {
+  position:absolute; top:0; left:0; bottom:0; width:3px;
+  border-radius:9px 0 0 9px;
+  background:var(--card-color, var(--accent));
+}
+.gap-card-head {
+  display:flex; align-items:center; gap:7px; padding-left:6px;
+}
+.gap-card-icon { font-size:12px; flex-shrink:0; }
+.gap-card-title {
+  font-size:11px; font-weight:600; color:var(--ink);
+  line-height:1.25; flex:1;
+}
+.gap-card-badge {
+  font-family:var(--mono); font-size:7.5px; font-weight:700;
+  padding:2px 6px; border-radius:3px; letter-spacing:.05em;
+  flex-shrink:0; white-space:nowrap;
+}
+.gap-card-chevron {
+  font-size:8px; color:var(--ink4);
+  transition:transform .22s; flex-shrink:0;
+}
+.gap-card.expanded .gap-card-chevron { transform:rotate(180deg); color:var(--ink2); }
+
+/* Expandable body */
+.gap-card-body {
+  max-height:0; overflow:hidden;
+  transition:max-height .32s cubic-bezier(.22,1,.36,1), opacity .25s;
+  opacity:0; padding-left:6px;
+}
+.gap-card.expanded .gap-card-body { max-height:200px; opacity:1; }
+.gap-card-body-inner {
+  padding-top:8px; margin-top:7px;
+  border-top:1px solid var(--paper3);
+}
+.gap-card-desc {
+  font-size:10px; color:var(--ink2); line-height:1.6; margin-bottom:7px;
+}
+.gap-card-chips { display:flex; flex-wrap:wrap; gap:4px; }
+.gap-chip {
+  font-family:var(--mono); font-size:8px; padding:2px 7px;
+  border-radius:3px; border:1px solid var(--paper3);
+  color:var(--ink3); background:var(--paper2);
+}
+.gap-chip.opp {
+  border-color:rgba(26,107,60,.3);
+  color:var(--green); background:var(--gp);
+}
+
+/* ── Connector arrows ── */
+.gap-arrow-col {
+  display:flex; flex-direction:column; justify-content:center;
+  align-items:center; gap:3px;
+}
+.gap-arrow-line { width:1px; flex:1; background:var(--paper3); }
+.gap-arrow-head { color:var(--ink4); font-size:9px; }
+
+/* ── Opportunity cards (right col) ── */
+.gap-opp-list {
+  display:flex; flex-direction:column; gap:5px;
+  overflow-y:auto; padding-left:4px;
+}
+.gap-opp-list::-webkit-scrollbar { width:3px; }
+.gap-opp-list::-webkit-scrollbar-track { background:transparent; }
+.gap-opp-list::-webkit-scrollbar-thumb { background:var(--paper3); border-radius:2px; }
+
+.gap-opp-card {
+  flex:1; min-height:36px;
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:9px; padding:9px 11px;
+  cursor:pointer; transition:all .18s; position:relative; overflow:hidden;
+}
+.gap-opp-card:hover {
+  border-color:var(--paper4);
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+.gap-opp-card.active {
+  background:var(--gp); border-color:rgba(26,107,60,.35);
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+}
+.gap-opp-top {
+  position:absolute; top:0; left:0; right:0; height:3px;
+  border-radius:9px 9px 0 0; background:var(--green); opacity:.6;
+}
+.gap-opp-card.active .gap-opp-top { opacity:1; }
+.gap-opp-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:3px; }
+.gap-opp-label {
+  font-family:var(--mono); font-size:7.5px; font-weight:700;
+  letter-spacing:.1em; color:var(--green);
+}
+.gap-opp-chevron {
+  font-size:8px; color:var(--ink4);
+  transition:transform .22s;
+}
+.gap-opp-card.active .gap-opp-chevron { transform:rotate(180deg); color:var(--green); }
+.gap-opp-title {
+  font-size:10.5px; font-weight:600; color:var(--ink); line-height:1.3;
+}
+.gap-opp-body {
+  max-height:0; overflow:hidden;
+  transition:max-height .32s cubic-bezier(.22,1,.36,1), opacity .25s;
+  opacity:0;
+}
+.gap-opp-card.active .gap-opp-body { max-height:240px; opacity:1; }
+.gap-opp-body-inner {
+  font-size:10px; color:var(--ink2); line-height:1.6;
+  padding-top:7px; margin-top:7px;
+  border-top:1px solid rgba(26,107,60,.2);
+}
+.gap-opp-items { display:flex; flex-direction:column; gap:3px; margin-top:6px; }
+.gap-opp-item {
+  font-size:9.5px; color:var(--ink3); padding-left:13px;
+  position:relative; line-height:1.45;
+}
+.gap-opp-item::before {
+  content:'→'; position:absolute; left:0;
+  color:var(--green); font-size:8px; font-weight:700;
+}
+
+/* Entry animations — same timing as rest of deck */
+@keyframes gap-in {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.gap-card     { animation:gap-in .38s cubic-bezier(.22,1,.36,1) both; }
+.gap-opp-card { animation:gap-in .42s cubic-bezier(.22,1,.36,1) both; }
+
+
+/* ════ GAP ANALYSIS — 3-SLIDE SECTION ═══════════════════════════════ */
+
+/* Slide 1: Executive Summary */
+.gx-hero { display:flex; gap:10px; margin-bottom:12px; flex-shrink:0; }
+.gx-kpi {
+  flex:1; background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:10px; padding:10px 14px; position:relative; overflow:hidden;
+  transition: transform .2s, box-shadow .2s;
+}
+.gx-kpi:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.07); }
+.gx-kpi-bar { position:absolute; top:0; left:0; right:0; height:3px; border-radius:10px 10px 0 0; }
+.gx-kpi-v { font-family:var(--mono); font-size:28px; font-weight:700; line-height:1; margin-bottom:3px; }
+.gx-kpi-l { font-size:10px; color:var(--ink3); line-height:1.4; }
+.gx-kpi-sub { font-size:9px; color:var(--ink4); margin-top:4px; font-style:italic; }
+
+/* Maturity bar chart */
+.gx-maturity { display:flex; flex-direction:column; gap:5px; }
+.gx-reg-row {
+  display:flex; align-items:center; gap:10px;
+  opacity:0; transform:translateX(-12px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.gx-reg-row.visible { opacity:1; transform:translateX(0); }
+.gx-reg-name { font-size:10.5px; font-weight:600; color:var(--ink2); width:180px; flex-shrink:0; }
+.gx-reg-dept { font-size:9px; color:var(--ink4); font-family:var(--mono); }
+.gx-bar-track { flex:1; height:22px; background:var(--paper3); border-radius:5px; overflow:hidden; position:relative; }
+.gx-bar-fill {
+  height:100%; border-radius:5px; width:0;
+  transition: width 1s cubic-bezier(.22,1,.36,1);
+  display:flex; align-items:center; padding-left:8px;
+}
+.gx-bar-label { font-family:var(--mono); font-size:8.5px; font-weight:700; color:#fff; white-space:nowrap; }
+.gx-score-badge {
+  font-family:var(--mono); font-size:11px; font-weight:700;
+  width:32px; text-align:center; flex-shrink:0;
+}
+.gx-maturity-label { font-size:8.5px; color:var(--ink4); font-style:italic; }
+
+/* Finding chips below chart */
+.gx-finding-row {
+  display:flex; align-items:flex-start; gap:8px; padding:6px 0;
+  border-bottom:1px solid var(--paper3);
+  opacity:0; transform:translateY(6px);
+  transition: opacity .35s ease, transform .35s ease;
+}
+.gx-finding-row.visible { opacity:1; transform:translateY(0); }
+.gx-finding-row:last-child { border-bottom:none; }
+.gx-g-badge {
+  font-family:var(--mono); font-size:8px; font-weight:700;
+  background:var(--paper3); color:var(--ink3); border-radius:3px;
+  padding:2px 6px; flex-shrink:0; margin-top:2px;
+}
+.gx-finding-text { font-size:10.5px; color:var(--ink2); line-height:1.55; flex:1; }
+.gx-finding-impact { font-size:9.5px; color:var(--ink4); font-style:italic; }
+
+/* Slide 2: Registry cards */
+.gx-reg-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; flex:1; min-height:0; overflow:hidden; }
+.gx-reg-card {
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:10px; padding:10px 11px; display:flex; flex-direction:column;
+  gap:5px; overflow:hidden; cursor:pointer;
+  transition: border-color .18s, box-shadow .18s;
+  opacity:0; transform:translateY(12px);
+  animation: gap-in .4s cubic-bezier(.22,1,.36,1) both;
+}
+.gx-reg-card.visible { opacity:1; transform:translateY(0); }
+.gx-reg-card:hover { border-color:var(--paper4); box-shadow:0 4px 16px rgba(0,0,0,.07); }
+.gx-reg-card.open { border-color:var(--accent); }
+.gx-reg-card-top { position:absolute; top:0; left:0; right:0; height:3px; border-radius:10px 10px 0 0; }
+.gx-reg-num { font-family:var(--mono); font-size:9px; font-weight:700; color:var(--ink4); letter-spacing:.1em; }
+.gx-reg-title { font-size:12px; font-weight:700; color:var(--ink); line-height:1.25; }
+.gx-reg-subtitle { font-size:9.5px; color:var(--ink3); }
+.gx-score-row { display:flex; align-items:center; gap:6px; }
+.gx-avg-score { font-family:var(--mono); font-size:18px; font-weight:700; }
+.gx-avg-label { font-size:9px; color:var(--ink4); line-height:1.3; }
+.gx-mini-bars { display:flex; flex-direction:column; gap:2px; flex:1; }
+.gx-mini-bar { height:4px; border-radius:2px; }
+.gx-gap-count { font-family:var(--mono); font-size:9px; font-weight:700; padding:2px 7px; border-radius:3px; }
+.gx-expand-body { max-height:0; overflow:hidden; transition:max-height .35s cubic-bezier(.22,1,.36,1); }
+.gx-reg-card.open .gx-expand-body { max-height:400px; }
+.gx-gap-list { padding-top:7px; border-top:1px solid var(--paper3); margin-top:4px; display:flex; flex-direction:column; gap:3px; }
+.gx-gap-item { display:flex; gap:6px; align-items:flex-start; }
+.gx-gap-badge { font-family:var(--mono); font-size:7.5px; font-weight:700; padding:1px 5px; border-radius:2px; background:var(--ap); color:var(--accent); flex-shrink:0; margin-top:2px; }
+.gx-gap-text { font-size:9.5px; color:var(--ink2); line-height:1.5; }
+
+/* Slide 3: Cross-cutting + bridge */
+.gx-bridge { display:grid; grid-template-columns:1fr 1fr; gap:14px; flex:1; min-height:0; }
+.gx-cross-col { display:flex; flex-direction:column; gap:8px; overflow:hidden; }
+.gx-cross-card {
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:9px; padding:10px 12px;
+  opacity:0; transform:translateY(10px);
+  transition:opacity .4s ease, transform .4s ease;
+}
+.gx-cross-card.visible { opacity:1; transform:translateY(0); }
+.gx-cross-label { font-family:var(--mono); font-size:8px; font-weight:700; letter-spacing:.12em; color:var(--ink4); margin-bottom:5px; }
+.gx-cross-title { font-size:11.5px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+.gx-cross-body { font-size:10px; color:var(--ink2); line-height:1.6; }
+.gx-cross-chips { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
+.gx-chip { font-family:var(--mono); font-size:8px; padding:2px 7px; border-radius:3px; border:1px solid var(--paper3); color:var(--ink3); background:var(--paper2); }
+.gx-chip.red { border-color:var(--rg2); color:var(--red); background:var(--rp); }
+.gx-chip.amber { border-color:var(--amg); color:var(--amber); background:var(--amp); }
+.gx-chip.green { border-color:var(--gg2); color:var(--green); background:var(--gp); }
+
+/* Bridge panel — right col slide 3 */
+.gx-bridge-panel {
+  background:var(--ink); border-radius:12px; padding:20px 22px;
+  display:flex; flex-direction:column; gap:10px; overflow:hidden;
+  opacity:0; transform:translateX(16px);
+  transition:opacity .5s ease .2s, transform .5s ease .2s;
+}
+.gx-bridge-panel.visible { opacity:1; transform:translateX(0); }
+.gx-bridge-eyebrow { font-family:var(--mono); font-size:8.5px; letter-spacing:.18em; font-weight:700; color:var(--accent2); margin-bottom:2px; }
+.gx-bridge-title { font-family:var(--serif); font-size:22px; color:#fff; line-height:1.2; margin-bottom:6px; }
+.gx-bridge-title em { color:var(--accent2); font-style:italic; }
+.gx-bridge-sub { font-size:11px; color:rgba(255,255,255,.45); line-height:1.6; margin-bottom:6px; }
+.gx-decision-pill {
+  display:flex; align-items:center; gap:9px;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+  border-radius:7px; padding:7px 10px;
+  opacity:0; transform:translateX(10px);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.gx-decision-pill.visible { opacity:1; transform:translateX(0); }
+.gx-decision-pill:hover { background:rgba(255,255,255,.09); }
+.gx-pill-q { font-family:var(--mono); font-size:9px; font-weight:700; padding:2px 7px; border-radius:3px; flex-shrink:0; }
+.gx-pill-text { font-size:10.5px; color:rgba(255,255,255,.75); flex:1; font-weight:500; }
+.gx-pill-arrow { font-size:10px; color:rgba(255,255,255,.25); }
+
+</style>
+<style>
+
+/* ── 30% FONT SIZE INCREASE OVERRIDES ── */
+.slide-h1{font-size:39px!important}
+.slide-sub{font-size:17px!important;max-width:820px!important}
+.kpi-v{font-size:22px!important}
+.kpi-l{font-size:12px!important}
+.ov-title{font-size:16px!important;font-weight:600}
+.ov-desc{font-size:13.5px!important;line-height:1.6}
+.ov-num{font-size:13px!important}
+.ov-badge{font-size:11px!important}
+.etag{font-size:12px!important;padding:5px 12px!important}
+.enum{font-size:12px!important}
+.note-bar{font-size:13.5px!important;padding:9px 14px!important}
+.note-bar strong{font-size:13.5px!important}
+.opt-name{font-size:14px!important}
+.opt-badge{font-size:11px!important}
+.pro,.con{font-size:12.5px!important;line-height:1.5}
+.ns-title{font-size:16px!important}
+.ns-item{font-size:13px!important}
+.ns-sprint{font-size:11px!important;letter-spacing:.08em}
+.cbox-text{font-size:14px!important}
+.cbox-title{font-size:11px!important}
+.rec-pill{font-size:13px!important}
+.rec-pill span{font-size:11px!important}
+.q-story{font-size:13.5px!important}
+.mtbl{font-size:14px!important}
+.mtbl th{font-size:11px!important}
+.fp-title{font-size:26px!important}
+.fp-subtitle{font-size:13px!important}
+.fp-node-heading{font-size:16px!important}
+.fp-node-body{font-size:13.5px!important;line-height:1.7}
+.fp-node-label{font-size:10.5px!important}
+.fp-impact-chip{font-size:11px!important}
+.fp-solution-text{font-size:13.5px!important;line-height:1.7}
+.fp-solution-tag{font-size:10.5px!important}
+.fp-eyebrow{font-size:11px!important}
+#gf-brand{font-size:12px!important}
+#gf-counter{font-size:12px!important}
+#gf-stage{font-size:12px!important}
+.fn-text{font-size:12px!important}
+.fn-logo{font-size:11px!important}
+#kbhint{font-size:12.5px!important}
+
+.acc-section{border:1px solid var(--paper3);border-radius:8px;overflow:hidden;margin-bottom:5px}
+.acc-head{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:pointer;user-select:none;transition:background .12s;font-size:14px;font-weight:600}
+.acc-head:hover{background:var(--paper2)}
+.acc-chev{margin-left:auto;font-size:12px;color:var(--ink4);transition:transform .22s}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .32s cubic-bezier(.22,1,.36,1)}
+.acc-open .acc-body{max-height:600px}
+.acc-open .acc-chev{transform:rotate(180deg)}
+.acc-content{padding:10px 14px 12px;font-size:14px;color:var(--ink2);line-height:1.7}
+.oq-card{background:var(--ink);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden}
+.oq-card::before{content:'?';position:absolute;right:12px;top:2px;font-family:var(--serif);font-size:90px;color:rgba(255,255,255,.035);line-height:1}
+.oq-label{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;color:#1a4f8a;margin-bottom:7px;text-transform:uppercase}
+.oq-q{font-family:var(--serif);font-size:17px;color:#fff;line-height:1.35;margin-bottom:5px}
+.oq-context{font-size:13px;color:rgba(255,255,255,.48);line-height:1.65}
+.bar-fill{transition:width 1s cubic-bezier(.22,1,.36,1)}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+.svg-flow{stroke-dasharray:7 4;animation:dash-flow 1.5s linear infinite}
+.fab-cluster{position:fixed;bottom:72px;right:16px;display:flex;flex-direction:column;gap:9px;z-index:200}
+.fab-btn{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 16px rgba(0,0,0,.22);transition:transform .15s,box-shadow .15s;position:relative}
+.fab-btn:hover{transform:scale(1.1);box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.fab-tooltip{position:absolute;right:58px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;padding:5px 11px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(255,255,255,.1)}
+.fab-btn:hover .fab-tooltip{opacity:1}
+#fp-overlay{position:fixed;inset:0;background:rgba(10,10,14,.55);backdrop-filter:blur(6px);z-index:900;display:none;opacity:0;transition:opacity .25s}
+#fp-overlay.open{display:block}
+#fp-overlay.visible{opacity:1}
+#fp-panel{position:fixed;right:0;top:0;bottom:0;width:min(700px,94vw);background:#0e1117;border-left:1px solid rgba(255,255,255,.08);z-index:901;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .32s cubic-bezier(.22,1,.36,1);overflow:hidden}
+#fp-panel.open{transform:translateX(0)}
+.fp-panel-header{padding:22px 26px 18px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.fp-header-left{flex:1;min-width:0}
+.fp-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.fp-close:hover{background:rgba(255,255,255,.14);color:#fff}
+.fp-body{flex:1;overflow-y:auto;padding:20px 26px 36px;display:flex;flex-direction:column;gap:0}
+.fp-body::-webkit-scrollbar{width:4px}
+.fp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+.fp-node{display:flex;align-items:flex-start;gap:14px;opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .4s ease;padding:0 0 0 2px}
+.fp-node.visible{opacity:1;transform:translateY(0)}
+.fp-node-spine{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:30px}
+.fp-node-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--mono);flex-shrink:0;position:relative;z-index:1}
+.fp-node-line{width:1px;flex:1;min-height:22px;background:linear-gradient(to bottom,rgba(255,255,255,.15),rgba(255,255,255,.04))}
+.fp-node:last-child .fp-node-line{display:none}
+.fp-node-content{flex:1;padding-bottom:22px}
+.fp-node-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;font-weight:700;padding:3px 9px;border-radius:3px;display:inline-block;margin-bottom:7px}
+.fp-node-heading{font-size:16px;font-weight:600;color:#fff;margin-bottom:6px;line-height:1.3}
+.fp-node-body{font-size:13.5px;color:rgba(255,255,255,.6);line-height:1.7}
+.fp-node-impact{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+.fp-impact-chip{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:12px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.09)}
+.fp-node-failure .fp-node-dot{background:rgba(138,26,46,.25);color:#e05470;border:1.5px solid rgba(138,26,46,.5)}
+.fp-node-failure .fp-node-label{background:rgba(138,26,46,.2);color:#e05470}
+.fp-node-cause .fp-node-dot{background:rgba(122,82,0,.25);color:#f0a500;border:1.5px solid rgba(122,82,0,.5)}
+.fp-node-cause .fp-node-label{background:rgba(122,82,0,.2);color:#f0a500}
+.fp-node-impact-type .fp-node-dot{background:rgba(200,81,10,.22);color:#e8722a;border:1.5px solid rgba(200,81,10,.45)}
+.fp-node-impact-type .fp-node-label{background:rgba(200,81,10,.18);color:#e8722a}
+.fp-node-resolve .fp-node-dot{background:rgba(26,107,60,.25);color:#4ade80;border:1.5px solid rgba(26,107,60,.5)}
+.fp-node-resolve .fp-node-label{background:rgba(26,107,60,.2);color:#4ade80}
+.fp-solution{margin-top:9px;background:rgba(26,107,60,.12);border:1px solid rgba(26,107,60,.25);border-radius:10px;padding:15px 17px;opacity:0;transform:translateY(10px);transition:opacity .4s ease .1s,transform .4s ease .1s}
+.fp-solution.visible{opacity:1;transform:translateY(0)}
+.fp-solution-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;font-weight:700;color:#4ade80;margin-bottom:8px}
+.fp-solution-text{font-size:13.5px;color:rgba(255,255,255,.72);line-height:1.7}
+.fp-solution-text strong{color:#fff}
+.panel-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.panel-tab{flex:1;padding:13px 10px;text-align:center;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.35);transition:color .2s;border:none;background:transparent;border-bottom:2px solid transparent}
+.panel-tab:hover{color:rgba(255,255,255,.7)}
+.panel-tab.active{color:#1a4f8a;border-bottom-color:#1a4f8a}
+.panel-svg-wrap{margin:14px 0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px}
+.panel-svg-title{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.35);margin-bottom:10px;font-weight:700;text-transform:uppercase}
+
+/* ── REFERENCE MODAL ──────────────────────────────────────────────── */
+#ref-fab{
+  position:fixed;bottom:72px;left:16px;z-index:200;
+  width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--ink2);color:#fff;font-size:18px;font-weight:700;
+  box-shadow:0 4px 16px rgba(0,0,0,.28);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s,box-shadow .15s;font-family:var(--mono);
+  position:fixed;
+}
+#ref-fab:hover{transform:scale(1.1);box-shadow:0 8px 28px rgba(0,0,0,.35)}
+#ref-fab .fab-tooltip{right:auto;left:58px}
+
+#ref-overlay{
+  position:fixed;inset:0;background:rgba(10,10,14,.6);
+  backdrop-filter:blur(8px);z-index:1000;
+  display:none;opacity:0;transition:opacity .25s;
+}
+#ref-overlay.open{display:block}
+#ref-overlay.visible{opacity:1}
+
+#ref-modal{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);
+  width:min(920px,96vw);max-height:88vh;
+  background:var(--paper);border:1px solid var(--paper3);
+  border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.28);
+  z-index:1001;display:flex;flex-direction:column;
+  opacity:0;transition:opacity .28s,transform .28s cubic-bezier(.22,1,.36,1);
+  overflow:hidden;
+}
+#ref-modal.visible{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+.ref-modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px 14px;border-bottom:1px solid var(--paper3);flex-shrink:0;
+}
+.ref-modal-title{font-family:var(--serif);font-size:22px;color:var(--ink);line-height:1.2}
+.ref-modal-sub{font-size:12px;color:var(--ink4);font-family:var(--mono);letter-spacing:.06em;margin-top:3px}
+.ref-modal-close{
+  width:32px;height:32px;border-radius:50%;background:var(--paper2);
+  border:1px solid var(--paper3);color:var(--ink3);cursor:pointer;
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+  transition:background .12s;flex-shrink:0;
+}
+.ref-modal-close:hover{background:var(--paper3);color:var(--ink)}
+
+.ref-tabs{
+  display:flex;border-bottom:1px solid var(--paper3);flex-shrink:0;
+  background:var(--paper2);
+}
+.ref-tab{
+  flex:1;padding:11px 16px;text-align:center;cursor:pointer;
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;
+  color:var(--ink4);transition:color .15s;border:none;background:transparent;
+  border-bottom:2px solid transparent;
+}
+.ref-tab:hover{color:var(--ink2)}
+.ref-tab.active{color:var(--ink);border-bottom-color:var(--ink)}
+
+.ref-body{flex:1;overflow-y:auto;padding:0}
+.ref-body::-webkit-scrollbar{width:4px}
+.ref-body::-webkit-scrollbar-thumb{background:var(--paper3);border-radius:2px}
+
+.ref-section{padding:10px 20px 4px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.14em;color:var(--ink4);font-weight:700;
+  border-bottom:1px solid var(--paper3);background:var(--paper2)}
+
+.ref-row{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:11px 20px;border-bottom:1px solid var(--paper3);
+  cursor:pointer;transition:background .12s;
+}
+.ref-row:hover{background:var(--paper2)}
+.ref-row.ref-expanded{background:var(--paper2)}
+.ref-row.ref-expanded .ref-desc{-webkit-line-clamp:unset;display:block}
+.ref-row.ref-expanded .ref-chev{transform:rotate(180deg)}
+
+.ref-code{
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  padding:4px 9px;border-radius:5px;white-space:nowrap;
+  flex-shrink:0;min-width:52px;text-align:center;letter-spacing:.04em;
+}
+.ref-name{
+  font-size:13.5px;font-weight:600;color:var(--ink);
+  min-width:160px;flex-shrink:0;line-height:1.4;
+}
+.ref-owner{
+  display:block;font-size:10.5px;color:var(--ink4);font-weight:400;
+  font-family:var(--mono);letter-spacing:.04em;margin-top:2px;
+}
+.ref-desc{
+  font-size:12.5px;color:var(--ink3);line-height:1.6;flex:1;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;
+  transition:all .2s;
+}
+.ref-chev{font-size:11px;color:var(--ink4);flex-shrink:0;margin-top:2px;transition:transform .2s}
+
+#ref-search{
+  width:100%;padding:10px 20px;border:none;border-bottom:1px solid var(--paper3);
+  background:var(--paper);font-family:var(--sans);font-size:13px;color:var(--ink);
+  outline:none;flex-shrink:0;
+}
+#ref-search::placeholder{color:var(--ink4)}
+#ref-search:focus{background:var(--paper2)}
+
+</style>
+</head>
+<body>
+<div id="stage">
+<div class="slide active" id="d7s1"><div class="prog"><div class="prog-fill" style="width:17%"></div></div><div class="id-bar" style="background:#1a4f8a"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#1a4f8a;border-color:#1a4f8a">D7 · The Team · DGTP-CAT-001</span>
+    <span class="enum">GoSXM API Catalog · Design Phase 2026</span>
+  </div>
+  <h2 class="slide-h1 a2">GoSXM API Catalog</h2>
+  <p class="slide-sub a3">The single source of truth for all platform APIs. Azure APIM Developer Portal with Swagger UI · try-it-out capability · role-gated consumer access · CI/CD auto-publication from approved OpenAPI 3.0 specs. Every approved API is visible. Nothing is undocumented.</p>
+</div>
+<div class="slide-body a4">
+  <div class="ov-grid" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">
+    <div class="ov-card">
+      <div class="ov-top-bar" style="background:#1a4f8a"></div>
+      <div class="ov-num">P-01 API-First</div>
+      <div class="ov-title">API-First — Catalogue as Source of Truth</div>
+      <div class="ov-desc">GoSXM API Catalogue is the authoritative reference for every API published on the platform. All approved OpenAPI 3.0 specs are published here automatically. No API is available to consumers unless it appears in the Catalogue. Every spec change triggers a CI/CD pipeline that updates the Catalogue within minutes.</div>
+      <span class="ov-badge" style="background:var(--bp);color:#1a4f8a">CI/CD AUTO-PUBLISH</span>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top-bar" style="background:#1a4f8a"></div>
+      <div class="ov-num">P-06 Open Standards</div>
+      <div class="ov-title">Open Standards — Swagger UI + Try-It-Out</div>
+      <div class="ov-desc">Azure APIM Developer Portal hosts the Catalogue with interactive Swagger UI. Every endpoint can be explored and tested directly from the browser. All specs are OpenAPI 3.0 — machine-readable and downloadable. Consumers self-register for API subscriptions subject to RBAC approval.</div>
+      <span class="ov-badge" style="background:var(--bp);color:#1a4f8a">SWAGGER UI + TRY-IT-OUT</span>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top-bar" style="background:#1a4f8a"></div>
+      <div class="ov-num">P-08 Identity-First Access</div>
+      <div class="ov-title">Identity-First — Role-Gated Access</div>
+      <div class="ov-desc">The Catalogue is protected by Azure Entra External ID. Government Staff and Integration Admin can browse all registry and platform APIs. Citizens see only public-facing endpoints. External developers require formal onboarding approved by the Integration Admin. All subscription requests are logged.</div>
+      <span class="ov-badge" style="background:var(--bp);color:#1a4f8a">ENTRA-GATED ACCESS</span>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-top" style="background:#1a4f8a"></div><div class="kpi-v">6 + 4</div><div class="kpi-l">Registry + Platform APIs</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#1a4f8a"></div><div class="kpi-v">OpenAPI 3.0</div><div class="kpi-l">All specs</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#1a4f8a"></div><div class="kpi-v">CI/CD</div><div class="kpi-l">Auto-publication</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#1a4f8a"></div><div class="kpi-v">Swagger UI</div><div class="kpi-l">Try-it-out</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#1a4f8a"></div><div class="kpi-v">3 Tiers</div><div class="kpi-l">Consumer access roles</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#8a1a2e"></div><div class="kpi-v">Last step</div><div class="kpi-l">After D4 specs approved</div></div>
+  </div>
+  <div class="note-bar" style="margin-top:10px">
+    <strong>Prerequisite — P-01 API-First:</strong> GoSXM API Catalogue is populated from the approved OpenAPI 3.0 specs produced in D4. It is the <em>last</em> Design Phase step — not the first. All registry specs must be approved by the Architecture Team before the Catalogue can be finalised. CI/CD auto-publication means the Catalogue is always in sync with the deployed APIM version.
+  </div>
+</div>
+</div>
+<div class="slide" id="d7s2"><div class="prog"><div class="prog-fill" style="width:35%"></div></div><div class="id-bar" style="background:#1a4f8a"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#1a4f8a;border-color:#1a4f8a">D7 · P-01 API-First · P-06 Open Standards</span>
+    <span class="enum">Catalogue Architecture &amp; Consumer Access Model</span>
+  </div>
+  <h2 class="slide-h1 a2">Catalogue Architecture & Access Model</h2>
+  <p class="slide-sub a3">One portal. Three consumer tiers. All APIs published from approved OpenAPI specs via CI/CD. Hover each node for details. No manual catalogue updates are ever permitted.</p>
+</div>
+<div class="slide-body a4">
+  <div class="q-layout">
+    <div class="q-left">
+      <div class="arch-svg-wrap">
+        <div class="arch-svg-title">GOSXM API CATALOGUE — ARCHITECTURE &amp; ACCESS MODEL · HOVER EACH NODE</div>
+        <svg viewBox="0 0 430 270" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans,sans-serif" style="width:100%;height:auto">
+          <defs>
+            <marker id="ca" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#1a4f8a" stroke-width="1.5" stroke-linecap="round"/>
+            </marker>
+          </defs>
+
+          <!-- Consumer tiers -->
+          <rect x="2" y="10" width="108" height="36" rx="6" fill="#f0f5ff" stroke="#1a4f8a" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'TIER 1 — Government Staff &amp; Integration Admin','Full API Browse Access','Can browse all 6 registry APIs and all 4 platform common APIs. Can subscribe to any endpoint subject to RBAC role approval. All subscription requests logged with timestamp and business justification. SSO via Entra External ID.','#1a4f8a')" onmouseleave="hideTip()"/>
+          <text x="56" y="25" text-anchor="middle" font-size="9" font-weight="700" fill="#1a4f8a">Government Staff</text>
+          <text x="56" y="38" text-anchor="middle" font-size="7.5" fill="#6b7280">Full browse · SSO</text>
+
+          <rect x="2" y="55" width="108" height="36" rx="6" fill="#fff5f5" stroke="#8a1a2e" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'TIER 2 — Citizens','Public Endpoints Only','Citizens see only public-facing service endpoints. No access to internal platform APIs or direct registry endpoints. All citizen API access is via the Citizen Portal BFF only. Authenticated via GovPass eID.','#8a1a2e')" onmouseleave="hideTip()"/>
+          <text x="56" y="70" text-anchor="middle" font-size="9" font-weight="700" fill="#8a1a2e">Citizens</text>
+          <text x="56" y="83" text-anchor="middle" font-size="7.5" fill="#6b7280">Public endpoints · eID</text>
+
+          <rect x="2" y="100" width="108" height="36" rx="6" fill="#fff5e6" stroke="#7a5200" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'TIER 3 — External Developers','Formal Onboarding Required','External developers require formal onboarding approved by Integration Admin. Scoped to specific approved endpoints only. All access time-limited and reviewed quarterly. No self-service — every external access request is manually reviewed.','#7a5200')" onmouseleave="hideTip()"/>
+          <text x="56" y="115" text-anchor="middle" font-size="9" font-weight="700" fill="#7a5200">External Developers</text>
+          <text x="56" y="128" text-anchor="middle" font-size="7.5" fill="#6b7280">Formal onboarding</text>
+
+          <!-- Arrows to APIM -->
+          <line x1="110" y1="28" x2="148" y2="90" stroke="#1a4f8a" stroke-width="1.5" class="svg-flow" marker-end="url(#ca)"/>
+          <line x1="110" y1="73" x2="148" y2="92" stroke="#8a1a2e" stroke-width="1.5" class="svg-flow" marker-end="url(#ca)"/>
+          <line x1="110" y1="118" x2="148" y2="94" stroke="#7a5200" stroke-width="1.5" class="svg-flow" marker-end="url(#ca)"/>
+
+          <!-- APIM Developer Portal (centre) -->
+          <rect x="150" y="62" width="130" height="64" rx="9" fill="#ebf4ff" stroke="#1a4f8a" stroke-width="2.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'P-01 API-First — Azure APIM Developer Portal','GoSXM API Catalogue — Single Source of Truth','Swagger UI with try-it-out for every endpoint. CI/CD auto-publishes every approved OpenAPI spec within minutes of deployment. Role-gated by Entra External ID. Consumer self-service subscription with admin approval. Always in sync with deployed APIM version — no manual catalogue updates ever.','#1a4f8a')" onmouseleave="hideTip()"/>
+          <text x="215" y="86" text-anchor="middle" font-size="10" font-weight="700" fill="#1a4f8a">Azure APIM</text>
+          <text x="215" y="100" text-anchor="middle" font-size="10" font-weight="700" fill="#1a4f8a">Developer Portal</text>
+          <text x="215" y="114" text-anchor="middle" font-size="8" fill="#6b7280">GoSXM API Catalogue</text>
+
+          <!-- Arrows to API groups -->
+          <line x1="280" y1="80" x2="316" y2="50" stroke="#1a4f8a" stroke-width="1.5" marker-end="url(#ca)"/>
+          <line x1="280" y1="90" x2="316" y2="95" stroke="#1a4f8a" stroke-width="1.5" marker-end="url(#ca)"/>
+          <line x1="280" y1="100" x2="316" y2="140" stroke="#1a4f8a" stroke-width="1.5" marker-end="url(#ca)"/>
+
+          <!-- Registry APIs box -->
+          <rect x="318" y="18" width="108" height="60" rx="7" fill="#f0faf4" stroke="#1a6b3c" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'Registry APIs (×6)','All 6 Registry OpenAPI 3.0 Specs','Civil Registry (CASBES), COCI, Tax Admin (SIAH), TEATT Licenses (BLISS), VROMI Permits (ArcGIS), Kadaster (deferred). Each documented with auth patterns, endpoints, schemas, errors, rate limits. Kadaster added when As-Is gap resolved.','#1a6b3c')" onmouseleave="hideTip()"/>
+          <text x="372" y="40" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a6b3c">Registry APIs</text>
+          <text x="372" y="54" text-anchor="middle" font-size="8" fill="#6b7280">×6 OpenAPI 3.0</text>
+          <text x="372" y="68" text-anchor="middle" font-size="7.5" fill="#9ca3af">(1 deferred)</text>
+
+          <!-- Platform APIs box -->
+          <rect x="318" y="88" width="108" height="60" rx="7" fill="#f0f5ff" stroke="#1a4f8a" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'Platform Common APIs (×4)','Identity · Audit · Consent · Once-Only','OAuth2 token endpoint, PII audit query API, consent management API, once-only lookup API. Platform-level APIs not specific to any registry. All documented as OpenAPI 3.0.','#1a4f8a')" onmouseleave="hideTip()"/>
+          <text x="372" y="110" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a4f8a">Platform APIs</text>
+          <text x="372" y="124" text-anchor="middle" font-size="8" fill="#6b7280">×4 OpenAPI 3.0</text>
+          <text x="372" y="138" text-anchor="middle" font-size="7.5" fill="#6b7280">Identity · Audit · Consent</text>
+
+          <!-- CI/CD box -->
+          <rect x="318" y="158" width="108" height="52" rx="7" fill="#fff5e6" stroke="#7a5200" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'CI/CD Auto-Publication Pipeline','Catalogue Always in Sync with Deployed APIM','Every approved API deployment triggers a GitHub Actions pipeline that updates the GoSXM Catalogue. No manual catalogue updates are ever permitted. Catalogue always reflects what is deployed — consumers always see the current spec.','#7a5200')" onmouseleave="hideTip()"/>
+          <text x="372" y="179" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7a5200">CI/CD Pipeline</text>
+          <text x="372" y="193" text-anchor="middle" font-size="8" fill="#6b7280">Auto-publish</text>
+          <text x="372" y="204" text-anchor="middle" font-size="7.5" fill="#6b7280">Always in sync</text>
+          <line x1="372" y1="158" x2="280" y2="110" stroke="#7a5200" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#ca)"/>
+
+          <!-- Entra gate -->
+          <rect x="150" y="160" width="130" height="48" rx="7" fill="#fff5f5" stroke="#8a1a2e" stroke-width="1.3" style="cursor:pointer"
+            onmouseenter="showTip(event,'P-08 Identity-First Access — Entra External ID Gate','All Catalogue Access Requires Authentication','No unauthenticated browsing. Government Staff: SSO via Entra. Citizens: eID/GovPass. External Developers: formal Entra app registration. Role determines which APIs are visible and which subscriptions are permitted.','#8a1a2e')" onmouseleave="hideTip()"/>
+          <text x="215" y="180" text-anchor="middle" font-size="9.5" font-weight="700" fill="#8a1a2e">Entra External ID</text>
+          <text x="215" y="194" text-anchor="middle" font-size="8" fill="#6b7280">Role-gated access</text>
+          <line x1="215" y1="126" x2="215" y2="160" stroke="#8a1a2e" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ca)"/>
+
+          <text x="215" y="258" text-anchor="middle" font-size="8" fill="#9ca3af">No manual catalogue updates ever · P-01 API-First: every API must appear in the Catalogue</text>
+        </svg>
+      </div>
+    </div>
+    <div class="q-right" style="gap:6px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">CATALOGUE RULES — P-01 API-First</div>
+      <div class="acc-section acc-open">
+        <div class="acc-head" style="border-left:4px solid #1a4f8a"><span>No API is available without a Catalogue entry</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Per P-01 API-First API-First, every platform API must have an approved OpenAPI 3.0 spec published in the GoSXM API Catalogue before any consumer can access it. A deployed APIM endpoint that is not in the Catalogue is not a published API — it is an undocumented endpoint and must be removed or catalogued immediately.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #1a4f8a"><span>No manual catalogue updates ever</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">The Catalogue is updated exclusively via CI/CD pipeline triggered by an approved API deployment. No team member may manually edit Catalogue entries, update spec files directly in APIM, or add endpoints outside the pipeline. Manual updates create drift between deployed APIM and the Catalogue — violating P-01 API-First.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #1a4f8a"><span>Subscription self-service with admin approval</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Consumers browse the Catalogue and self-select API subscriptions. All subscription requests require Integration Admin approval before access is granted. Approval decisions are logged with timestamp, approver, and business justification. Subscription scope is limited to the consumer's RBAC role — no consumer can subscribe to endpoints outside their role.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #7a5200"><span>Quarterly access review for all subscriptions</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">All active API subscriptions are reviewed quarterly by the Integration Admin. Subscriptions with no API calls in the previous 90 days are revoked after written notice to the consumer. External developer subscriptions are reviewed monthly — not quarterly. All reviews are logged in the audit trail per P-13 Observability First Observability First.</div></div>
+      </div>
+      <div class="oq-card" style="margin-top:6px">
+        <div class="oq-label">Design Decision — P-01 API-First</div>
+        <div class="oq-q">Should the GoSXM API Catalogue be publicly accessible (no auth to browse) or gated (Entra login required to view)?</div>
+        <div class="oq-context">Public: easier developer discovery, aligns with open government principles. Gated: prevents enumeration of government API surface by unauthorised parties. Architecture Team decision required — it affects the Entra configuration and the APIM developer portal settings.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="slide" id="d7s3"><div class="prog"><div class="prog-fill" style="width:58%"></div></div><div class="id-bar" style="background:#1a4f8a"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#1a4f8a;border-color:#1a4f8a">D7 · LIVE DEMO</span>
+    <span class="enum">GoSXM API Catalogue — Interactive Browser</span>
+  </div>
+  <h2 class="slide-h1 a2">GoSXM API Catalogue — Live Browser</h2>
+  <p class="slide-sub a3">This is what the GoSXM API Catalogue looks like. Browse APIs by category, search by keyword, expand any endpoint to see its spec summary, and subscribe. Role selector simulates different consumer views.</p>
+</div>
+<div class="slide-body a4" style="padding-top:6px">
+  <div style="display:grid;grid-template-columns:220px 1fr;gap:12px;height:100%;min-height:0">
+
+    <!-- LEFT: sidebar -->
+    <div style="display:flex;flex-direction:column;gap:8px;min-height:0">
+
+      <!-- Role selector -->
+      <div style="background:var(--ink);border-radius:9px;padding:12px 13px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,.3);margin-bottom:8px;font-weight:700">VIEWING AS</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <button class="role-btn active" data-role="staff" onclick="setRole(this,'staff')" style="font-family:var(--mono);font-size:10px;font-weight:700;padding:7px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:rgba(26,79,138,.35);color:#6b9bd2;cursor:pointer;text-align:left;transition:all .15s">👤 Government Staff</button>
+          <button class="role-btn" data-role="citizen" onclick="setRole(this,'citizen')" style="font-family:var(--mono);font-size:10px;font-weight:700;padding:7px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:transparent;color:rgba(255,255,255,.4);cursor:pointer;text-align:left;transition:all .15s">🏠 Citizen</button>
+          <button class="role-btn" data-role="external" onclick="setRole(this,'external')" style="font-family:var(--mono);font-size:10px;font-weight:700;padding:7px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:transparent;color:rgba(255,255,255,.4);cursor:pointer;text-align:left;transition:all .15s">🌐 External Developer</button>
+        </div>
+        <div id="role-note" style="font-size:11px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.5"></div>
+      </div>
+
+      <!-- Category nav -->
+      <div style="flex:1;background:var(--paper2);border-radius:9px;padding:10px 12px;overflow-y:auto;min-height:0">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--ink4);margin-bottom:8px;font-weight:700">API CATEGORIES</div>
+        <div id="cat-nav" style="display:flex;flex-direction:column;gap:3px"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: catalogue content -->
+    <div style="display:flex;flex-direction:column;gap:8px;min-height:0">
+      <!-- Search + stats bar -->
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+        <input id="cat-search" type="text" placeholder="Search APIs, endpoints, tags…"
+          style="flex:1;padding:8px 13px;border:1px solid var(--paper3);border-radius:7px;font-family:var(--sans);font-size:13px;color:var(--ink);background:var(--paper2);outline:none"
+          oninput="catSearch(this.value)"/>
+        <span id="cat-stats" style="font-family:var(--mono);font-size:10px;color:var(--ink4);white-space:nowrap"></span>
+        <span id="role-badge" style="font-family:var(--mono);font-size:10px;font-weight:700;padding:4px 12px;border-radius:12px;flex-shrink:0"></span>
+      </div>
+      <!-- API list -->
+      <div id="api-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;min-height:0;padding-right:2px">
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="slide" id="d7s4"><div class="prog"><div class="prog-fill" style="width:78%"></div></div><div class="id-bar" style="background:#1a4f8a"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#1a4f8a;border-color:#1a4f8a">D7 · P-01 API-First · P-13 Observability First</span>
+    <span class="enum">CI/CD Publication Pipeline &amp; Document Map</span>
+  </div>
+  <h2 class="slide-h1 a2">CI/CD Publication Pipeline & Document Map</h2>
+  <p class="slide-sub a3">Every approved spec deployment triggers an automatic Catalogue update. No manual steps. The Catalogue is always in sync with what is deployed in Azure APIM — guaranteed by the pipeline, not by discipline.</p>
+</div>
+<div class="slide-body a4">
+  <div class="q-layout">
+    <div class="q-left" style="gap:7px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">CI/CD PIPELINE — SPEC TO CATALOGUE</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:#1a4f8a18;color:#1a4f8a;border:1.5px solid #1a4f8a66;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0">1</div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Architecture Team approves OpenAPI spec</div><div style="font-size:12px;color:var(--ink3);line-height:1.6">Spec review complete, registry validation done, sign-off received. Spec PR merged to the central spec repository.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:#1a4f8a18;color:#1a4f8a;border:1.5px solid #1a4f8a66;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0">2</div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:3px">GitHub Actions pipeline triggered on merge</div><div style="font-size:12px;color:var(--ink3);line-height:1.6">Pipeline validates spec (OpenAPI linting), imports to Azure APIM via ARM/Bicep, updates APIM Developer Portal, and creates/updates the Catalogue entry.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:#1a4f8a18;color:#1a4f8a;border:1.5px solid #1a4f8a66;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0">3</div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Catalogue updated within minutes</div><div style="font-size:12px;color:var(--ink3);line-height:1.6">GoSXM API Catalogue reflects the new spec. Existing subscriptions remain active. All consumers see the updated documentation immediately.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:#1a6b3c18;color:#1a6b3c;border:1.5px solid #1a6b3c66;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">✓</div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;color:#1a6b3c">Azure Monitor alert confirms successful publication</div><div style="font-size:12px;color:var(--ink3);line-height:1.6">Per P-13 Observability First Observability First — every Catalogue update triggers a confirmation alert to the Integration Admin. Failed pipeline runs trigger a P1 alert within 2 minutes.</div></div>
+        </div>
+      </div>
+      <div class="note-bar">
+        <strong>Breaking change protection:</strong> If a deployed spec is a breaking change (/v2/ promotion), the pipeline automatically sends deprecation notices to all active subscribers of the /v1/ endpoint with the 4-week notice period defined in D4 API Design Guidelines.
+      </div>
+    </div>
+    <div class="q-right" style="gap:8px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">DGTP-CAT-001 DOCUMENT MAP</div>
+      <div class="ns-grid" style="grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="ns-card"><div class="ns-top" style="background:#1a4f8a"></div>
+          <div class="ns-sprint">REQUIRES</div><div class="ns-title">DGTP-API-GL-001 (D4)</div>
+          <div class="ns-items">
+            <div class="ns-item">All registry OpenAPI specs come from D4</div>
+            <div class="ns-item">D7 is the final step after all D4 specs approved</div>
+            <div class="ns-item">API standards defined in D4 govern the Catalogue</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#1a4f8a"></div>
+          <div class="ns-sprint">REQUIRES</div><div class="ns-title">Azure APIM Provisioned</div>
+          <div class="ns-items">
+            <div class="ns-item">Developer Portal must be configured and live</div>
+            <div class="ns-item">Entra External ID integration configured</div>
+            <div class="ns-item">CI/CD pipeline connected to APIM ARM API</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#1a6b3c"></div>
+          <div class="ns-sprint">ENABLES</div><div class="ns-title">Build Phase Development</div>
+          <div class="ns-items">
+            <div class="ns-item">Developers reference Catalogue during Build Phase</div>
+            <div class="ns-item">Mock policies discoverable via Catalogue</div>
+            <div class="ns-item">Consumers begin onboarding and subscriptions</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#1a4f8a"></div>
+          <div class="ns-sprint">INFORMS</div><div class="ns-title">DGTP-LLD-001 (D8)</div>
+          <div class="ns-items">
+            <div class="ns-item">LLD documents Catalogue CI/CD pipeline design</div>
+            <div class="ns-item">Consumer onboarding workflow in LLD</div>
+            <div class="ns-item">Subscription approval process formalised in D8</div>
+          </div>
+        </div>
+      </div>
+      <div class="closing-row">
+        <div class="cbox" style="background:var(--bp);border-color:#1a4f8a44">
+          <div class="cbox-title" style="color:#1a4f8a">ALIGNED WITH</div>
+          <div class="cbox-text">P-01 API-First API-First · P-06 Open Standards Open Standards · P-07 Security by Design Security by Design · P-08 Identity-First Access Identity-First Access · P-13 Observability First Observability First · DGTP-API-GL-001 (D4) · DGTP-SEC-001 (D1) · DGTP-HLD-001 §3 (API Catalogue)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="slide" id="d7s5"><div class="prog"><div class="prog-fill" style="width:100%"></div></div><div class="id-bar" style="background:#1a4f8a"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#1a4f8a;border-color:#1a4f8a">D7 · P-13 Observability First Observability First</span>
+    <span class="enum">Catalogue Monitoring, Analytics &amp; Governance</span>
+  </div>
+  <h2 class="slide-h1 a2">Catalogue Monitoring & API Governance Metrics</h2>
+  <p class="slide-sub a3">Per P-13 Observability First Observability First — the Catalogue is not just a documentation portal. It is an active governance instrument. API usage, subscription velocity, error rates, and deprecation status are tracked and reported to the Architecture Team weekly.</p>
+</div>
+<div class="slide-body a4">
+  <div class="q-layout">
+    <div class="q-left" style="gap:8px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">CATALOGUE GOVERNANCE METRICS — P-13 Observability First</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px">
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:12px 13px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:#1a4f8a;font-weight:700;margin-bottom:6px">API ADOPTION RATE</div>
+          <div style="font-family:var(--serif);font-size:26px;color:var(--ink);margin-bottom:3px">85%</div>
+          <div style="font-size:12px;color:var(--ink3)">of published APIs have at least 1 active subscriber within 30 days of publication</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:12px 13px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:#1a4f8a;font-weight:700;margin-bottom:6px">CATALOGUE FRESHNESS</div>
+          <div style="font-family:var(--serif);font-size:26px;color:var(--ink);margin-bottom:3px">&lt;5 min</div>
+          <div style="font-size:12px;color:var(--ink3)">Time from approved spec merge to Catalogue update — guaranteed by CI/CD pipeline, not manual process</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:12px 13px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:#7a5200;font-weight:700;margin-bottom:6px">SUBSCRIPTION APPROVAL</div>
+          <div style="font-family:var(--serif);font-size:26px;color:var(--ink);margin-bottom:3px">&lt;2 days</div>
+          <div style="font-size:12px;color:var(--ink3)">Target SLA for Integration Admin to approve or reject a new subscription request from any consumer</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:12px 13px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:#8a1a2e;font-weight:700;margin-bottom:6px">STALE SUBSCRIPTION RATE</div>
+          <div style="font-family:var(--serif);font-size:26px;color:var(--ink);margin-bottom:3px">&lt;5%</div>
+          <div style="font-size:12px;color:var(--ink3)">Target: fewer than 5% of active subscriptions with zero API calls in the previous 90 days — enforced by quarterly review</div>
+        </div>
+      </div>
+      <div class="acc-section acc-open">
+        <div class="acc-head" style="border-left:4px solid #1a4f8a"><span>Weekly Architecture Team Report</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Every Monday: Integration Admin produces a Catalogue health report covering: new subscriptions (approved/rejected), top 5 most-called APIs, APIs with zero calls in 30 days, deprecation notices sent, pipeline failures in the past week, and any consumer complaints about spec accuracy. Distributed to Architecture Team and Project Steering Committee.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #7a5200"><span>Deprecation Tracking Dashboard</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">All /v1/ endpoints with a planned /v2/ promotion are tracked in the Catalogue with a deprecation countdown banner visible to all subscribers. When the 4-week notice period begins, all active subscribers receive an automated email. The Catalogue shows which consumers have migrated to /v2/ and which are still on the deprecated /v1/ endpoint — enabling the Architecture Team to follow up.</div></div>
+      </div>
+    </div>
+    <div class="q-right" style="gap:8px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">CATALOGUE ITEMS AT PHASE 1 LAUNCH</div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
+        <div style="background:#fff;border:1px solid #1a6b3c33;border-radius:7px;padding:9px 12px;display:flex;gap:10px;align-items:center">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:#1a6b3c;min-width:48px">LIVE</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">Civil Registry API</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-left:auto">/v1/civil · 3 endpoints</span>
+        </div>
+        <div style="background:#fff;border:1px solid #1a6b3c33;border-radius:7px;padding:9px 12px;display:flex;gap:10px;align-items:center">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:#1a6b3c;min-width:48px">LIVE</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">Chamber of Commerce API</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-left:auto">/v1/coci · 4 endpoints</span>
+        </div>
+        <div style="background:#fff;border:1px solid #1a6b3c33;border-radius:7px;padding:9px 12px;display:flex;gap:10px;align-items:center">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:#1a6b3c;min-width:48px">LIVE</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">TEATT Licenses API</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-left:auto">/v1/teatt · 3 endpoints</span>
+        </div>
+        <div style="background:#fff;border:1px solid #1a6b3c33;border-radius:7px;padding:9px 12px;display:flex;gap:10px;align-items:center">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:#1a6b3c;min-width:48px">LIVE</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">VROMI Permits API</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-left:auto">/v1/vromi · 4 endpoints</span>
+        </div>
+        <div style="background:#fff;border:1px solid #7a520033;border-radius:7px;padding:9px 12px;display:flex;gap:10px;align-items:center">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:#7a5200;min-width:48px">COND.</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">Tax Administration API</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-left:auto">/v1/siah · DSA pending</span>
+        </div>
+        <div style="background:#fff;border:1px solid #9ca3af33;border-radius:7px;padding:9px 12px;display:flex;gap:10px;align-items:center;opacity:.65">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:#9ca3af;min-width:48px">DEFER.</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">Kadaster (Land Registry) API</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-left:auto">Phase 1b</span>
+        </div>
+        <div style="background:#fff;border:1px solid #1a4f8a33;border-radius:7px;padding:9px 12px;display:flex;gap:10px;align-items:center">
+          <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:#1a4f8a;min-width:48px">LIVE</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">Platform Common APIs ×4</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-left:auto">Identity · Audit · Consent · Once-Only</span>
+        </div>
+      </div>
+      <div class="rec-pill">
+        <span>RECOMMENDED</span>Launch Catalogue in read-only preview mode during the Build Phase so registry technical contacts and internal consumers can begin exploring specs and planning their integrations before production go-live.
+      </div>
+    </div>
+  </div>
+</div>
+</div></div>
+<div class="fab-cluster">
+  <button class="fab-btn" style="background:#1a4f8a;color:#fff" onclick="openPanel('analysis')">
+    <span class="fab-tooltip">Failure Analysis</span>⚡
+  </button>
+  <button class="fab-btn" style="background:#8a1a2e;color:#fff" onclick="openPanel('challenges')">
+    <span class="fab-tooltip">Challenges</span>⚠
+  </button>
+  <button class="fab-btn" style="background:var(--ink);color:#fff" onclick="window.location='../index.html'">
+    <span class="fab-tooltip">Back to Overview</span>↩
+  </button>
+</div>
+<div id="fp-overlay" onclick="closePanel()"></div>
+<div id="fp-panel">
+  <div class="fp-panel-header">
+    <div class="fp-header-left">
+      <div class="fp-eyebrow" id="fp-eyebrow">DGTP-CAT-001</div>
+      <div class="fp-title" id="fp-title">Analysis</div>
+      <div class="fp-subtitle" id="fp-subtitle"></div>
+    </div>
+    <button class="fp-close" onclick="closePanel()">&#x2715;</button>
+  </div>
+  <div class="panel-tabs">
+    <button class="panel-tab active" id="tab-analysis" onclick="switchTab('analysis')">⚡ Failure Analysis</button>
+    <button class="panel-tab" id="tab-challenges" onclick="switchTab('challenges')">⚠ Challenges</button>
+    <button class="panel-tab" id="tab-faq" onclick="switchTab('faq')">❓ FAQ</button>
+  </div>
+  <div class="fp-body" id="fp-body"></div>
+</div>
+<div id="svg-tip"><div class="tip-tag" id="tip-tag"></div><div class="tip-title" id="tip-title"></div><div class="tip-body" id="tip-body"></div></div>
+<div id="global-footnote">
+  <span class="fn-logo">ORANGE BD · DGTP SINT MAARTEN</span>
+  <span class="fn-text">GoSXM API Catalog · DGTP-CAT-001 · The Team · Design Phase 2026</span>
+  <span class="fn-link" style="color:#1a4f8a">Low–Med · 2–3 day buffer</span>
+</div>
+<div id="global-footer">
+  <div id="gf-left">
+    <button class="gf-arrow" onclick="prev()">&#8592;</button>
+    <span id="gf-brand">DGTP Sint Maarten · OrangeBD · DGTP-CAT-001</span>
+  </div>
+  <div id="gf-dots"></div>
+  <div id="gf-right">
+    <span id="gf-stage" style="color:#1a4f8a;background:#1a4f8a18;border:1px solid #1a4f8a44;border-radius:4px;padding:4px 12px;font-family:var(--mono);letter-spacing:.06em">DGTP-CAT-001</span>
+    <span id="gf-counter">1 / 5</span>
+    <button class="gf-arrow" onclick="next()">&#8594;</button>
+  </div>
+</div>
+<span id="kbhint">&#8592; &#8594; navigate</span>
+<script>
+const slides=document.querySelectorAll('.slide'),total=slides.length;let cur=0;
+const gfDots=document.getElementById('gf-dots');
+for(let i=0;i<total;i++){const d=document.createElement('button');d.className='gf-dot'+(i===0?' on':'');d.onclick=(n=>()=>goTo(n))(i);gfDots.appendChild(d);}
+function goTo(n){slides[cur].classList.remove('active');cur=(n+total)%total;slides[cur].classList.add('active');document.querySelectorAll('.gf-dot').forEach((d,i)=>d.classList.toggle('on',i===cur));document.getElementById('gf-counter').textContent=(cur+1)+' / '+total;setTimeout(()=>slides[cur].querySelectorAll('.bar-fill[data-w]').forEach(b=>b.style.width=b.dataset.w),80);}
+function next(){goTo(cur+1)}function prev(){goTo(cur-1)}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')next();if(e.key==='ArrowLeft')prev();if(e.key==='Escape')closePanel();});
+setTimeout(()=>slides[0].querySelectorAll('.bar-fill[data-w]').forEach(b=>b.style.width=b.dataset.w),150);
+let tip,tipTag,tipTi,tipBo,tipOn=false;
+document.addEventListener('DOMContentLoaded',()=>{tip=document.getElementById('svg-tip');tipTag=document.getElementById('tip-tag');tipTi=document.getElementById('tip-title');tipBo=document.getElementById('tip-body');});
+function showTip(e,tag,ttl,body,col){if(!tip){tip=document.getElementById('svg-tip');tipTag=document.getElementById('tip-tag');tipTi=document.getElementById('tip-title');tipBo=document.getElementById('tip-body');}tipTag.textContent=tag;tipTag.style.background=(col||'#333')+'28';tipTag.style.color=col||'#333';tipTi.textContent=ttl;tipBo.innerHTML=body;tip.style.display='block';tip.style.opacity='0';tip.style.transform='translateY(4px)';requestAnimationFrame(()=>{tip.style.opacity='1';tip.style.transform='translateY(0)';});tipOn=true;posTip(e);}
+function posTip(e){if(!tipOn||!tip)return;const tw=320,th=190;let x=e.clientX+16,y=e.clientY+16;if(x+tw>window.innerWidth-8)x=e.clientX-tw-8;if(y+th>window.innerHeight-8)y=e.clientY-th-8;if(x<4)x=4;if(y<4)y=4;tip.style.left=x+'px';tip.style.top=y+'px';}
+function hideTip(){if(tip){tip.style.opacity='0';tip.style.transform='translateY(4px)';setTimeout(()=>{if(!tipOn)tip.style.display='none';},120);}tipOn=false;}
+document.addEventListener('mousemove',posTip);
+window.showTip=showTip;window.hideTip=hideTip;
+const PANEL_DATA={
+  analysis: {
+    eyebrow: "DGTP-CAT-001 · FAILURE PATH ANALYSIS",
+    title: "What breaks without a GoSXM API Catalogue?",
+    subtitle: "From no central catalogue to fragmented, ungoverned, undiscoverable platform APIs.",
+    svgTitle: "CATALOGUE ABSENCE — GOVERNANCE FAILURE CHAIN",
+    svg: `<svg viewBox="0 0 620 108" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans,sans-serif" style="width:100%;height:auto">
+      <defs><marker id="qa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 2L8 5L2 8" fill="none" stroke="#e05470" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+      <rect x="2" y="16" width="130" height="68" rx="7" fill="rgba(138,26,46,.14)" stroke="#e05470" stroke-width="1.5"/>
+      <text x="67" y="36" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e05470">No Catalogue</text>
+      <text x="67" y="52" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">APIs undiscoverable</text>
+      <text x="67" y="66" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)">Consumers ask via email</text>
+      <line x1="132" y1="50" x2="156" y2="50" stroke="#e05470" stroke-width="1.5" marker-end="url(#qa)" stroke-dasharray="5 3"/>
+      <rect x="158" y="16" width="130" height="68" rx="7" fill="rgba(122,82,0,.14)" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="223" y="36" text-anchor="middle" font-size="8.5" font-weight="700" fill="#f0a500">No CI/CD Sync</text>
+      <text x="223" y="52" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">Docs drift from reality</text>
+      <text x="223" y="66" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)">Consumers use stale specs</text>
+      <line x1="288" y1="50" x2="312" y2="50" stroke="#f0a500" stroke-width="1.5" marker-end="url(#qa)" stroke-dasharray="5 3"/>
+      <rect x="314" y="16" width="130" height="68" rx="7" fill="rgba(200,81,10,.14)" stroke="#e8722a" stroke-width="1.5"/>
+      <text x="379" y="36" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e8722a">No Governance</text>
+      <text x="379" y="52" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">Ungated subscriptions</text>
+      <text x="379" y="66" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)">No access reviews</text>
+      <line x1="444" y1="50" x2="468" y2="50" stroke="#e8722a" stroke-width="1.5" marker-end="url(#qa)" stroke-dasharray="5 3"/>
+      <rect x="470" y="4" width="148" height="92" rx="7" fill="rgba(138,26,46,.2)" stroke="#e05470" stroke-width="2"/>
+      <text x="544" y="26" text-anchor="middle" font-size="9" font-weight="700" fill="#e05470">PLATFORM FAILS</text>
+      <text x="544" y="42" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">10 different API docs</text>
+      <text x="544" y="55" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">Stale specs in production</text>
+      <text x="544" y="68" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">No subscription audit trail</text>
+      <text x="544" y="81" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">P01NAME violated</text>
+    </svg>`.replace('P01NAME', 'P-01 API-First'),
+    nodes: [
+      {type:"failure",icon:"📚",label:"ROOT FAILURE — No Central API Catalogue",
+       heading:"APIs Are Undiscoverable — Consumers Ask Via Email",
+       body:"Without a GoSXM API Catalogue, there is no single place to find what APIs are available, what their endpoints are, what auth method they use, or how to subscribe. Consumers resort to emailing the DGTP team for spec files. Different teams receive different versions. Some consume outdated specs. The Architecture Team has no visibility into who is consuming which API — subscription governance collapses.",
+       chips:["No single source of truth for APIs","Consumers receive stale spec files by email","No subscription audit trail per P-15 Compliance by Design"]},
+      {type:"cause",icon:"🔄",label:"CASCADING — No CI/CD Sync",
+       heading:"Documentation Drifts From Reality — Consumers Use Stale Specs",
+       body:"Without CI/CD auto-publication, the Catalogue is updated manually. Manual updates are forgotten, delayed, or done incorrectly. Within weeks, the documented API and the deployed API diverge. Consumers build integrations against spec v1.2 while APIM is running v1.4. Integration failures are blamed on the consumer's code — when the real cause is that the documentation was never updated.",
+       chips:["Manual updates: forgotten within weeks","Consumers build against stale specs","Integration failures blamed on consumers wrongly"]},
+      {type:"impact-type",icon:"🔓",label:"GOVERNANCE — No Subscription Control",
+       heading:"No Subscription Management = No Access Governance",
+       body:"Without a managed Catalogue, there is no formal subscription workflow. Any consumer who can reach the APIM endpoint can call the API if they have credentials — there is no record of why they have access, when access was approved, or whether access should still be valid. Quarterly access reviews are impossible without a subscription registry. This violates P-08 Identity-First Access Identity-First Access and P-15 Compliance by Design Compliance by Design.",
+       chips:["No record of who has access to which API","Quarterly reviews impossible without subscription log","P-08 Identity-First Access: all API access must be explicitly approved"]},
+      {type:"resolve",icon:"✓",label:"SOLUTION — DGTP-CAT-001 GoSXM API Catalogue",
+       heading:"Single Catalogue + CI/CD Sync + Role-Gated Access = Governed Platform",
+       body:"DGTP-CAT-001 defines: GoSXM API Catalogue on Azure APIM Developer Portal as the single source of truth (P-01 API-First), CI/CD auto-publication from approved specs (no manual updates ever), Swagger UI with try-it-out for every endpoint (P-06 Open Standards), Entra External ID role-gated access (P-08 Identity-First Access), self-service subscription with admin approval, quarterly access reviews, and weekly governance metrics reported to the Architecture Team (P-13 Observability First).",
+       chips:["P-01 API-First: Catalogue = single source of truth","P-06 Open Standards: Swagger UI + try-it-out for every API","P-08 Identity-First Access: every subscription explicitly approved"]}
+    ]
+  },
+  challenges: {
+    eyebrow: "DGTP-CAT-001 · KNOWN CHALLENGES",
+    title: "GoSXM API Catalogue Open Challenges",
+    subtitle: "Four challenges to resolve before the Catalogue can be launched.",
+    svgTitle: "CATALOGUE CHALLENGE PRIORITY",
+    svg: `<svg viewBox="0 0 620 90" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans,sans-serif" style="width:100%;height:auto">
+      <rect x="2" y="6" width="148" height="76" rx="6" fill="rgba(138,26,46,.16)" stroke="#e05470" stroke-width="1.5"/>
+      <text x="76" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#e05470">🔴 CRITICAL</text>
+      <text x="76" y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">APIM Not Yet</text>
+      <text x="76" y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Provisioned</text>
+      <text x="76" y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">Blocks Catalogue entirely</text>
+      <rect x="158" y="6" width="148" height="76" rx="6" fill="rgba(122,82,0,.14)" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="232" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#f0a500">🟡 HIGH</text>
+      <text x="232" y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Public vs Gated</text>
+      <text x="232" y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Access Decision</text>
+      <text x="232" y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">Architecture Team must decide</text>
+      <rect x="314" y="6" width="148" height="76" rx="6" fill="rgba(122,82,0,.10)" stroke="#f0a500" stroke-width="1.2"/>
+      <text x="388" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#f0a500">🟡 MEDIUM</text>
+      <text x="388" y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Tax + Kadaster</text>
+      <text x="388" y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Specs Not Yet Ready</text>
+      <text x="388" y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">Catalogue launch with placeholders</text>
+      <rect x="470" y="6" width="148" height="76" rx="6" fill="rgba(122,82,0,.10)" stroke="#f0a500" stroke-width="1.2"/>
+      <text x="544" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#f0a500">🟡 MEDIUM</text>
+      <text x="544" y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">CI/CD Pipeline</text>
+      <text x="544" y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Design Not Finalised</text>
+      <text x="544" y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">Central repo decision first</text>
+    </svg>`,
+    nodes: [
+      {type:"failure",icon:"☁",label:"CRITICAL — Azure APIM Not Yet Provisioned",
+       heading:"The Catalogue Cannot Exist Without Azure APIM Developer Portal",
+       body:"GoSXM API Catalogue runs on Azure APIM Developer Portal. Without a provisioned Azure subscription and APIM instance in the European region, the Catalogue portal cannot be configured, the CI/CD pipeline cannot be connected, and no specs can be published. Azure subscription provisioning is the single most critical unblocked dependency — escalate to SXM ICT immediately.",
+       chips:["No Azure subscription = no APIM = no Catalogue","European region required per P-12 Data Sovereignty","Escalate to SXM ICT — Week 1 action"]},
+      {type:"cause",icon:"🌐",label:"HIGH — Public vs Gated Access Decision",
+       heading:"Architecture Team Must Decide: Public Browse or Login Required",
+       body:"This decision affects the Entra External ID configuration, the APIM Developer Portal settings, and the CI/CD pipeline access controls. Public: easier developer discovery, aligns with open government. Gated: prevents enumeration of government API surface. Both are valid — but the decision must be made before the Catalogue is configured. Default recommendation: gated initially, with a planned transition to public browse after security review.",
+       chips:["Affects Entra + APIM portal configuration","Must decide before Catalogue is configured","Recommend: gated initially, public after security review"]},
+      {type:"cause",icon:"📋",label:"MEDIUM — Tax + Kadaster Specs Not Yet Ready",
+       heading:"Catalogue Launches With 4 of 6 Registry Specs — Plus Placeholders",
+       body:"Tax Administration spec is gated on DSA approval. Kadaster spec is formally deferred to Phase 1b. The Catalogue should launch with 4 live registry specs (Civil, COCI, TEATT, VROMI) plus 4 platform common APIs, with clear placeholder entries for Tax and Kadaster showing their expected availability status. Placeholder entries prevent consumers from thinking those APIs do not exist.",
+       chips:["Launch with 4 registry + 4 platform APIs","Tax: placeholder entry with DSA-pending status","Kadaster: placeholder entry with Phase 1b status"]},
+      {type:"resolve",icon:"✓",label:"RESOLUTION — Catalogue Launch Sequence",
+       heading:"Three Steps to a Live GoSXM API Catalogue",
+       body:"1. Escalate Azure APIM provisioning to SXM ICT as Week 1 action — no Catalogue is possible without it. 2. Architecture Team decides public vs gated access within 2 weeks of APIM provisioning. 3. CI/CD pipeline connected to spec repo — test with one spec (COCI, lowest risk) before publishing all approved specs. Launch Catalogue in read-only preview mode during Build Phase so consumers can plan integrations before go-live.",
+       chips:["Week 1: APIM provisioning escalated to SXM ICT","Week 3: public vs gated decision made","Preview: read-only Catalogue live during Build Phase"]}
+    ]
+  },
+  faq: {
+    eyebrow: "DGTP-CAT-001 · FAQ",
+    title: "GoSXM API Catalogue — FAQ",
+    subtitle: "Questions from consumers, registry teams, and SXM ICT about the Catalogue.",
+    nodes: [
+      {type:"cause",icon:"❓",label:"Q — How do I get access to an API?",
+       heading:"How does a consumer subscribe to a registry API?",
+       body:"1. Log in to the GoSXM API Catalogue using your Entra External ID account (Government Staff SSO or eID for citizens). 2. Browse to the API you need. 3. Click Subscribe. 4. Submit a subscription request with your business justification. 5. Integration Admin reviews and approves or rejects within 2 business days. 6. Once approved, your client credentials are activated for the subscribed endpoints. All subscriptions are scoped to your RBAC role — you cannot subscribe to endpoints outside your role.",
+       chips:["Login with Entra SSO / eID","Submit subscription request with justification","Approval within 2 business days"]},
+      {type:"cause",icon:"❓",label:"Q — Can I use the try-it-out feature in production?",
+       heading:"Is the Swagger UI try-it-out feature connected to production or a sandbox?",
+       body:"By default, Swagger UI try-it-out in the GoSXM API Catalogue is connected to the staging environment (rg-dgtp-staging) with mock data — not production. This prevents accidental data writes to live registries from the Catalogue UI. Consumers who need try-it-out against production must be explicitly approved by the Integration Admin and are given a separate production subscription with rate limits enforced.",
+       chips:["Default try-it-out: staging environment","No accidental writes to production via Catalogue","Production try-it-out: separate explicit approval"]},
+      {type:"cause",icon:"❓",label:"Q — What happens when a spec changes?",
+       heading:"How are consumers notified when an API spec is updated?",
+       body:"Non-breaking changes (new optional fields, additional error codes): Catalogue updates automatically via CI/CD. All subscribers receive an email notification with a diff summary. No action required — existing integrations continue to work. Breaking changes (/v2/ promotion): 4-week deprecation notice sent to all active /v1/ subscribers. Catalogue shows a deprecation countdown banner on the /v1/ spec. Consumers must migrate to /v2/ before the deadline.",
+       chips:["Non-breaking: auto-update + email notification","Breaking change: 4-week notice + deprecation banner","Subscribers tracked individually in Catalogue"]},
+      {type:"resolve",icon:"✓",label:"TIMELINE — When does D7 launch?",
+       heading:"GoSXM API Catalogue Is the Last Design Phase Deliverable",
+       body:"D7 launches after all Design Phase specs are approved (D4 complete) and Azure APIM is provisioned. Target: Catalogue live in preview mode at the start of the Build Phase. Preview mode: read-only, no try-it-out. Full mode: Swagger UI with try-it-out active at Build Phase Sprint 2. Full governance mode (subscription approval + quarterly reviews): at platform go-live. The Catalogue grows with the platform — it is not a one-time deliverable.",
+       chips:["Design Phase end: Catalogue live in preview","Build Phase Sprint 2: try-it-out active","Platform go-live: full governance mode active"]}
+    ]
+  }
+};
+let activeTab='analysis';
+function openPanel(tab){activeTab=tab||'analysis';const ov=document.getElementById('fp-overlay'),pan=document.getElementById('fp-panel');ov.classList.add('open');pan.classList.add('open');requestAnimationFrame(()=>ov.classList.add('visible'));renderTab(activeTab);document.body.style.overflow='hidden';document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+activeTab).classList.add('active');}
+function closePanel(){const ov=document.getElementById('fp-overlay'),pan=document.getElementById('fp-panel');ov.classList.remove('visible');pan.classList.remove('open');setTimeout(()=>{ov.classList.remove('open');document.body.style.overflow='';},320);}
+function switchTab(tab){activeTab=tab;document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');renderTab(tab);}
+function renderTab(tab){
+  const body=document.getElementById('fp-body'),data=PANEL_DATA[tab];
+  if(!data)return;
+  body.innerHTML='';
+  document.getElementById('fp-eyebrow').textContent=data.eyebrow||'';
+  document.getElementById('fp-title').textContent=data.title||'';
+  document.getElementById('fp-subtitle').textContent=data.subtitle||'';
+  if(data.svg){const w=document.createElement('div');w.className='panel-svg-wrap';w.innerHTML='<div class="panel-svg-title">'+(data.svgTitle||'')+'</div>'+data.svg;body.appendChild(w);}
+  (data.nodes||[]).forEach((node,idx)=>{
+    const el=document.createElement('div');el.className='fp-node fp-node-'+node.type;
+    const icon=node.icon||{failure:'!',cause:'→','impact-type':'⚠',resolve:'✓'}[node.type]||'·';
+    el.innerHTML=`<div class="fp-node-spine"><div class="fp-node-dot">${icon}</div><div class="fp-node-line"></div></div><div class="fp-node-content"><div class="fp-node-label">${node.label}</div><div class="fp-node-heading">${node.heading}</div><div class="fp-node-body">${node.body}</div>${node.chips?'<div class="fp-node-impact">'+node.chips.map(c=>'<span class="fp-impact-chip">'+c+'</span>').join('')+'</div>':''}</div>`;
+    if(node.type==='resolve'){const sol=document.createElement('div');sol.className='fp-solution';sol.innerHTML='<div class="fp-solution-tag">✓ RESOLUTION</div><div class="fp-solution-text">'+node.body+'</div>';el.querySelector('.fp-node-body').style.display='none';el.querySelector('.fp-node-content').appendChild(sol);setTimeout(()=>sol.classList.add('visible'),(idx+1)*120+300);}
+    body.appendChild(el);setTimeout(()=>el.classList.add('visible'),idx*110+80);
+  });
+}
+document.querySelectorAll('.acc-head').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('acc-open')));
+
+
+const CAT_APIS = [
+  {id:'civil', cat:'Registry APIs', name:'Civil Registry API', tag:'CASBES · StUF-BG',
+   color:'#8a1a2e', version:'v1.0.0', status:'live',
+   desc:'Person records, registration status, and cross-registry linkage data from the Civil Registry (CASBES). Primary citizen identifier: NSN.',
+   roles:['staff'],
+   endpoints:[
+     {method:'GET', path:'/v1/civil/persons/{nsn}', summary:'Get person by NSN', auth:'OAuth2 PKCE'},
+     {method:'GET', path:'/v1/civil/persons/{nsn}/registrations', summary:'Get cross-registry links', auth:'OAuth2 PKCE'},
+     {method:'GET', path:'/v1/civil/persons/search', summary:'Search persons by name/DOB', auth:'OAuth2 PKCE'},
+   ]},
+  {id:'coci', cat:'Registry APIs', name:'Chamber of Commerce API', tag:'COCI · OData v4',
+   color:'#1a6b3c', version:'v1.0.0', status:'live',
+   desc:'Business registration data including company status, directors, shareholders, and CRIB number. Cross-references Civil Registry via NSN.',
+   roles:['staff','external'],
+   endpoints:[
+     {method:'GET', path:'/v1/coci/businesses/{crib}', summary:'Get business by CRIB number', auth:'OAuth2 Client Credentials'},
+     {method:'GET', path:'/v1/coci/businesses/{crib}/directors', summary:'Get directors and shareholders', auth:'OAuth2 Client Credentials'},
+     {method:'GET', path:'/v1/coci/businesses/search', summary:'Search businesses', auth:'OAuth2 Client Credentials'},
+     {method:'GET', path:'/v1/coci/persons/{nsn}/businesses', summary:'Get businesses by person NSN', auth:'OAuth2 Client Credentials'},
+   ]},
+  {id:'teatt', cat:'Registry APIs', name:'TEATT Licenses API', tag:'BLISS · D365 OData',
+   color:'#4a1a7a', version:'v1.0.0', status:'live',
+   desc:'Licence records for businesses and individuals. Status enum: ACTIVE / SUSPENDED / EXPIRED / PENDING. Holder NSN cross-references Civil Registry.',
+   roles:['staff'],
+   endpoints:[
+     {method:'GET', path:'/v1/teatt/licences/{id}', summary:'Get licence by ID', auth:'OAuth2 PKCE'},
+     {method:'GET', path:'/v1/teatt/licences', summary:'Search licences by NSN or status', auth:'OAuth2 PKCE'},
+     {method:'GET', path:'/v1/teatt/licences/{id}/history', summary:'Get licence status history', auth:'OAuth2 PKCE'},
+   ]},
+  {id:'vromi', cat:'Registry APIs', name:'VROMI Permits API', tag:'ArcGIS REST',
+   color:'#1a5c6b', version:'v1.0.0', status:'live',
+   desc:'Land parcel and permit records. WKT geometry for parcel boundaries. Spatial queries by Parcel ID. Owner NSN cross-references Civil Registry.',
+   roles:['staff','external'],
+   endpoints:[
+     {method:'GET', path:'/v1/vromi/parcels/{parcelId}', summary:'Get parcel with geometry and permits', auth:'OAuth2 Client Credentials'},
+     {method:'GET', path:'/v1/vromi/permits/{permitId}', summary:'Get permit details', auth:'OAuth2 Client Credentials'},
+     {method:'GET', path:'/v1/vromi/parcels/search', summary:'Search parcels by district or owner', auth:'OAuth2 Client Credentials'},
+     {method:'GET', path:'/v1/vromi/districts', summary:'List all districts', auth:'OAuth2 Client Credentials'},
+   ]},
+  {id:'siah', cat:'Registry APIs', name:'Tax Administration API', tag:'SIAH · MS CRM',
+   color:'#7a5200', version:'v1.0.0', status:'conditional',
+   desc:'Tax registration and status data. Restricted access — requires data sharing agreement. CRIB cross-references COCI. DSA approval pending.',
+   roles:['staff'],
+   endpoints:[
+     {method:'GET', path:'/v1/siah/taxpayers/{crib}', summary:'Get taxpayer by CRIB number', auth:'OAuth2 PKCE'},
+     {method:'GET', path:'/v1/siah/taxpayers/{crib}/status', summary:'Get tax compliance status', auth:'OAuth2 PKCE'},
+   ]},
+  {id:'identity', cat:'Platform APIs', name:'Identity & Auth API', tag:'Platform · Entra',
+   color:'#1a4f8a', version:'v1.0.0', status:'live',
+   desc:'OAuth2 token endpoint, JWT introspection, and RBAC role lookup. Used by all consumers to acquire and validate tokens.',
+   roles:['staff','citizen','external'],
+   endpoints:[
+     {method:'POST', path:'/v1/auth/token', summary:'Acquire OAuth2 access token', auth:'Client Credentials / PKCE'},
+     {method:'POST', path:'/v1/auth/introspect', summary:'Validate and introspect a JWT', auth:'Client Credentials'},
+   ]},
+  {id:'audit', cat:'Platform APIs', name:'PII Audit API', tag:'Platform · Log Analytics',
+   color:'#1a4f8a', version:'v1.0.0', status:'live',
+   desc:'Query PII access audit log. Citizens can view which services accessed their data and when. Auditors can run compliance reports.',
+   roles:['staff','citizen'],
+   endpoints:[
+     {method:'GET', path:'/v1/audit/access-log', summary:'Query PII access events', auth:'OAuth2 PKCE'},
+     {method:'GET', path:'/v1/audit/access-log/{nsn}', summary:'Get access log for a citizen', auth:'OAuth2 PKCE'},
+   ]},
+  {id:'consent', cat:'Platform APIs', name:'Consent Management API', tag:'Platform · Once-Only',
+   color:'#1a4f8a', version:'v1.0.0', status:'live',
+   desc:'Manage and query citizen consent records for cross-registry data sharing. Required before any cross-registry data is reused.',
+   roles:['staff','citizen'],
+   endpoints:[
+     {method:'GET', path:'/v1/consent/{nsn}', summary:'Get consent records for a citizen', auth:'OAuth2 PKCE'},
+     {method:'POST', path:'/v1/consent/{nsn}/grant', summary:'Record consent grant', auth:'OAuth2 PKCE'},
+     {method:'DELETE', path:'/v1/consent/{nsn}/revoke', summary:'Revoke consent', auth:'OAuth2 PKCE'},
+   ]},
+  {id:'onceonly', cat:'Platform APIs', name:'Once-Only Lookup API', tag:'Platform · Canonical Store',
+   color:'#1a4f8a', version:'v1.0.0', status:'live',
+   desc:'Retrieve citizen data from the Canonical Data Store. Implements P-11 Once-Only Principle — citizens never re-enter known data.',
+   roles:['staff'],
+   endpoints:[
+     {method:'GET', path:'/v1/onceonly/citizens/{nsn}', summary:'Get aggregated citizen profile', auth:'OAuth2 PKCE'},
+     {method:'GET', path:'/v1/onceonly/citizens/{nsn}/freshness', summary:'Check data freshness per registry', auth:'OAuth2 PKCE'},
+   ]},
+];
+
+const ROLE_CONFIG = {
+  staff:    {label:'Government Staff', color:'#1a4f8a', badge:'SSO · Full Access',
+             note:'Full access to all Registry and Platform APIs. Subscribe to any endpoint subject to RBAC approval.'},
+  citizen:  {label:'Citizen (eID)', color:'#8a1a2e', badge:'eID · Public only',
+             note:'Public-facing endpoints only. PII Audit and Consent APIs available. Registry APIs not directly accessible.'},
+  external: {label:'External Developer', color:'#7a5200', badge:'Onboarding required',
+             note:'Restricted to specific approved endpoints. Formal onboarding required. Monthly access review.'},
+};
+
+let currentRole    = 'staff';
+let currentCat     = 'all';
+let currentSearch  = '';
+let expandedApi    = null;
+
+function initCatalogue() {
+  renderCatNav();
+  renderRoleBadge();
+  renderApis();
+}
+
+function renderRoleBadge() {
+  const r = ROLE_CONFIG[currentRole];
+  const badge = document.getElementById('role-badge');
+  const note  = document.getElementById('role-note');
+  if (badge) {
+    badge.textContent = r.badge;
+    badge.style.background = r.color + '22';
+    badge.style.color = r.color;
+    badge.style.border = '1px solid ' + r.color + '44';
+  }
+  if (note) note.textContent = r.note;
+}
+
+function renderCatNav() {
+  const nav = document.getElementById('cat-nav');
+  if (!nav) return;
+  const cats = ['all', 'Registry APIs', 'Platform APIs'];
+  nav.innerHTML = cats.map(cat => {
+    const count = cat === 'all' ? CAT_APIS.length : CAT_APIS.filter(a => a.cat === cat).length;
+    const active = currentCat === cat;
+    return `<button onclick="setCat('${cat}')" style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:6px;border:none;background:${active ? 'var(--ink)' : 'transparent'};color:${active ? '#fff' : 'var(--ink3)'};cursor:pointer;font-size:13px;font-weight:${active ? '600' : '400'};width:100%;text-align:left;transition:all .15s">
+      <span>${cat === 'all' ? 'All APIs' : cat}</span>
+      <span style="font-family:var(--mono);font-size:10px;opacity:.6">${count}</span>
+    </button>`;
+  }).join('');
+}
+
+function setCat(cat) {
+  currentCat = cat;
+  renderCatNav();
+  renderApis();
+}
+
+function setRole(btn, role) {
+  currentRole = role;
+  document.querySelectorAll('.role-btn').forEach(b => {
+    b.style.background = 'transparent';
+    b.style.color = 'rgba(255,255,255,.4)';
+    b.style.borderColor = 'rgba(255,255,255,.08)';
+  });
+  const r = ROLE_CONFIG[role];
+  btn.style.background = r.color + '33';
+  btn.style.color = r.color.replace('#', '#') + 'cc';
+  btn.style.borderColor = r.color + '66';
+  renderRoleBadge();
+  renderApis();
+}
+
+function catSearch(q) {
+  currentSearch = q.toLowerCase();
+  renderApis();
+}
+
+function renderApis() {
+  const list = document.getElementById('api-list');
+  if (!list) return;
+
+  let apis = CAT_APIS;
+  if (currentCat !== 'all') apis = apis.filter(a => a.cat === currentCat);
+  if (currentRole !== 'staff') apis = apis.filter(a => a.roles.includes(currentRole));
+  if (currentSearch) apis = apis.filter(a =>
+    a.name.toLowerCase().includes(currentSearch) ||
+    a.desc.toLowerCase().includes(currentSearch) ||
+    a.tag.toLowerCase().includes(currentSearch) ||
+    a.endpoints.some(e => e.path.toLowerCase().includes(currentSearch) || e.summary.toLowerCase().includes(currentSearch))
+  );
+
+  const stats = document.getElementById('cat-stats');
+  if (stats) stats.textContent = apis.length + ' API' + (apis.length !== 1 ? 's' : '');
+
+  if (!apis.length) {
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ink4);font-size:13px">No APIs match the current filter</div>';
+    return;
+  }
+
+  list.innerHTML = apis.map(api => {
+    const isExpanded = expandedApi === api.id;
+    const statusColor = api.status === 'live' ? '#1a6b3c' : api.status === 'conditional' ? '#7a5200' : '#9ca3af';
+    const statusBg    = api.status === 'live' ? '#f0faf4'  : api.status === 'conditional' ? '#fff5e6'  : '#f8f7f4';
+    const statusLabel = api.status === 'live' ? 'LIVE' : api.status === 'conditional' ? 'CONDITIONAL' : 'DEFERRED';
+    const epCount = api.endpoints.length;
+
+    const endpointsHtml = isExpanded ? api.endpoints.map(ep => {
+      const mc = ep.method === 'GET' ? '#1a6b3c' : ep.method === 'POST' ? '#7a5200' : '#8a1a2e';
+      const mb = ep.method === 'GET' ? '#f0faf4'  : ep.method === 'POST' ? '#fff5e6'  : '#fff5f5';
+      return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 12px;border-bottom:1px solid var(--paper3)">
+        <span style="font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:${mb};color:${mc};flex-shrink:0;min-width:42px;text-align:center">${ep.method}</span>
+        <code style="font-family:var(--mono);font-size:11px;color:var(--ink2);flex-shrink:0">${ep.path}</code>
+        <span style="font-size:12px;color:var(--ink3);flex:1">${ep.summary}</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--ink4);flex-shrink:0">${ep.auth}</span>
+      </div>`;
+    }).join('') : '';
+
+    return `<div style="background:#fff;border:1px solid var(--paper3);border-radius:9px;overflow:hidden;transition:box-shadow .15s" class="api-card">
+      <div onclick="toggleApi('${api.id}')" style="display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;border-left:4px solid ${api.color}">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+            <span style="font-size:14px;font-weight:700;color:var(--ink)">${api.name}</span>
+            <span style="font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:${statusBg};color:${statusColor};border:1px solid ${statusColor}33">${statusLabel}</span>
+            <span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:10px;background:var(--paper2);color:var(--ink4)">${api.version}</span>
+          </div>
+          <div style="font-size:12px;color:var(--ink3);line-height:1.5">${api.desc}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--ink4);margin-bottom:4px">${epCount} endpoint${epCount !== 1 ? 's' : ''}</div>
+          <button onclick="event.stopPropagation();subscribeApi('${api.id}','${api.name}')" style="font-family:var(--mono);font-size:10px;font-weight:700;padding:4px 12px;border-radius:5px;border:1.5px solid ${api.color}55;background:${api.color}10;color:${api.color};cursor:pointer">Subscribe</button>
+        </div>
+        <span style="font-size:14px;color:var(--ink4);transition:transform .2s;flex-shrink:0" id="api-chev-${api.id}">${isExpanded ? '▴' : '▾'}</span>
+      </div>
+      ${isExpanded ? `<div style="border-top:1px solid var(--paper3)">${endpointsHtml}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleApi(id) {
+  expandedApi = expandedApi === id ? null : id;
+  renderApis();
+}
+
+function subscribeApi(id, name) {
+  const toast = document.createElement('div');
+  toast.textContent = 'Subscription request submitted for ' + name + ' — Integration Admin will review within 2 business days.';
+  toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-family:var(--mono);font-size:11px;padding:10px 18px;border-radius:8px;z-index:9999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1)';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCatalogue);
+} else {
+  initCatalogue();
+}
+
+
+function openRef(){
+  const ov=document.getElementById('ref-overlay'),m=document.getElementById('ref-modal');
+  ov.classList.add('open');requestAnimationFrame(()=>{ov.classList.add('visible');m.classList.add('visible');});
+  document.body.style.overflow='hidden';
+  document.getElementById('ref-search').focus();
+}
+function closeRef(){
+  const ov=document.getElementById('ref-overlay'),m=document.getElementById('ref-modal');
+  ov.classList.remove('visible');m.classList.remove('visible');
+  setTimeout(()=>ov.classList.remove('open'),280);
+  document.body.style.overflow='';
+  document.getElementById('ref-search').value='';filterRef('');
+}
+function showRefTab(tab){
+  document.querySelectorAll('.ref-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('rtab-'+tab).classList.add('active');
+  const ps=document.getElementById('ref-p-section');
+  const ds=document.getElementById('ref-d-section');
+  ps.style.display=(tab==='deliverables')?'none':'block';
+  ds.style.display=(tab==='principles')?'none':'block';
+}
+function filterRef(q){
+  const v=q.toLowerCase().trim();
+  document.querySelectorAll('.ref-row').forEach(row=>{
+    const t=(row.textContent||'').toLowerCase();
+    row.style.display=(!v||t.includes(v))?'':'none';
+  });
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('ref-modal').classList.contains('visible'))closeRef();});
+</script>
+
+<!-- ── REFERENCE MODAL FAB ── -->
+<button id="ref-fab" onclick="openRef()" title="Quick Reference">
+  <span class="fab-tooltip" style="position:absolute;left:58px;right:auto;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 11px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(255,255,255,.1)">Quick Reference</span>
+  ℹ
+</button>
+<div id="ref-overlay" onclick="closeRef()"></div>
+<div id="ref-modal">
+  <div class="ref-modal-head">
+    <div>
+      <div class="ref-modal-title">DGTP Quick Reference</div>
+      <div class="ref-modal-sub">DESIGN PHASE · SINT MAARTEN · 15 PRINCIPLES · 10 DELIVERABLES</div>
+    </div>
+    <button class="ref-modal-close" onclick="closeRef()">&#x2715;</button>
+  </div>
+  <div class="ref-tabs">
+    <button class="ref-tab active" id="rtab-both" onclick="showRefTab('both')">📋 All</button>
+    <button class="ref-tab" id="rtab-principles" onclick="showRefTab('principles')">⚙ Principles (P-01–P-15)</button>
+    <button class="ref-tab" id="rtab-deliverables" onclick="showRefTab('deliverables')">📦 Deliverables (D1–D10)</button>
+  </div>
+  <input id="ref-search" type="text" placeholder="Search principles or deliverables…" oninput="filterRef(this.value)"/>
+  <div class="ref-body" id="ref-body">
+    <div id="ref-p-section">
+      <div class="ref-section">⚙ ARCHITECTURE PRINCIPLES — P-01 to P-15 · Click any row to expand description</div>
+      
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-01</div>
+          <div class="ref-name">API-First</div>
+          <div class="ref-desc">All platform APIs documented in OpenAPI 3.0 and agreed by Architecture Team BEFORE development begins. GoSXM API Catalogue is the single source of truth.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-02</div>
+          <div class="ref-name">Cloud-Native Azure</div>
+          <div class="ref-desc">Exclusive Azure PaaS in European region. No multi-cloud, no on-premise in Phase 1. All deployments via IaC — no manual portal changes in staging or production.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-03</div>
+          <div class="ref-name">Separation of Concerns</div>
+          <div class="ref-desc">Seven enforced platform layers. Each layer has one responsibility. No cross-layer shortcutting. Experience Layer cannot query registries directly.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-04</div>
+          <div class="ref-name">Loose Coupling</div>
+          <div class="ref-desc">One dedicated, independently deployable adapter per registry. A registry changing its protocol affects only its adapter — zero platform-wide impact.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-05</div>
+          <div class="ref-name">Resilience by Default</div>
+          <div class="ref-desc">Outbox Pattern in all adapters guarantees zero data loss. Service Bus zone-redundant with Geo-DR. Circuit breakers prevent cascade failures.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-06</div>
+          <div class="ref-name">Open Standards</div>
+          <div class="ref-desc">REST/JSON, OpenAPI 3.0, OAuth2/OIDC, OData where available. Vendor lock-in minimised. All interface contracts machine-readable and publicly documented.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">P-07</div>
+          <div class="ref-name">Security by Design</div>
+          <div class="ref-desc">Security embedded at every layer from Day 1. mTLS between all services. OWASP review is a go-live gate. SAST/CVE scanning in all CI/CD pipelines.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">P-08</div>
+          <div class="ref-name">Identity-First Access</div>
+          <div class="ref-desc">Azure Entra External ID is the sole identity provider. 7 RBAC roles. JWT 15-min TTL. PIM Just-In-Time for all privileged access. No standing admin privileges.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">P-09</div>
+          <div class="ref-name">Privacy by Design</div>
+          <div class="ref-desc">Data minimisation and consent management built into every cross-registry call. Citizens can view their data access history. 90-day PII audit log in Log Analytics.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">P-10</div>
+          <div class="ref-name">Authoritative Source</div>
+          <div class="ref-desc">Each data domain has exactly one authoritative registry. Canonical Data Store is a read-model — it never becomes the source of truth. Registries own their data.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">P-11</div>
+          <div class="ref-name">Once-Only Principle</div>
+          <div class="ref-desc">Citizens submit data once. The platform reuses it across services via the Canonical Data Store with a freshness SLA of less than 15 minutes. No re-entry of known data.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">P-12</div>
+          <div class="ref-name">Data Sovereignty</div>
+          <div class="ref-desc">All citizen data stays within Azure European region at all times. Geo-DR secondary must also be European. No third-party SaaS without a signed EU data processing agreement.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">P-13</div>
+          <div class="ref-name">Observability First</div>
+          <div class="ref-desc">Structured logging, distributed tracing, and metrics from Day 1 in every component. Azure Monitor + Application Insights. Alerts on DLQ first-message within 2 minutes.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">P-14</div>
+          <div class="ref-name">Infrastructure as Code</div>
+          <div class="ref-desc">All Azure resources provisioned via Bicep/Terraform. No manual portal changes in staging or production. IaC enforces region and security constraints in every template.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">P-15</div>
+          <div class="ref-name">Compliance by Design</div>
+          <div class="ref-desc">ID-Exchange EA Ordinance approval is a hard go-live gate. Privacy Ordinance compliance built into data flows. Audit logs satisfy statutory reporting requirements.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+    </div>
+    <div id="ref-d-section">
+      <div class="ref-section">📦 DESIGN PHASE DELIVERABLES — D1 to D10 · Click any row to expand description</div>
+      
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">D1</div>
+          <div class="ref-name" style="min-width:130px">DGTP-SEC-001<span class="ref-owner">The Team (Solo)</span></div>
+          <div class="ref-desc">Security Architecture Document — zero-trust, RBAC, mTLS, Key Vault, OWASP gate, consent & PII audit.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">D2</div>
+          <div class="ref-name" style="min-width:130px">HLD Extension<span class="ref-owner">The Team + The Team</span></div>
+          <div class="ref-desc">Platform Architecture Design — seven-layer stack, SLA commitments, 15 architecture principles, recovery objectives.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">D3</div>
+          <div class="ref-name" style="min-width:130px">DGTP-INT-001<span class="ref-owner">The Team + The Team</span></div>
+          <div class="ref-desc">Integration Architecture — 6-registry adapter pattern, Outbox Pattern, Service Bus topology, once-only data flow.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">D4</div>
+          <div class="ref-name" style="min-width:130px">DGTP-API-GL-001<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">API Design Guidelines — REST/JSON standards, OpenAPI 3.0, OAuth2 patterns, rate limits, versioning rules.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:#7a5200;background:rgba(122,82,0,.08)">D5</div>
+          <div class="ref-name" style="min-width:130px">DGTP-API-SPEC-REG<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">API Specification Pack — per-registry OpenAPI bundles, integration guide, sandbox credentials, data sharing agreement template.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:#7a5200;background:rgba(122,82,0,.08)">D6</div>
+          <div class="ref-name" style="min-width:130px">DGTP-SUP-001<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">Registry Technical Support Logs — session notes, issue register, API validation results, registry sign-off per integration.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">D7</div>
+          <div class="ref-name" style="min-width:130px">DGTP-CAT-001<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">GoSXM API Catalog — Azure APIM Developer Portal, Swagger UI, role-gated access, CI/CD auto-publication.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--purple);background:rgba(74,26,122,.08)">D8</div>
+          <div class="ref-name" style="min-width:130px">DGTP-LLD-001<span class="ref-owner">The Team</span></div>
+          <div class="ref-desc">Final Technical Specification (LLD) — component design, IaC templates, security configuration, deployment runbook.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">D9</div>
+          <div class="ref-name" style="min-width:130px">DGTP-ENV-001<span class="ref-owner">The Team (Solo)</span></div>
+          <div class="ref-desc">Environment Strategy — DEV / Staging / Production topology, IaC provisioning, Azure resource groups, CI/CD pipeline design.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">D10</div>
+          <div class="ref-name" style="min-width:130px">DGTP-3P-001<span class="ref-owner">The Team</span></div>
+          <div class="ref-desc">3rd-Party & SaaS Readiness — vendor assessments, EU data processing agreements, integration patterns, risk register.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+    </div>
+  </div>
+</div>
+</body></html>

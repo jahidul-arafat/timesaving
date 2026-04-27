@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Integration Architecture Document — DGTP Sint Maarten</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#0e1117;--ink2:#2d3340;--ink3:#6b7280;--ink4:#9ca3af;
+  --paper:#f8f7f4;--paper2:#f1efe9;--paper3:#e5e2da;--paper4:#d4cfc5;
+  --accent:#c8510a;--accent2:#e8722a;--ap:rgba(200,81,10,.1);--ag:rgba(200,81,10,.25);
+  --blue:#1a4f8a;--bp:rgba(26,79,138,.1);--bg2:rgba(26,79,138,.2);
+  --green:#1a6b3c;--gp:rgba(26,107,60,.1);--gg2:rgba(26,107,60,.22);
+  --red:#8a1a2e;--rp:rgba(138,26,46,.1);--rg2:rgba(138,26,46,.22);
+  --amber:#7a5200;--amp:rgba(122,82,0,.1);--amg:rgba(122,82,0,.22);
+  --purple:#4a1a7a;--pp:rgba(74,26,122,.1);--pg:rgba(74,26,122,.22);
+  --teal:#1a5c6b;--tp:rgba(26,92,107,.1);--tg:rgba(26,92,107,.22);
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#1a1a1c;font-family:var(--sans);height:100vh;overflow:hidden;
+  display:block;margin:0;padding:0}
+#kbhint{color:rgba(255,255,255,.28);font-size:11px;font-family:var(--mono);
+  position:fixed;bottom:10px;right:14px;letter-spacing:.05em}
+#stage{width:100vw;height:100vh;position:relative;overflow:hidden;}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;background:var(--paper);overflow:hidden;isolation:isolate}
+.slide.active{display:flex}
+
+/* ── ENTRANCE ANIMATIONS ── */
+@keyframes slideIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.slide.active .a1{animation:slideIn .38s cubic-bezier(.22,1,.36,1) both}
+.slide.active .a2{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .07s both}
+.slide.active .a3{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .14s both}
+.slide.active .a4{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .21s both}
+.slide.active .a5{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .28s both}
+@media(prefers-reduced-motion:reduce){.slide.active [class*="a"]{animation:none}}
+
+/* ── PROGRESS BAR ── */
+.prog{position:absolute;top:0;left:0;right:0;height:3px;background:var(--paper3);z-index:20}
+.prog-fill{height:100%;background:var(--accent);border-radius:0 2px 2px 0}
+
+/* ── COLOUR ID BAR ── */
+.id-bar{height:3px;flex-shrink:0}
+
+/* ── SLIDE STRUCTURE ── */
+.slide-header{padding:24px 56px 0;flex-shrink:0;position:relative;z-index:1}
+.eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.etag{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.13em;
+  padding:4px 10px;border-radius:4px;border:1px solid currentColor}
+.enum{font-family:var(--mono);font-size:10px;color:var(--ink4);letter-spacing:.06em}
+.slide-h1{font-family:var(--serif);font-size:30px;line-height:1.1;color:var(--ink);
+  margin-bottom:2px;letter-spacing:-.01em}
+.slide-sub{font-size:13px;color:var(--ink3);line-height:1.65;max-width:680px}
+.slide-body{flex:1;padding:10px 56px 78px;overflow:hidden;position:relative;z-index:1}
+.slide-footer{display:none}
+.footer-brand{font-family:var(--mono);font-size:10px;color:var(--ink4);letter-spacing:.06em}
+.footer-stage{font-size:10px;color:var(--accent);background:var(--ap);
+  border:1px solid var(--ag);border-radius:4px;padding:3px 10px;
+  font-family:var(--mono);letter-spacing:.06em}
+.footer-slide{font-family:var(--mono);font-size:10px;color:var(--ink4)}
+.footnote{display:none}
+#global-footnote{position:fixed;bottom:50px;left:0;right:0;height:22px;
+  background:rgba(248,247,244,.92);backdrop-filter:blur(8px);
+  border-top:1px solid var(--paper3);
+  display:flex;align-items:center;gap:10px;z-index:50;
+  padding:0 56px}
+.fn-logo{font-family:var(--mono);font-size:9px;font-weight:600;
+  color:var(--accent);white-space:nowrap;letter-spacing:.07em}
+.fn-text{font-size:10px;color:var(--ink3);font-style:italic;flex:1}
+.fn-link{font-family:var(--mono);font-size:9px;color:var(--accent);text-decoration:none}
+.fn-link:hover{text-decoration:underline}
+
+/* ══ SLIDE 1 TITLE ══ */
+#s1{background:var(--ink)}
+#s1 .geo{position:absolute;inset:0;overflow:hidden}
+#s1 .content{position:relative;flex:1;display:flex;flex-direction:column;
+  justify-content:center;padding:60px 80px}
+#s1 .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--accent2);
+  margin-bottom:20px;display:flex;align-items:center;gap:14px}
+#s1 .lbl::before{content:'';width:40px;height:1.5px;background:var(--accent2)}
+#s1 h1{font-family:var(--serif);font-size:62px;line-height:1.06;color:#fff;
+  margin-bottom:18px;letter-spacing:-.02em}
+#s1 h1 em{color:var(--accent2);font-style:italic}
+#s1 .tg{font-size:15px;color:rgba(255,255,255,.42);max-width:520px;line-height:1.78;
+  font-weight:300}
+#s1 .meta{margin-top:48px;display:flex;gap:38px;flex-wrap:wrap}
+#s1 .ml{font-family:var(--mono);font-size:9px;letter-spacing:.16em;
+  color:rgba(255,255,255,.22);margin-bottom:4px}
+#s1 .mv{font-size:13px;color:rgba(255,255,255,.62);font-weight:500}
+#s1 .six{position:absolute;right:78px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:8px}
+#s1 .sn{width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:11px;
+  color:rgba(255,255,255,.22)}
+#s1 .sn.on{border-color:var(--accent);color:var(--accent2);background:rgba(200,81,10,.14)}
+#s1 .sbar{position:absolute;bottom:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2))}
+
+/* ══ OVERVIEW ══ */
+.ov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.ov-card{background:var(--paper2);border:1px solid var(--paper3);border-radius:10px;
+  padding:12px;display:flex;flex-direction:column;gap:4px;
+  position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.ov-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.07)}
+.ov-top-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.ov-num{font-family:var(--mono);font-size:11px;font-weight:500;opacity:.22;line-height:1;margin-top:2px}
+.ov-title{font-size:13.5px;font-weight:600;color:var(--ink)}
+.ov-desc{font-size:11px;color:var(--ink3);line-height:1.6;flex:1}
+.ov-badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 8px;
+  border-radius:3px;width:fit-content;margin-top:6px;letter-spacing:.06em}
+.note-bar{background:var(--ap);border:1px solid var(--ag);border-radius:8px;
+  padding:7px 12px;margin-bottom:8px;font-size:11px;color:var(--ink2);line-height:1.5}
+.note-bar strong{color:var(--accent)}
+
+/* ══ QUESTION LAYOUT ══ */
+.q-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;height:100%;min-height:0}
+.q-left,.q-right{display:flex;flex-direction:column;gap:6px;overflow:hidden;min-height:0}
+.q-story{border-left:3px solid;border-radius:0 8px 8px 0;padding:7px 11px;
+  font-size:11px;color:var(--ink2);line-height:1.55;font-style:italic;flex-shrink:0}
+.q-story strong{font-style:normal;font-size:9px;font-family:var(--mono);
+  letter-spacing:.13em;display:block;margin-bottom:3px}
+.opts-label{font-family:var(--mono);font-size:9px;letter-spacing:.13em;
+  color:var(--ink4);margin-bottom:1px;font-weight:500}
+.opt{border-radius:7px;padding:6px 10px;margin-bottom:3px;border:1px solid transparent}
+.opt-head{display:flex;align-items:baseline;gap:7px;margin-bottom:3px}
+.opt-badge{font-size:9px;font-weight:700;font-family:var(--mono);
+  padding:2px 7px;border-radius:3px;letter-spacing:.06em;flex-shrink:0;color:#fff}
+.opt-name{font-size:11.5px;font-weight:600;line-height:1.2}
+.opt-pc{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.pro,.con{font-size:10px;line-height:1.4;padding-left:13px;position:relative;color:var(--ink3)}
+.pro::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700;font-size:10px}
+.con::before{content:'✗';position:absolute;left:0;color:var(--red);font-weight:700;font-size:10px}
+.opt-a{background:var(--bp)}.opt-a .opt-name{color:var(--blue)}.opt-a .opt-badge{background:var(--blue)}
+.opt-b{background:var(--gp)}.opt-b .opt-name{color:var(--green)}.opt-b .opt-badge{background:var(--green)}
+.opt-c{background:var(--pp)}.opt-c .opt-name{color:var(--purple)}.opt-c .opt-badge{background:var(--purple)}
+
+/* KPI row */
+.kpi-row{display:flex;gap:7px;flex-shrink:0}
+.kpi{background:var(--paper2);border:1px solid var(--paper3);border-radius:7px;
+  padding:5px 8px;text-align:center;flex:1;position:relative;overflow:hidden}
+.kpi-top{position:absolute;top:0;left:0;right:0;height:2px}
+.kpi-v{font-size:17px;font-weight:600;font-family:var(--mono);
+  color:var(--ink);line-height:1.1;margin-bottom:1px}
+.kpi-l{font-size:9px;color:var(--ink3)}
+
+/* Rec pill */
+.rec-pill{display:flex;align-items:center;gap:8px;background:var(--ink);
+  color:#fff;border-radius:7px;padding:6px 11px;font-size:10.5px;
+  font-weight:500;flex-shrink:0}
+.rec-pill span{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.38);
+  letter-spacing:.08em;white-space:nowrap}
+
+/* Arch SVG */
+.arch-svg-wrap{background:var(--paper2);border:1px solid var(--paper3);
+  border-radius:10px;padding:9px;flex:1;overflow:visible;min-height:100px;position:relative}
+.arch-svg-title{font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  color:var(--ink4);margin-bottom:5px;font-weight:500}
+.arch-svg-wrap svg{width:100%;height:auto;display:block}
+
+/* ══ SLIDE 9 MATRIX ══ */
+.mtbl{width:100%;border-collapse:collapse;font-size:12px}
+.mtbl th{padding:9px 13px;text-align:left;font-size:9px;font-weight:700;
+  font-family:var(--mono);letter-spacing:.1em;border-bottom:2px solid var(--paper3);
+  color:var(--ink3)}
+.mtbl td{padding:9px 13px;border-bottom:1px solid var(--paper3);
+  color:var(--ink2);vertical-align:middle}
+.mtbl tr:last-child td{border-bottom:none}
+.mtbl tr:nth-child(even) td{background:var(--paper2)}
+.mtbl tr:hover td{background:var(--paper3)}
+.dlbl{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:4px;
+  display:inline-block;font-family:var(--mono);letter-spacing:.04em}
+.crit{font-size:10.5px;color:var(--ink3);font-style:italic;line-height:1.5}
+
+/* ══ SLIDE 10 NEXT STEPS ══ */
+.ns-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:12px}
+.ns-card{background:var(--paper2);border:1px solid var(--paper3);border-radius:10px;
+  padding:14px;position:relative;overflow:hidden}
+.ns-top{position:absolute;top:0;left:0;right:0;height:3px}
+.ns-sprint{font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  color:var(--ink4);margin-bottom:6px;font-weight:500}
+.ns-title{font-size:13px;font-weight:600;margin-bottom:7px}
+.ns-items{display:flex;flex-direction:column;gap:4px}
+.ns-item{font-size:11px;color:var(--ink2);padding-left:13px;
+  position:relative;line-height:1.5}
+.ns-item::before{content:'→';position:absolute;left:0;color:var(--accent);
+  font-size:10px;font-weight:700}
+.ns-tline{height:3px;background:var(--paper3);border-radius:2px;margin-top:9px;overflow:hidden}
+.ns-tfill{height:100%;border-radius:2px}
+.closing-row{display:flex;gap:11px}
+.cbox{flex:1;border-radius:8px;padding:13px;border:1px solid transparent}
+.cbox-title{font-family:var(--mono);font-size:9px;letter-spacing:.13em;
+  font-weight:700;margin-bottom:6px}
+.cbox-text{font-size:11.5px;line-height:1.65}
+
+/* ── NAV ── */
+#nav{display:flex;align-items:center;gap:9px;margin-top:13px}
+.ndot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.18);
+  cursor:pointer;transition:all .2s}
+.ndot.on{background:#fff;transform:scale(1.4)}
+.nbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  color:rgba(255,255,255,.65);border-radius:6px;padding:6px 18px;
+  cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:500;
+  transition:all .2s}
+.nbtn:hover{background:rgba(255,255,255,.2);color:#fff}
+#sc{color:rgba(255,255,255,.32);font-family:var(--mono);font-size:11px;margin:0 5px}
+
+/* ════ FULLSCREEN + TOOLTIP ════ */
+.fs-btn{position:absolute;top:6px;right:6px;width:26px;height:26px;
+  border-radius:6px;border:1px solid var(--paper3);background:var(--paper);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:13px;z-index:5;transition:all .15s;color:var(--ink3)}
+.fs-btn:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.arch-svg-wrap{position:relative}
+#svg-tip{position:fixed;z-index:10001;background:var(--ink);color:#fff;
+  border-radius:10px;padding:12px 14px;max-width:310px;
+  pointer-events:none;display:none;
+  box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.08);
+  opacity:0;transform:translateY(4px);
+  transition:opacity .12s ease,transform .12s ease;
+  will-change:transform,opacity}
+#svg-tip .tip-title{font-size:12px;font-weight:600;margin-bottom:5px;line-height:1.3}
+#svg-tip .tip-body{font-size:11px;color:rgba(255,255,255,.65);line-height:1.65}
+#svg-tip .tip-tag{font-size:9px;font-family:var(--mono);letter-spacing:.1em;
+  font-weight:700;padding:2px 7px;border-radius:3px;display:inline-block;margin-bottom:7px}
+#fs-overlay{position:fixed;inset:0;background:rgba(10,10,14,.92);
+  backdrop-filter:blur(12px);z-index:10000;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:14px}
+#fs-overlay.open{display:flex}
+#fs-wrap{background:var(--paper);border-radius:14px;
+  border:1px solid var(--paper3);overflow:hidden;
+  width:min(92vw,1200px);max-height:88vh;display:flex;flex-direction:column;
+  box-shadow:0 48px 100px rgba(0,0,0,.6)}
+#fs-header{padding:14px 18px;border-bottom:1px solid var(--paper3);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#fs-htitle{font-size:12px;font-weight:600;color:var(--ink);
+  font-family:var(--mono);letter-spacing:.06em}
+#fs-close{width:30px;height:30px;border-radius:50%;border:1px solid var(--paper3);
+  background:transparent;cursor:pointer;font-size:16px;
+  color:var(--ink3);display:flex;align-items:center;justify-content:center;transition:all .15s}
+#fs-close:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+#fs-body{flex:1;overflow:auto;padding:20px}
+#fs-body svg{width:100%;height:auto;display:block}
+#fs-legend{display:flex;gap:10px;flex-wrap:wrap;padding:10px 18px 14px;
+  border-top:1px solid var(--paper3);flex-shrink:0}
+.fsl{display:flex;align-items:center;gap:5px;font-size:10px;
+  font-family:var(--mono);color:var(--ink3)}
+.fsld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* ── SLIDE BACKGROUND IMAGE ── */
+.slide::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:url('');
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  opacity:0.5;
+  z-index:0;
+  pointer-events:none;
+  z-index:-1;
+}
+/* Ensure all slide content sits above the bg */
+.slide-header,.slide-body,.slide-footer,.footnote,
+.prog,.id-bar,.slide-progress{position:relative;z-index:2}
+#s1 .content,#s1 .geo,#s1 .six,#s1 .sbar{z-index:2}
+
+/* ── IN-FOOTER NAVIGATION ARROWS ── */
+.nav-arrow{width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--paper3);background:transparent;
+  cursor:pointer;font-size:16px;color:var(--ink3);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;flex-shrink:0;line-height:1}
+.nav-arrow:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.footer-dots{display:flex;gap:5px;align-items:center;flex:1;justify-content:center}
+.footer-dot{width:6px;height:6px;border-radius:50%;
+  background:var(--paper3);cursor:pointer;transition:all .2s;border:none;padding:0}
+.footer-dot.on{background:var(--accent);transform:scale(1.3)}
+/* Hide old external nav */
+#dots-bar{display:none}
+#kbhint{color:rgba(255,255,255,.28);font-size:11px;font-family:var(--mono);
+  position:fixed;bottom:10px;right:14px;letter-spacing:.05em}
+
+/* ── INSIGHT PANEL (after rec-pill) ── */
+.insight-panel{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;flex-shrink:0}
+.insight-card{border-radius:7px;padding:7px 9px;border:1px solid transparent}
+.insight-card-title{font-size:9px;font-weight:700;font-family:var(--mono);
+  letter-spacing:.1em;margin-bottom:4px}
+.insight-card-text{font-size:10px;color:var(--ink2);line-height:1.55}
+.ic-risk{background:var(--rp);border-color:var(--rg2)}
+.ic-risk .insight-card-title{color:var(--red)}
+.ic-win{background:var(--gp);border-color:var(--gg2)}
+.ic-win .insight-card-title{color:var(--green)}
+.ic-ctx{background:var(--bp);border-color:var(--bg2)}
+.ic-ctx .insight-card-title{color:var(--blue)}
+.ic-dep{background:var(--amp);border-color:var(--amg)}
+.ic-dep .insight-card-title{color:var(--amber)}
+.ic-note{background:var(--pp);border-color:var(--pg)}
+.ic-note .insight-card-title{color:var(--purple)}
+
+.mx-badge{font-size:9px;font-family:var(--mono);font-weight:700;padding:2px 7px;
+  border-radius:3px;display:inline-block;letter-spacing:.04em;white-space:nowrap}
+.mx-low{background:rgba(26,107,60,.12);color:var(--green)}
+.mx-med{background:rgba(122,82,0,.12);color:var(--amber)}
+.mx-high{background:rgba(138,26,46,.12);color:var(--red)}
+.mx-prop{background:rgba(26,79,138,.12);color:var(--blue)}
+
+#global-footer{position:fixed;bottom:0;left:0;right:0;height:50px;
+  background:rgba(248,247,244,.96);backdrop-filter:blur(10px);
+  border-top:1px solid var(--paper3);
+  display:flex;align-items:center;padding:0 56px;
+  justify-content:space-between;z-index:100}
+#gf-dots{display:flex;gap:5px;align-items:center;position:absolute;
+  left:50%;transform:translateX(-50%)}
+.gf-dot{width:6px;height:6px;border-radius:50%;background:var(--paper3);
+  border:none;cursor:pointer;padding:0;transition:all .2s}
+.gf-dot.on{background:var(--accent);transform:scale(1.35)}
+#gf-left{display:flex;align-items:center;gap:12px}
+#gf-right{display:flex;align-items:center;gap:12px}
+.gf-arrow{width:32px;height:32px;border-radius:50%;border:1px solid var(--paper3);
+  background:transparent;cursor:pointer;font-size:16px;color:var(--ink3);
+  display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1}
+.gf-arrow:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+#gf-brand{font-family:var(--mono);font-size:10px;color:var(--ink4);letter-spacing:.06em}
+#gf-stage{font-size:10px;color:var(--accent);background:var(--ap);
+  border:1px solid var(--ag);border-radius:4px;padding:3px 10px;
+  font-family:var(--mono);letter-spacing:.06em}
+#gf-counter{font-family:var(--mono);font-size:10px;color:var(--ink4)}
+
+.cxi-legend-row{display:flex;align-items:center;gap:7px;padding:4px 7px;border-radius:5px;transition:background .15s}
+.cxi-legend-row:hover{background:var(--paper3)}
+.cxi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cxi-label{font-size:10px;color:var(--ink2);flex:1}
+.cxi-pct{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink)}
+.cxi-range{font-size:9px;color:var(--ink3);font-family:var(--mono);white-space:nowrap}
+.score-pref td{background:rgba(26,107,60,.07)!important}
+.score-pref .score-val{color:var(--green);font-weight:700}
+.score-bar{height:5px;border-radius:3px;background:var(--paper3);margin-top:3px}
+.score-bar-fill{height:100%;border-radius:3px}
+
+/* ── STORY SLIDE ── */
+.st-dot{width:6px;height:6px;border-radius:50%;background:var(--paper3);transition:all .2s}
+.st-dot.on{background:var(--accent);transform:scale(1.3)}
+
+/* ════ FAILURE PATH PANEL ════════════════════════════════════════════ */
+.fp-trigger {
+  position: fixed;
+  bottom: 82px; /* above footer (50px) + footnote bar (22px) + 10px gap */
+  right: 18px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 7px 14px 7px 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,.28), 0 0 0 1px rgba(255,255,255,.06);
+  transition: transform .18s, box-shadow .18s, background .18s;
+  white-space: nowrap;
+}
+.fp-trigger:hover {
+  background: #c8510a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(200,81,10,.4), 0 0 0 1px rgba(255,255,255,.10);
+}
+.fp-trigger .fp-pulse {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #e8722a;
+  animation: fp-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes fp-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(232,114,42,.6); }
+  50%      { box-shadow: 0 0 0 5px rgba(232,114,42,0); }
+}
+
+/* Overlay backdrop */
+#fp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,14,.55);
+  backdrop-filter: blur(6px);
+  z-index: 900;
+  display: none;
+  opacity: 0;
+  transition: opacity .25s;
+}
+#fp-overlay.open { display: block; }
+#fp-overlay.visible { opacity: 1; }
+
+/* Panel */
+#fp-panel {
+  position: fixed;
+  right: 0; top: 0; bottom: 0;
+  width: min(680px, 94vw);
+  background: #0e1117;
+  border-left: 1px solid rgba(255,255,255,.08);
+  z-index: 901;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .32s cubic-bezier(.22,1,.36,1);
+  overflow: hidden;
+}
+#fp-panel.open {
+  transform: translateX(0);
+}
+
+.fp-panel-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.fp-header-left { flex: 1; min-width: 0; }
+.fp-eyebrow {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .16em;
+  color: #c8510a;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.fp-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 20px;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.fp-subtitle {
+  font-size: 11px;
+  color: rgba(255,255,255,.42);
+  line-height: 1.5;
+}
+.fp-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  color: rgba(255,255,255,.6);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s, color .15s;
+}
+.fp-close:hover { background: rgba(255,255,255,.14); color: #fff; }
+
+/* Scrollable body */
+.fp-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.fp-body::-webkit-scrollbar { width: 4px; }
+.fp-body::-webkit-scrollbar-track { background: transparent; }
+.fp-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 2px; }
+
+/* Animated flowchart nodes */
+.fp-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.fp-node {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .4s ease, transform .4s ease;
+  padding: 0 0 0 2px;
+}
+.fp-node.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fp-node-spine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 28px;
+}
+.fp-node-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--mono);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.fp-node-line {
+  width: 1px;
+  flex: 1;
+  min-height: 20px;
+  background: linear-gradient(to bottom, rgba(255,255,255,.15), rgba(255,255,255,.04));
+}
+.fp-node:last-child .fp-node-line { display: none; }
+
+.fp-node-content {
+  flex: 1;
+  padding-bottom: 20px;
+}
+.fp-node-label {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: .12em;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.fp-node-heading {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 5px;
+  line-height: 1.3;
+}
+.fp-node-body {
+  font-size: 11px;
+  color: rgba(255,255,255,.58);
+  line-height: 1.65;
+}
+.fp-node-impact {
+  margin-top: 7px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.fp-impact-chip {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.45);
+  border: 1px solid rgba(255,255,255,.09);
+}
+
+/* Node type colours */
+.fp-node-failure .fp-node-dot  { background: rgba(138,26,46,.25); color: #e05470; border: 1.5px solid rgba(138,26,46,.5); }
+.fp-node-failure .fp-node-label { background: rgba(138,26,46,.2); color: #e05470; }
+.fp-node-cause   .fp-node-dot  { background: rgba(122,82,0,.25); color: #f0a500; border: 1.5px solid rgba(122,82,0,.5); }
+.fp-node-cause   .fp-node-label { background: rgba(122,82,0,.2); color: #f0a500; }
+.fp-node-impact-type .fp-node-dot { background: rgba(200,81,10,.22); color: #e8722a; border: 1.5px solid rgba(200,81,10,.45); }
+.fp-node-impact-type .fp-node-label { background: rgba(200,81,10,.18); color: #e8722a; }
+.fp-node-resolve .fp-node-dot  { background: rgba(26,107,60,.25); color: #4ade80; border: 1.5px solid rgba(26,107,60,.5); }
+.fp-node-resolve .fp-node-label { background: rgba(26,107,60,.2); color: #4ade80; }
+
+/* Branch connector for multi-path */
+.fp-branch {
+  margin: 4px 0 4px 42px;
+  border-left: 1px dashed rgba(255,255,255,.1);
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .35s ease, transform .35s ease;
+}
+.fp-branch.visible { opacity: 1; transform: translateY(0); }
+.fp-branch-item {
+  font-size: 10.5px;
+  color: rgba(255,255,255,.5);
+  line-height: 1.55;
+  position: relative;
+  padding-left: 12px;
+}
+.fp-branch-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 7px;
+  width: 6px; height: 1px;
+  background: rgba(255,255,255,.2);
+}
+.fp-branch-item strong { color: rgba(255,255,255,.75); font-weight: 600; }
+
+/* Solution footer */
+.fp-solution {
+  margin-top: 8px;
+  background: rgba(26,107,60,.12);
+  border: 1px solid rgba(26,107,60,.25);
+  border-radius: 10px;
+  padding: 14px 16px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .4s ease .1s, transform .4s ease .1s;
+}
+.fp-solution.visible { opacity: 1; transform: translateY(0); }
+.fp-solution-tag {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: .12em;
+  font-weight: 700;
+  color: #4ade80;
+  margin-bottom: 7px;
+}
+.fp-solution-text {
+  font-size: 11.5px;
+  color: rgba(255,255,255,.72);
+  line-height: 1.65;
+}
+.fp-solution-text strong { color: #4ade80; }
+
+
+/* ════ LOGIN GATE ════════════════════════════════════════════════════ */
+#login-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #0e1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+#login-gate.hidden {
+  display: none;
+}
+.lg-card {
+  width: 360px;
+  background: #16191f;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 40px 36px 36px;
+  box-shadow: 0 40px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.lg-logo {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .22em;
+  font-weight: 700;
+  color: #c8510a;
+  margin-bottom: 24px;
+}
+.lg-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 26px;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.lg-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,.35);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+.lg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.lg-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .14em;
+  font-weight: 700;
+  color: rgba(255,255,255,.35);
+}
+.lg-input {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  color: #fff;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  outline: none;
+  transition: border-color .15s, background .15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.lg-input:focus {
+  border-color: rgba(200,81,10,.6);
+  background: rgba(200,81,10,.06);
+}
+.lg-input::placeholder {
+  color: rgba(255,255,255,.18);
+}
+.lg-error {
+  font-size: 11px;
+  color: #e05470;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .06em;
+  height: 16px;
+  margin-bottom: 8px;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.lg-error.show { opacity: 1; }
+.lg-btn {
+  width: 100%;
+  padding: 12px;
+  background: #c8510a;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background .15s, transform .12s;
+  letter-spacing: .02em;
+}
+.lg-btn:hover { background: #e8722a; transform: translateY(-1px); }
+.lg-btn:active { transform: translateY(0); }
+.lg-btn.shaking {
+  animation: lg-shake .35s ease;
+}
+@keyframes lg-shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+.lg-divider {
+  height: 1px;
+  background: rgba(255,255,255,.06);
+  margin: 28px 0 20px;
+}
+.lg-footer {
+  font-size: 10px;
+  color: rgba(255,255,255,.18);
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .06em;
+}
+
+
+
+
+/* ════ GAP ANALYSIS SLIDE ════════════════════════════════════════════ */
+/* Uses the deck's standard --paper bg, --ink text, --paper2/3 cards  */
+
+#s-gap { background: var(--paper); }
+
+/* Summary stats */
+.gap-summary-bar {
+  display:flex; gap:7px; margin-bottom:10px; flex-shrink:0;
+}
+.gap-stat {
+  flex:1; background:var(--paper2);
+  border:1px solid var(--paper3); border-radius:8px;
+  padding:7px 10px; display:flex; flex-direction:column; gap:2px;
+  position:relative; overflow:hidden;
+}
+.gap-stat-bar { position:absolute; top:0; left:0; right:0; height:3px; border-radius:8px 8px 0 0; }
+.gap-stat-v {
+  font-family:var(--mono); font-size:18px; font-weight:700;
+  line-height:1; color:var(--ink);
+}
+.gap-stat-l { font-size:8.5px; color:var(--ink4); letter-spacing:.06em; font-family:var(--mono); }
+
+/* Two-column layout */
+.gap-flow {
+  display:grid; grid-template-columns:1fr 20px 1fr;
+  gap:0; flex:1; min-height:0; overflow:hidden;
+}
+
+/* Column labels */
+.gap-col-label {
+  font-family:var(--mono); font-size:8.5px; font-weight:700;
+  letter-spacing:.13em; color:var(--ink4);
+  margin-bottom:5px; flex-shrink:0;
+}
+
+/* ── Finding cards (left col) ── */
+.gap-findings-list {
+  display:flex; flex-direction:column; gap:5px;
+  overflow-y:auto; padding-right:4px;
+}
+.gap-findings-list::-webkit-scrollbar { width:3px; }
+.gap-findings-list::-webkit-scrollbar-track { background:transparent; }
+.gap-findings-list::-webkit-scrollbar-thumb { background:var(--paper3); border-radius:2px; }
+
+.gap-card {
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:9px; padding:9px 10px;
+  cursor:pointer; position:relative; overflow:hidden;
+  transition:border-color .18s, background .18s, box-shadow .18s;
+  flex-shrink:0;
+}
+.gap-card:hover {
+  border-color:var(--paper4);
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+.gap-card.expanded {
+  border-color:var(--card-color, var(--accent));
+  background:var(--paper);
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+}
+.gap-card-accent {
+  position:absolute; top:0; left:0; bottom:0; width:3px;
+  border-radius:9px 0 0 9px;
+  background:var(--card-color, var(--accent));
+}
+.gap-card-head {
+  display:flex; align-items:center; gap:7px; padding-left:6px;
+}
+.gap-card-icon { font-size:12px; flex-shrink:0; }
+.gap-card-title {
+  font-size:11px; font-weight:600; color:var(--ink);
+  line-height:1.25; flex:1;
+}
+.gap-card-badge {
+  font-family:var(--mono); font-size:7.5px; font-weight:700;
+  padding:2px 6px; border-radius:3px; letter-spacing:.05em;
+  flex-shrink:0; white-space:nowrap;
+}
+.gap-card-chevron {
+  font-size:8px; color:var(--ink4);
+  transition:transform .22s; flex-shrink:0;
+}
+.gap-card.expanded .gap-card-chevron { transform:rotate(180deg); color:var(--ink2); }
+
+/* Expandable body */
+.gap-card-body {
+  max-height:0; overflow:hidden;
+  transition:max-height .32s cubic-bezier(.22,1,.36,1), opacity .25s;
+  opacity:0; padding-left:6px;
+}
+.gap-card.expanded .gap-card-body { max-height:200px; opacity:1; }
+.gap-card-body-inner {
+  padding-top:8px; margin-top:7px;
+  border-top:1px solid var(--paper3);
+}
+.gap-card-desc {
+  font-size:10px; color:var(--ink2); line-height:1.6; margin-bottom:7px;
+}
+.gap-card-chips { display:flex; flex-wrap:wrap; gap:4px; }
+.gap-chip {
+  font-family:var(--mono); font-size:8px; padding:2px 7px;
+  border-radius:3px; border:1px solid var(--paper3);
+  color:var(--ink3); background:var(--paper2);
+}
+.gap-chip.opp {
+  border-color:rgba(26,107,60,.3);
+  color:var(--green); background:var(--gp);
+}
+
+/* ── Connector arrows ── */
+.gap-arrow-col {
+  display:flex; flex-direction:column; justify-content:center;
+  align-items:center; gap:3px;
+}
+.gap-arrow-line { width:1px; flex:1; background:var(--paper3); }
+.gap-arrow-head { color:var(--ink4); font-size:9px; }
+
+/* ── Opportunity cards (right col) ── */
+.gap-opp-list {
+  display:flex; flex-direction:column; gap:5px;
+  overflow-y:auto; padding-left:4px;
+}
+.gap-opp-list::-webkit-scrollbar { width:3px; }
+.gap-opp-list::-webkit-scrollbar-track { background:transparent; }
+.gap-opp-list::-webkit-scrollbar-thumb { background:var(--paper3); border-radius:2px; }
+
+.gap-opp-card {
+  flex:1; min-height:36px;
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:9px; padding:9px 11px;
+  cursor:pointer; transition:all .18s; position:relative; overflow:hidden;
+}
+.gap-opp-card:hover {
+  border-color:var(--paper4);
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+.gap-opp-card.active {
+  background:var(--gp); border-color:rgba(26,107,60,.35);
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+}
+.gap-opp-top {
+  position:absolute; top:0; left:0; right:0; height:3px;
+  border-radius:9px 9px 0 0; background:var(--green); opacity:.6;
+}
+.gap-opp-card.active .gap-opp-top { opacity:1; }
+.gap-opp-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:3px; }
+.gap-opp-label {
+  font-family:var(--mono); font-size:7.5px; font-weight:700;
+  letter-spacing:.1em; color:var(--green);
+}
+.gap-opp-chevron {
+  font-size:8px; color:var(--ink4);
+  transition:transform .22s;
+}
+.gap-opp-card.active .gap-opp-chevron { transform:rotate(180deg); color:var(--green); }
+.gap-opp-title {
+  font-size:10.5px; font-weight:600; color:var(--ink); line-height:1.3;
+}
+.gap-opp-body {
+  max-height:0; overflow:hidden;
+  transition:max-height .32s cubic-bezier(.22,1,.36,1), opacity .25s;
+  opacity:0;
+}
+.gap-opp-card.active .gap-opp-body { max-height:240px; opacity:1; }
+.gap-opp-body-inner {
+  font-size:10px; color:var(--ink2); line-height:1.6;
+  padding-top:7px; margin-top:7px;
+  border-top:1px solid rgba(26,107,60,.2);
+}
+.gap-opp-items { display:flex; flex-direction:column; gap:3px; margin-top:6px; }
+.gap-opp-item {
+  font-size:9.5px; color:var(--ink3); padding-left:13px;
+  position:relative; line-height:1.45;
+}
+.gap-opp-item::before {
+  content:'→'; position:absolute; left:0;
+  color:var(--green); font-size:8px; font-weight:700;
+}
+
+/* Entry animations — same timing as rest of deck */
+@keyframes gap-in {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.gap-card     { animation:gap-in .38s cubic-bezier(.22,1,.36,1) both; }
+.gap-opp-card { animation:gap-in .42s cubic-bezier(.22,1,.36,1) both; }
+
+
+/* ════ GAP ANALYSIS — 3-SLIDE SECTION ═══════════════════════════════ */
+
+/* Slide 1: Executive Summary */
+.gx-hero { display:flex; gap:10px; margin-bottom:12px; flex-shrink:0; }
+.gx-kpi {
+  flex:1; background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:10px; padding:10px 14px; position:relative; overflow:hidden;
+  transition: transform .2s, box-shadow .2s;
+}
+.gx-kpi:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.07); }
+.gx-kpi-bar { position:absolute; top:0; left:0; right:0; height:3px; border-radius:10px 10px 0 0; }
+.gx-kpi-v { font-family:var(--mono); font-size:28px; font-weight:700; line-height:1; margin-bottom:3px; }
+.gx-kpi-l { font-size:10px; color:var(--ink3); line-height:1.4; }
+.gx-kpi-sub { font-size:9px; color:var(--ink4); margin-top:4px; font-style:italic; }
+
+/* Maturity bar chart */
+.gx-maturity { display:flex; flex-direction:column; gap:5px; }
+.gx-reg-row {
+  display:flex; align-items:center; gap:10px;
+  opacity:0; transform:translateX(-12px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.gx-reg-row.visible { opacity:1; transform:translateX(0); }
+.gx-reg-name { font-size:10.5px; font-weight:600; color:var(--ink2); width:180px; flex-shrink:0; }
+.gx-reg-dept { font-size:9px; color:var(--ink4); font-family:var(--mono); }
+.gx-bar-track { flex:1; height:22px; background:var(--paper3); border-radius:5px; overflow:hidden; position:relative; }
+.gx-bar-fill {
+  height:100%; border-radius:5px; width:0;
+  transition: width 1s cubic-bezier(.22,1,.36,1);
+  display:flex; align-items:center; padding-left:8px;
+}
+.gx-bar-label { font-family:var(--mono); font-size:8.5px; font-weight:700; color:#fff; white-space:nowrap; }
+.gx-score-badge {
+  font-family:var(--mono); font-size:11px; font-weight:700;
+  width:32px; text-align:center; flex-shrink:0;
+}
+.gx-maturity-label { font-size:8.5px; color:var(--ink4); font-style:italic; }
+
+/* Finding chips below chart */
+.gx-finding-row {
+  display:flex; align-items:flex-start; gap:8px; padding:6px 0;
+  border-bottom:1px solid var(--paper3);
+  opacity:0; transform:translateY(6px);
+  transition: opacity .35s ease, transform .35s ease;
+}
+.gx-finding-row.visible { opacity:1; transform:translateY(0); }
+.gx-finding-row:last-child { border-bottom:none; }
+.gx-g-badge {
+  font-family:var(--mono); font-size:8px; font-weight:700;
+  background:var(--paper3); color:var(--ink3); border-radius:3px;
+  padding:2px 6px; flex-shrink:0; margin-top:2px;
+}
+.gx-finding-text { font-size:10.5px; color:var(--ink2); line-height:1.55; flex:1; }
+.gx-finding-impact { font-size:9.5px; color:var(--ink4); font-style:italic; }
+
+/* Slide 2: Registry cards */
+.gx-reg-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; flex:1; min-height:0; overflow:hidden; }
+.gx-reg-card {
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:10px; padding:10px 11px; display:flex; flex-direction:column;
+  gap:5px; overflow:hidden; cursor:pointer;
+  transition: border-color .18s, box-shadow .18s;
+  opacity:0; transform:translateY(12px);
+  animation: gap-in .4s cubic-bezier(.22,1,.36,1) both;
+}
+.gx-reg-card.visible { opacity:1; transform:translateY(0); }
+.gx-reg-card:hover { border-color:var(--paper4); box-shadow:0 4px 16px rgba(0,0,0,.07); }
+.gx-reg-card.open { border-color:var(--accent); }
+.gx-reg-card-top { position:absolute; top:0; left:0; right:0; height:3px; border-radius:10px 10px 0 0; }
+.gx-reg-num { font-family:var(--mono); font-size:9px; font-weight:700; color:var(--ink4); letter-spacing:.1em; }
+.gx-reg-title { font-size:12px; font-weight:700; color:var(--ink); line-height:1.25; }
+.gx-reg-subtitle { font-size:9.5px; color:var(--ink3); }
+.gx-score-row { display:flex; align-items:center; gap:6px; }
+.gx-avg-score { font-family:var(--mono); font-size:18px; font-weight:700; }
+.gx-avg-label { font-size:9px; color:var(--ink4); line-height:1.3; }
+.gx-mini-bars { display:flex; flex-direction:column; gap:2px; flex:1; }
+.gx-mini-bar { height:4px; border-radius:2px; }
+.gx-gap-count { font-family:var(--mono); font-size:9px; font-weight:700; padding:2px 7px; border-radius:3px; }
+.gx-expand-body { max-height:0; overflow:hidden; transition:max-height .35s cubic-bezier(.22,1,.36,1); }
+.gx-reg-card.open .gx-expand-body { max-height:400px; }
+.gx-gap-list { padding-top:7px; border-top:1px solid var(--paper3); margin-top:4px; display:flex; flex-direction:column; gap:3px; }
+.gx-gap-item { display:flex; gap:6px; align-items:flex-start; }
+.gx-gap-badge { font-family:var(--mono); font-size:7.5px; font-weight:700; padding:1px 5px; border-radius:2px; background:var(--ap); color:var(--accent); flex-shrink:0; margin-top:2px; }
+.gx-gap-text { font-size:9.5px; color:var(--ink2); line-height:1.5; }
+
+/* Slide 3: Cross-cutting + bridge */
+.gx-bridge { display:grid; grid-template-columns:1fr 1fr; gap:14px; flex:1; min-height:0; }
+.gx-cross-col { display:flex; flex-direction:column; gap:8px; overflow:hidden; }
+.gx-cross-card {
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:9px; padding:10px 12px;
+  opacity:0; transform:translateY(10px);
+  transition:opacity .4s ease, transform .4s ease;
+}
+.gx-cross-card.visible { opacity:1; transform:translateY(0); }
+.gx-cross-label { font-family:var(--mono); font-size:8px; font-weight:700; letter-spacing:.12em; color:var(--ink4); margin-bottom:5px; }
+.gx-cross-title { font-size:11.5px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+.gx-cross-body { font-size:10px; color:var(--ink2); line-height:1.6; }
+.gx-cross-chips { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
+.gx-chip { font-family:var(--mono); font-size:8px; padding:2px 7px; border-radius:3px; border:1px solid var(--paper3); color:var(--ink3); background:var(--paper2); }
+.gx-chip.red { border-color:var(--rg2); color:var(--red); background:var(--rp); }
+.gx-chip.amber { border-color:var(--amg); color:var(--amber); background:var(--amp); }
+.gx-chip.green { border-color:var(--gg2); color:var(--green); background:var(--gp); }
+
+/* Bridge panel — right col slide 3 */
+.gx-bridge-panel {
+  background:var(--ink); border-radius:12px; padding:20px 22px;
+  display:flex; flex-direction:column; gap:10px; overflow:hidden;
+  opacity:0; transform:translateX(16px);
+  transition:opacity .5s ease .2s, transform .5s ease .2s;
+}
+.gx-bridge-panel.visible { opacity:1; transform:translateX(0); }
+.gx-bridge-eyebrow { font-family:var(--mono); font-size:8.5px; letter-spacing:.18em; font-weight:700; color:var(--accent2); margin-bottom:2px; }
+.gx-bridge-title { font-family:var(--serif); font-size:22px; color:#fff; line-height:1.2; margin-bottom:6px; }
+.gx-bridge-title em { color:var(--accent2); font-style:italic; }
+.gx-bridge-sub { font-size:11px; color:rgba(255,255,255,.45); line-height:1.6; margin-bottom:6px; }
+.gx-decision-pill {
+  display:flex; align-items:center; gap:9px;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+  border-radius:7px; padding:7px 10px;
+  opacity:0; transform:translateX(10px);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.gx-decision-pill.visible { opacity:1; transform:translateX(0); }
+.gx-decision-pill:hover { background:rgba(255,255,255,.09); }
+.gx-pill-q { font-family:var(--mono); font-size:9px; font-weight:700; padding:2px 7px; border-radius:3px; flex-shrink:0; }
+.gx-pill-text { font-size:10.5px; color:rgba(255,255,255,.75); flex:1; font-weight:500; }
+.gx-pill-arrow { font-size:10px; color:rgba(255,255,255,.25); }
+
+</style>
+<style>
+
+/* ── 30% FONT SIZE INCREASE OVERRIDES ── */
+.slide-h1{font-size:39px!important}
+.slide-sub{font-size:17px!important;max-width:820px!important}
+.kpi-v{font-size:22px!important}
+.kpi-l{font-size:12px!important}
+.ov-title{font-size:16px!important;font-weight:600}
+.ov-desc{font-size:13.5px!important;line-height:1.6}
+.ov-num{font-size:13px!important}
+.ov-badge{font-size:11px!important}
+.etag{font-size:12px!important;padding:5px 12px!important}
+.enum{font-size:12px!important}
+.note-bar{font-size:13.5px!important;padding:9px 14px!important}
+.note-bar strong{font-size:13.5px!important}
+.opt-name{font-size:14px!important}
+.opt-badge{font-size:11px!important}
+.pro,.con{font-size:12.5px!important;line-height:1.5}
+.ns-title{font-size:16px!important}
+.ns-item{font-size:13px!important}
+.ns-sprint{font-size:11px!important;letter-spacing:.08em}
+.cbox-text{font-size:14px!important}
+.cbox-title{font-size:11px!important}
+.rec-pill{font-size:13px!important}
+.rec-pill span{font-size:11px!important}
+.q-story{font-size:13.5px!important}
+.mtbl{font-size:14px!important}
+.mtbl th{font-size:11px!important}
+.fp-title{font-size:26px!important}
+.fp-subtitle{font-size:13px!important}
+.fp-node-heading{font-size:16px!important}
+.fp-node-body{font-size:13.5px!important;line-height:1.7}
+.fp-node-label{font-size:10.5px!important}
+.fp-impact-chip{font-size:11px!important}
+.fp-solution-text{font-size:13.5px!important;line-height:1.7}
+.fp-solution-tag{font-size:10.5px!important}
+.fp-eyebrow{font-size:11px!important}
+#gf-brand{font-size:12px!important}
+#gf-counter{font-size:12px!important}
+#gf-stage{font-size:12px!important}
+.fn-text{font-size:12px!important}
+.fn-logo{font-size:11px!important}
+#kbhint{font-size:12.5px!important}
+
+.acc-section{border:1px solid var(--paper3);border-radius:8px;overflow:hidden;margin-bottom:5px}
+.acc-head{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:pointer;user-select:none;transition:background .12s;font-size:14px;font-weight:600}
+.acc-head:hover{background:var(--paper2)}
+.acc-chev{margin-left:auto;font-size:12px;color:var(--ink4);transition:transform .22s}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .32s cubic-bezier(.22,1,.36,1)}
+.acc-open .acc-body{max-height:600px}
+.acc-open .acc-chev{transform:rotate(180deg)}
+.acc-content{padding:10px 14px 12px;font-size:14px;color:var(--ink2);line-height:1.7}
+.oq-card{background:var(--ink);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden}
+.oq-card::before{content:'?';position:absolute;right:12px;top:2px;font-family:var(--serif);font-size:90px;color:rgba(255,255,255,.035);line-height:1}
+.oq-label{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;color:#1a5c6b;margin-bottom:7px;text-transform:uppercase}
+.oq-q{font-family:var(--serif);font-size:17px;color:#fff;line-height:1.35;margin-bottom:5px}
+.oq-context{font-size:13px;color:rgba(255,255,255,.48);line-height:1.65}
+.bar-fill{transition:width 1s cubic-bezier(.22,1,.36,1)}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+.svg-flow{stroke-dasharray:7 4;animation:dash-flow 1.5s linear infinite}
+.fab-cluster{position:fixed;bottom:72px;right:16px;display:flex;flex-direction:column;gap:9px;z-index:200}
+.fab-btn{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 16px rgba(0,0,0,.22);transition:transform .15s,box-shadow .15s;position:relative}
+.fab-btn:hover{transform:scale(1.1);box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.fab-tooltip{position:absolute;right:58px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;padding:5px 11px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(255,255,255,.1)}
+.fab-btn:hover .fab-tooltip{opacity:1}
+#fp-overlay{position:fixed;inset:0;background:rgba(10,10,14,.55);backdrop-filter:blur(6px);z-index:900;display:none;opacity:0;transition:opacity .25s}
+#fp-overlay.open{display:block}
+#fp-overlay.visible{opacity:1}
+#fp-panel{position:fixed;right:0;top:0;bottom:0;width:min(700px,94vw);background:#0e1117;border-left:1px solid rgba(255,255,255,.08);z-index:901;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .32s cubic-bezier(.22,1,.36,1);overflow:hidden}
+#fp-panel.open{transform:translateX(0)}
+.fp-panel-header{padding:22px 26px 18px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.fp-header-left{flex:1;min-width:0}
+.fp-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.fp-close:hover{background:rgba(255,255,255,.14);color:#fff}
+.fp-body{flex:1;overflow-y:auto;padding:20px 26px 36px;display:flex;flex-direction:column;gap:0}
+.fp-body::-webkit-scrollbar{width:4px}
+.fp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+.fp-node{display:flex;align-items:flex-start;gap:14px;opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .4s ease;padding:0 0 0 2px}
+.fp-node.visible{opacity:1;transform:translateY(0)}
+.fp-node-spine{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:30px}
+.fp-node-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--mono);flex-shrink:0;position:relative;z-index:1}
+.fp-node-line{width:1px;flex:1;min-height:22px;background:linear-gradient(to bottom,rgba(255,255,255,.15),rgba(255,255,255,.04))}
+.fp-node:last-child .fp-node-line{display:none}
+.fp-node-content{flex:1;padding-bottom:22px}
+.fp-node-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;font-weight:700;padding:3px 9px;border-radius:3px;display:inline-block;margin-bottom:7px}
+.fp-node-heading{font-size:16px;font-weight:600;color:#fff;margin-bottom:6px;line-height:1.3}
+.fp-node-body{font-size:13.5px;color:rgba(255,255,255,.6);line-height:1.7}
+.fp-node-impact{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+.fp-impact-chip{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:12px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.09)}
+.fp-node-failure .fp-node-dot{background:rgba(138,26,46,.25);color:#e05470;border:1.5px solid rgba(138,26,46,.5)}
+.fp-node-failure .fp-node-label{background:rgba(138,26,46,.2);color:#e05470}
+.fp-node-cause .fp-node-dot{background:rgba(122,82,0,.25);color:#f0a500;border:1.5px solid rgba(122,82,0,.5)}
+.fp-node-cause .fp-node-label{background:rgba(122,82,0,.2);color:#f0a500}
+.fp-node-impact-type .fp-node-dot{background:rgba(200,81,10,.22);color:#e8722a;border:1.5px solid rgba(200,81,10,.45)}
+.fp-node-impact-type .fp-node-label{background:rgba(200,81,10,.18);color:#e8722a}
+.fp-node-resolve .fp-node-dot{background:rgba(26,107,60,.25);color:#4ade80;border:1.5px solid rgba(26,107,60,.5)}
+.fp-node-resolve .fp-node-label{background:rgba(26,107,60,.2);color:#4ade80}
+.fp-solution{margin-top:9px;background:rgba(26,107,60,.12);border:1px solid rgba(26,107,60,.25);border-radius:10px;padding:15px 17px;opacity:0;transform:translateY(10px);transition:opacity .4s ease .1s,transform .4s ease .1s}
+.fp-solution.visible{opacity:1;transform:translateY(0)}
+.fp-solution-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;font-weight:700;color:#4ade80;margin-bottom:8px}
+.fp-solution-text{font-size:13.5px;color:rgba(255,255,255,.72);line-height:1.7}
+.fp-solution-text strong{color:#fff}
+.panel-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.panel-tab{flex:1;padding:13px 10px;text-align:center;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.35);transition:color .2s;border:none;background:transparent;border-bottom:2px solid transparent}
+.panel-tab:hover{color:rgba(255,255,255,.7)}
+.panel-tab.active{color:#1a5c6b;border-bottom-color:#1a5c6b}
+.panel-svg-wrap{margin:14px 0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px}
+.panel-svg-title{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.35);margin-bottom:10px;font-weight:700;text-transform:uppercase}
+
+/* ── REFERENCE MODAL ──────────────────────────────────────────────── */
+#ref-fab{
+  position:fixed;bottom:72px;left:16px;z-index:200;
+  width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--ink2);color:#fff;font-size:18px;font-weight:700;
+  box-shadow:0 4px 16px rgba(0,0,0,.28);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s,box-shadow .15s;font-family:var(--mono);
+  position:fixed;
+}
+#ref-fab:hover{transform:scale(1.1);box-shadow:0 8px 28px rgba(0,0,0,.35)}
+#ref-fab .fab-tooltip{right:auto;left:58px}
+
+#ref-overlay{
+  position:fixed;inset:0;background:rgba(10,10,14,.6);
+  backdrop-filter:blur(8px);z-index:1000;
+  display:none;opacity:0;transition:opacity .25s;
+}
+#ref-overlay.open{display:block}
+#ref-overlay.visible{opacity:1}
+
+#ref-modal{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);
+  width:min(920px,96vw);max-height:88vh;
+  background:var(--paper);border:1px solid var(--paper3);
+  border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.28);
+  z-index:1001;display:flex;flex-direction:column;
+  opacity:0;transition:opacity .28s,transform .28s cubic-bezier(.22,1,.36,1);
+  overflow:hidden;
+}
+#ref-modal.visible{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+.ref-modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px 14px;border-bottom:1px solid var(--paper3);flex-shrink:0;
+}
+.ref-modal-title{font-family:var(--serif);font-size:22px;color:var(--ink);line-height:1.2}
+.ref-modal-sub{font-size:12px;color:var(--ink4);font-family:var(--mono);letter-spacing:.06em;margin-top:3px}
+.ref-modal-close{
+  width:32px;height:32px;border-radius:50%;background:var(--paper2);
+  border:1px solid var(--paper3);color:var(--ink3);cursor:pointer;
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+  transition:background .12s;flex-shrink:0;
+}
+.ref-modal-close:hover{background:var(--paper3);color:var(--ink)}
+
+.ref-tabs{
+  display:flex;border-bottom:1px solid var(--paper3);flex-shrink:0;
+  background:var(--paper2);
+}
+.ref-tab{
+  flex:1;padding:11px 16px;text-align:center;cursor:pointer;
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;
+  color:var(--ink4);transition:color .15s;border:none;background:transparent;
+  border-bottom:2px solid transparent;
+}
+.ref-tab:hover{color:var(--ink2)}
+.ref-tab.active{color:var(--ink);border-bottom-color:var(--ink)}
+
+.ref-body{flex:1;overflow-y:auto;padding:0}
+.ref-body::-webkit-scrollbar{width:4px}
+.ref-body::-webkit-scrollbar-thumb{background:var(--paper3);border-radius:2px}
+
+.ref-section{padding:10px 20px 4px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.14em;color:var(--ink4);font-weight:700;
+  border-bottom:1px solid var(--paper3);background:var(--paper2)}
+
+.ref-row{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:11px 20px;border-bottom:1px solid var(--paper3);
+  cursor:pointer;transition:background .12s;
+}
+.ref-row:hover{background:var(--paper2)}
+.ref-row.ref-expanded{background:var(--paper2)}
+.ref-row.ref-expanded .ref-desc{-webkit-line-clamp:unset;display:block}
+.ref-row.ref-expanded .ref-chev{transform:rotate(180deg)}
+
+.ref-code{
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  padding:4px 9px;border-radius:5px;white-space:nowrap;
+  flex-shrink:0;min-width:52px;text-align:center;letter-spacing:.04em;
+}
+.ref-name{
+  font-size:13.5px;font-weight:600;color:var(--ink);
+  min-width:160px;flex-shrink:0;line-height:1.4;
+}
+.ref-owner{
+  display:block;font-size:10.5px;color:var(--ink4);font-weight:400;
+  font-family:var(--mono);letter-spacing:.04em;margin-top:2px;
+}
+.ref-desc{
+  font-size:12.5px;color:var(--ink3);line-height:1.6;flex:1;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;
+  transition:all .2s;
+}
+.ref-chev{font-size:11px;color:var(--ink4);flex-shrink:0;margin-top:2px;transition:transform .2s}
+
+#ref-search{
+  width:100%;padding:10px 20px;border:none;border-bottom:1px solid var(--paper3);
+  background:var(--paper);font-family:var(--sans);font-size:13px;color:var(--ink);
+  outline:none;flex-shrink:0;
+}
+#ref-search::placeholder{color:var(--ink4)}
+#ref-search:focus{background:var(--paper2)}
+
+</style>
+</head>
+<body>
+<div id="stage">
+<div class="slide active" id="d3s1"><div class="prog"><div class="prog-fill" style="width:17%"></div></div><div class="id-bar" style="background:#1a5c6b"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#1a5c6b;border-color:#1a5c6b">D3 · The Team · DGTP-INT-001</span>
+    <span class="enum">Integration Architecture Document · Design Phase 2026</span>
+  </div>
+  <h2 class="slide-h1 a2">Integration Architecture</h2>
+  <p class="slide-sub a3">Adapter Pattern · Outbox Pattern · Six-registry landscape · Azure Service Bus topology · Once-Only citizen data flow. Three principles govern every integration decision.</p>
+</div>
+<div class="slide-body a4">
+  <div class="ov-grid" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">
+    <div class="ov-card">
+      <div class="ov-top-bar" style="background:#1a5c6b"></div>
+      <div class="ov-num">P-04 Loose Coupling Loose Coupling</div>
+      <div class="ov-title">Loose Coupling</div>
+      <div class="ov-desc">One dedicated, independently deployable adapter per registry. A registry changing its protocol — SOAP to REST, OData v2 to v4 — affects only its own adapter. Zero platform-wide impact. No adapter contains business logic.</div>
+      <span class="ov-badge" style="background:var(--tp);color:#1a5c6b">6 DEDICATED ADAPTERS</span>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top-bar" style="background:#1a5c6b"></div>
+      <div class="ov-num">P-05 Resilience by Default Resilience by Default</div>
+      <div class="ov-title">Resilience by Default</div>
+      <div class="ov-desc">Outbox Pattern in every adapter guarantees zero data loss even when Azure Service Bus is unavailable. Records stay PENDING and retry automatically. Circuit breakers prevent cascade failures when a registry is slow or down.</div>
+      <span class="ov-badge" style="background:var(--tp);color:#1a5c6b">ZERO DATA LOSS</span>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top-bar" style="background:#1a5c6b"></div>
+      <div class="ov-num">P-11 Once-Only Principle Once-Only Principle</div>
+      <div class="ov-title">Once-Only Principle</div>
+      <div class="ov-desc">Citizens submit data once to any government service. The platform reuses that data via the Canonical Data Store — continuously synchronised from all six registries with a freshness SLA of less than 15 minutes.</div>
+      <span class="ov-badge" style="background:var(--tp);color:#1a5c6b">&lt;15 MIN FRESHNESS SLA</span>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-top" style="background:#1a5c6b"></div><div class="kpi-v">6</div><div class="kpi-l">Registry Adapters</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#1a5c6b"></div><div class="kpi-v">Zero</div><div class="kpi-l">Data Loss (Outbox)</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#1a5c6b"></div><div class="kpi-v">&lt;15m</div><div class="kpi-l">Canonical Freshness</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#1a5c6b"></div><div class="kpi-v">14 days</div><div class="kpi-l">SB Retention</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#1a5c6b"></div><div class="kpi-v">DLQ</div><div class="kpi-l">Per Subscription</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#8a1a2e"></div><div class="kpi-v">1</div><div class="kpi-l">Deferred (Kadaster)</div></div>
+  </div>
+  <div class="note-bar" style="margin-top:10px">
+    <strong>Critical Gap — P-04 Loose Coupling Loose Coupling:</strong> The Land Registry (Kadaster) has no As-Is architecture document. The adapter cannot be designed without it. Kadaster is formally deferred. Contact the Kadaster focal point in Design Phase Week 1. Target: documentation received within 4 weeks.
+  </div>
+</div>
+</div>
+<div class="slide" id="d3s2"><div class="prog"><div class="prog-fill" style="width:38%"></div></div><div class="id-bar" style="background:#1a5c6b"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#1a5c6b;border-color:#1a5c6b">D3 · P-04 Loose Coupling Loose Coupling · P-05 Resilience by Default Resilience by Default</span>
+    <span class="enum">Registry Landscape &amp; Outbox Pattern — DGTP-HLD-001 Fig 6.1 + 6.2</span>
+  </div>
+  <h2 class="slide-h1 a2">Six Registries → Adapters → Service Bus → Canonical Store</h2>
+  <p class="slide-sub a3">Every registry connects exclusively via its dedicated adapter module. Hover each node for protocol, risk, and focal point details. Outbox Pattern guarantees zero data loss at every adapter.</p>
+</div>
+<div class="slide-body a4">
+  <div class="q-layout">
+    <div class="q-left">
+      <div class="arch-svg-wrap">
+        <div class="arch-svg-title">REGISTRY LANDSCAPE — HOVER EACH NODE FOR DETAILS · P-04 Loose Coupling Loose Coupling enforces one adapter per registry</div>
+        <svg viewBox="0 0 440 268" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans,sans-serif" style="width:100%;height:auto">
+          <defs>
+            <marker id="ta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#1a5c6b" stroke-width="1.5" stroke-linecap="round"/>
+            </marker>
+            <marker id="ta2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#7a5200" stroke-width="1.5" stroke-linecap="round"/>
+            </marker>
+          </defs>
+          <rect x="2" y="4" width="118" height="34" rx="6" fill="#fff5f5" stroke="#8a1a2e" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'HIGH RISK — Civil Registry (CASBES)','StUF-BG SOAP to REST','Most complex adapter. Legacy Dutch SOAP standard. APIM transforms XML to REST/JSON. NSN is the primary citizen key. Knowledge concentration risk — secure all documentation from the Civil Registry technical contact in Week 1.','#8a1a2e')" onmouseleave="hideTip()"/>
+          <text x="61" y="17" text-anchor="middle" font-size="9" font-weight="700" fill="#8a1a2e">Civil Registry</text>
+          <text x="61" y="30" text-anchor="middle" font-size="7.5" fill="#6b7280">CASBES · StUF-BG SOAP</text>
+          <rect x="2" y="46" width="118" height="34" rx="6" fill="#f0faf4" stroke="#1a6b3c" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'LOW RISK — Chamber of Commerce','COCI · Oracle OData v4','Digital front-end exists. OData v4 REST adapter. CRIB number cross-reference with Tax Administration is critical. Board quorum rules may slow decisions — allow extra lead time.','#1a6b3c')" onmouseleave="hideTip()"/>
+          <text x="61" y="59" text-anchor="middle" font-size="9" font-weight="700" fill="#1a6b3c">Chamber of Commerce</text>
+          <text x="61" y="72" text-anchor="middle" font-size="7.5" fill="#6b7280">COCI · Oracle OData v4</text>
+          <rect x="2" y="88" width="118" height="34" rx="6" fill="#fff5e6" stroke="#7a5200" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'MEDIUM RISK — Tax Administration','SIAH · MS Dynamics CRM to REST','External access restricted — data sharing approval required before design can be finalised. Centralised decisions slow responses. CRIB number cross-reference with COCI. Escalate data sharing request in Week 1.','#7a5200')" onmouseleave="hideTip()"/>
+          <text x="61" y="101" text-anchor="middle" font-size="9" font-weight="700" fill="#7a5200">Tax Administration</text>
+          <text x="61" y="114" text-anchor="middle" font-size="7.5" fill="#6b7280">SIAH · MS Dynamics CRM</text>
+          <rect x="2" y="130" width="118" height="34" rx="6" fill="#f8f5ff" stroke="#4a1a7a" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'MEDIUM RISK — TEATT Licenses','BLISS · D365 OData v4','Licence status: ACTIVE / SUSPENDED / EXPIRED / PENDING. Holder identity cross-references Civil Registry NSN. D365 OData v4 is well-documented. No unified case management yet.','#4a1a7a')" onmouseleave="hideTip()"/>
+          <text x="61" y="143" text-anchor="middle" font-size="9" font-weight="700" fill="#4a1a7a">TEATT Licenses</text>
+          <text x="61" y="156" text-anchor="middle" font-size="7.5" fill="#6b7280">BLISS · D365 OData v4</text>
+          <rect x="2" y="172" width="118" height="34" rx="6" fill="#f0f9fb" stroke="#1a5c6b" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'LOW RISK — VROMI Permits','ArcGIS REST Feature Service','Best As-Is documentation. GIS vendor cooperative. Parcel ID + WKT geometry in response. eVROMI planned — coordinate timing with VROMI focal point.','#1a5c6b')" onmouseleave="hideTip()"/>
+          <text x="61" y="185" text-anchor="middle" font-size="9" font-weight="700" fill="#1a5c6b">VROMI Permits</text>
+          <text x="61" y="198" text-anchor="middle" font-size="7.5" fill="#6b7280">ArcGIS REST + DECOS</text>
+          <rect x="2" y="214" width="118" height="34" rx="6" fill="#f8f7f4" stroke="#9ca3af" stroke-width="1.2" stroke-dasharray="5 3" style="cursor:pointer"
+            onmouseenter="showTip(event,'DEFERRED — Kadaster (Land Registry)','No As-Is Architecture Document','P-04 Loose Coupling Loose Coupling requires documented registry architecture before adapter design begins. No As-Is doc exists. Contact the Kadaster focal point in Week 1. Target: documentation within 4 weeks. Deferred to Phase 1b.','#9ca3af')" onmouseleave="hideTip()"/>
+          <text x="61" y="227" text-anchor="middle" font-size="9" font-weight="700" fill="#9ca3af">Kadaster DEFERRED</text>
+          <text x="61" y="240" text-anchor="middle" font-size="7.5" fill="#9ca3af">No As-Is · Engage focal point</text>
+          <!-- Flow lines to SB -->
+          <line x1="120" y1="21" x2="162" y2="118" stroke="#1a5c6b" stroke-width="1.2" class="svg-flow" marker-end="url(#ta)"/>
+          <line x1="120" y1="63" x2="162" y2="120" stroke="#1a5c6b" stroke-width="1.2" class="svg-flow" marker-end="url(#ta)"/>
+          <line x1="120" y1="105" x2="162" y2="122" stroke="#1a5c6b" stroke-width="1.2" class="svg-flow" marker-end="url(#ta)"/>
+          <line x1="120" y1="147" x2="162" y2="124" stroke="#1a5c6b" stroke-width="1.2" class="svg-flow" marker-end="url(#ta)"/>
+          <line x1="120" y1="189" x2="162" y2="126" stroke="#1a5c6b" stroke-width="1.2" class="svg-flow" marker-end="url(#ta)"/>
+          <!-- Service Bus -->
+          <rect x="164" y="95" width="114" height="60" rx="8" fill="#f0f9fb" stroke="#1a5c6b" stroke-width="2" style="cursor:pointer"
+            onmouseenter="showTip(event,'P-05 Resilience by Default Resilience by Default — Azure Service Bus Premium','Zone-HA · Geo-DR · 6 Topics · 14-day Retention','Premium tier mandatory. One topic per registry domain. DLQ on all subscriptions with 2-minute alert. Geo-DR to second EU region per P-12 Data Sovereignty Data Sovereignty. 14-day retention for replay. Circuit breakers per adapter prevent cascade.','#1a5c6b')" onmouseleave="hideTip()"/>
+          <text x="221" y="117" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a5c6b">Azure Service Bus</text>
+          <text x="221" y="130" text-anchor="middle" font-size="8.5" font-weight="600" fill="#1a5c6b">Premium · Zone-HA</text>
+          <text x="221" y="143" text-anchor="middle" font-size="7.5" fill="#6b7280">Geo-DR · 14d · DLQ</text>
+          <line x1="278" y1="125" x2="314" y2="125" stroke="#1a5c6b" stroke-width="2" class="svg-flow" marker-end="url(#ta)"/>
+          <!-- Canonical Store -->
+          <rect x="316" y="95" width="122" height="60" rx="8" fill="#f8f7f4" stroke="#2d3340" stroke-width="1.5" style="cursor:pointer"
+            onmouseenter="showTip(event,'P-11 Once-Only Principle Once-Only Principle — Canonical Data Store','Azure SQL / Cosmos DB — Read-Model Only','Populated ONLY via Integration Layer. Consumers never query registries directly. Freshness SLA under 15 minutes per P-11 Once-Only Principle Once-Only Principle. P-10 Authoritative Source Authoritative Source: each data domain has exactly one owning registry.','#2d3340')" onmouseleave="hideTip()"/>
+          <text x="377" y="117" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2d3340">Canonical Store</text>
+          <text x="377" y="130" text-anchor="middle" font-size="8.5" fill="#6b7280">SQL / Cosmos DB</text>
+          <text x="377" y="143" text-anchor="middle" font-size="7.5" fill="#6b7280">&lt;15 min freshness SLA</text>
+          <!-- Outbox -->
+          <rect x="164" y="172" width="114" height="50" rx="6" fill="#fff5e6" stroke="#7a5200" stroke-width="1.3" style="cursor:pointer"
+            onmouseenter="showTip(event,'P-05 Resilience by Default Resilience by Default — Outbox Pattern','Atomic Write + Background Publisher + DLQ','1: Adapter writes data + outbox record in single DB transaction. 2: Publisher polls PENDING records and delivers to Service Bus. 3: If SB unavailable, records retry automatically. Zero data loss guaranteed.','#7a5200')" onmouseleave="hideTip()"/>
+          <text x="221" y="191" text-anchor="middle" font-size="9" font-weight="700" fill="#7a5200">Outbox Table</text>
+          <text x="221" y="204" text-anchor="middle" font-size="7.5" fill="#6b7280">PENDING → PUBLISHED</text>
+          <text x="221" y="215" text-anchor="middle" font-size="7" fill="#7a5200">atomic dual-write</text>
+          <line x1="221" y1="155" x2="221" y2="172" stroke="#7a5200" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#ta2)"/>
+          <text x="231" y="167" font-size="7" fill="#7a5200" font-family="DM Mono,monospace">atomic</text>
+          <text x="61" y="258" text-anchor="middle" font-size="7.5" fill="#9ca3af">6 Registries · 5 Protocols</text>
+          <text x="221" y="232" text-anchor="middle" font-size="7.5" fill="#9ca3af">P-05 Resilience by Default Resilience by Default</text>
+          <text x="377" y="164" text-anchor="middle" font-size="7.5" fill="#9ca3af">P-10 Authoritative Source Authoritative Source</text>
+        </svg>
+      </div>
+    </div>
+    <div class="q-right" style="gap:6px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">OUTBOX PATTERN — P-05 Resilience by Default Resilience by Default</div>
+      <div class="acc-section acc-open">
+        <div class="acc-head" style="border-left:4px solid #1a5c6b"><span>① Atomic Write — No Dual-Write Problem</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">The adapter writes both the data record AND an outbox record in a single DB transaction. Both succeed or both fail — never one without the other. The data and its delivery intent are always in sync, even if the process crashes immediately after the write.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #1a5c6b"><span>② Background Publisher — Reliable Delivery</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">A background process polls the outbox table for PENDING records (default: 30-second interval). For each record it publishes to the appropriate Service Bus topic. Once SB acknowledges, the record is marked PUBLISHED. If SB is unavailable, records stay PENDING and retry on the next successful poll cycle — zero data loss regardless of outage duration.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #7a5200"><span>③ Dead-Letter Queue — No Silent Failures</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Messages exceeding the maximum retry count on a Service Bus subscription route to the Dead-Letter Queue (DLQ). Azure Monitor fires a first-message DLQ alert within 2 minutes. 14-day retention allows investigation and replay. Every DLQ entry requires manual resolution — DLQs are never silently ignored or automatically discarded.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #8a1a2e"><span>④ Circuit Breaker — No Cascade Failures</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Each adapter implements its own circuit breaker independently. After 3 consecutive failures within 30 seconds, the circuit opens — no further calls reach the unavailable registry. A probe request tests recovery and closes the circuit on success. Per P-04 Loose Coupling Loose Coupling, one registry failing cannot cascade to affect other adapters or the Service Bus backbone.</div></div>
+      </div>
+      <div class="oq-card" style="margin-top:6px">
+        <div class="oq-label">Architecture Decision — P-04 Loose Coupling Loose Coupling</div>
+        <div class="oq-q">Should each registry have its own Service Bus namespace, or share a platform namespace?</div>
+        <div class="oq-context">Shared: lower cost, simpler operations. Separate: complete blast-radius isolation — one registry incident cannot affect others. This decision affects the cost model and the incident isolation strategy for Phase 1. Architecture Team decision required before Service Bus provisioning begins.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="slide" id="d3s3"><div class="prog"><div class="prog-fill" style="width:65%"></div></div><div class="id-bar" style="background:#1a5c6b"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#1a5c6b;border-color:#1a5c6b">D3 · P-05 Resilience by Default Resilience by Default</span>
+    <span class="enum">Service Bus Configuration &amp; Registry Integration Risk Assessment</span>
+  </div>
+  <h2 class="slide-h1 a2">Service Bus Configuration & Registry Risk Matrix</h2>
+  <p class="slide-sub a3">Premium tier is non-negotiable. Zone-redundant across Azure availability zones. Geo-DR secondary must be a second European Azure region per P-12 Data Sovereignty Data Sovereignty.</p>
+</div>
+<div class="slide-body a4">
+  <div class="q-layout">
+    <div class="q-left" style="gap:7px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:4px;font-weight:700">SERVICE BUS CONFIGURATION — P-05 Resilience by Default Resilience by Default</div>
+      <div class="kpi-row" style="margin-bottom:8px">
+        <div class="kpi"><div class="kpi-top" style="background:#1a5c6b"></div><div class="kpi-v">Premium</div><div class="kpi-l">Tier — mandatory</div></div>
+        <div class="kpi"><div class="kpi-top" style="background:#1a5c6b"></div><div class="kpi-v">6</div><div class="kpi-l">Topics</div></div>
+        <div class="kpi"><div class="kpi-top" style="background:#1a5c6b"></div><div class="kpi-v">14 days</div><div class="kpi-l">Retention</div></div>
+        <div class="kpi"><div class="kpi-top" style="background:#1a5c6b"></div><div class="kpi-v">Geo-DR</div><div class="kpi-l">EU Secondary</div></div>
+      </div>
+      <div class="acc-section acc-open">
+        <div class="acc-head" style="border-left:4px solid #1a5c6b"><span>Premium Tier — Not Negotiable</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Standard tier does not support Azure Availability Zones or VNet integration. Premium is required for both. Provides dedicated message units for consistent, predictable throughput. No exceptions — any proposal to use Standard for cost reduction must be rejected at Architecture Team review.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #1a5c6b"><span>Topic + Subscription Topology</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">One topic per registry data domain (6 topics total: civil-registry, chamber-of-commerce, tax-administration, teatt-licenses, vromi-permits, kadaster-future). Canonical Data Store subscribes to all topics. Authorised consumers subscribe to specific topics only per their RBAC role. DLQ enabled on every subscription — first-message alert within 2 minutes via Azure Monitor.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #7a5200"><span>Geo-DR — European Region Only (P-12 Data Sovereignty Data Sovereignty)</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">The Geo-DR secondary namespace must be in a second Azure European region. No citizen data may replicate outside European Azure regions under any failure scenario. This constraint is enforced in the IaC template per P-14 Infrastructure as Code Infrastructure as Code. Failover is manual — a tested runbook must exist before go-live. Failover RTO: under 4 hours per the platform SLA.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #1a5c6b"><span>Protocol Translation — Adapters Only (P-03 Separation of Concerns Separation of Concerns)</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Protocol translation from legacy formats (StUF-BG SOAP, MS CRM API, ArcGIS Feature Service, D365 OData) to canonical REST/JSON happens exclusively inside the adapter module. The Service Bus, Business Services layer, and Canonical Store never handle legacy protocol payloads. This is the core enforcement of P-03 Separation of Concerns Separation of Concerns in the integration layer.</div></div>
+      </div>
+    </div>
+    <div class="q-right" style="gap:6px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">REGISTRY INTEGRATION RISK MATRIX</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px">
+        <div class="ns-card"><div class="ns-top" style="background:#8a1a2e"></div>
+          <div class="ns-sprint" style="color:#8a1a2e">🔴 HIGH RISK</div>
+          <div class="ns-title">Civil Registry (CASBES)</div>
+          <div class="ns-items">
+            <div class="ns-item">Legacy StUF-BG SOAP — highest adapter complexity</div>
+            <div class="ns-item">Knowledge concentration risk</div>
+            <div class="ns-item">Secure all docs from focal point in Week 1</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#7a5200"></div>
+          <div class="ns-sprint" style="color:#7a5200">🟡 MEDIUM RISK</div>
+          <div class="ns-title">Tax Administration (SIAH)</div>
+          <div class="ns-items">
+            <div class="ns-item">Restricted external access — approval needed</div>
+            <div class="ns-item">Centralised decisions slow progress</div>
+            <div class="ns-item">CRIB cross-reference must be validated</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#7a5200"></div>
+          <div class="ns-sprint" style="color:#7a5200">🟡 MEDIUM RISK</div>
+          <div class="ns-title">TEATT Licenses (BLISS)</div>
+          <div class="ns-items">
+            <div class="ns-item">D365 OData v4 — technically documented</div>
+            <div class="ns-item">Status enum mapping (4 values)</div>
+            <div class="ns-item">No unified case management exists</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#1a6b3c"></div>
+          <div class="ns-sprint" style="color:#1a6b3c">🟢 LOW RISK</div>
+          <div class="ns-title">COCI + VROMI</div>
+          <div class="ns-items">
+            <div class="ns-item">Digital front-ends exist and documented</div>
+            <div class="ns-item">Vendors cooperative and capable</div>
+            <div class="ns-item">Deliver specs in parallel — Week 1–2</div>
+          </div>
+        </div>
+      </div>
+      <div class="ns-card" style="border-color:#9ca3af44">
+        <div class="ns-top" style="background:#9ca3af"></div>
+        <div class="ns-sprint" style="color:#9ca3af">DEFERRED — Kadaster (Land Registry)</div>
+        <div class="ns-title">No As-Is Documentation · P-04 Loose Coupling Loose Coupling Blocks Adapter Design</div>
+        <div class="ns-items">
+          <div class="ns-item">Cannot begin adapter design without As-Is architecture document</div>
+          <div class="ns-item">Engage the Kadaster focal point in Design Phase Week 1</div>
+          <div class="ns-item">Target: documentation received and reviewed within 4 weeks</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="slide" id="d3s4"><div class="prog"><div class="prog-fill" style="width:100%"></div></div><div class="id-bar" style="background:#1a5c6b"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#1a5c6b;border-color:#1a5c6b">D3 · Integration Architecture</span>
+    <span class="enum">Per-Adapter Specifications &amp; Document Dependencies</span>
+  </div>
+  <h2 class="slide-h1 a2">Adapter Specifications & DGTP-INT-001 Document Map</h2>
+  <p class="slide-sub a3">Each adapter is independently deployable per P-04 Loose Coupling Loose Coupling. Protocol translation occurs only inside the adapter — never in the platform core. DGTP-INT-001 is a prerequisite for D4, D5, and D8.</p>
+</div>
+<div class="slide-body a4">
+  <div class="q-layout">
+    <div class="q-left" style="gap:7px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">PER-ADAPTER SPECIFICATIONS — P-04 Loose Coupling Loose Coupling</div>
+      <div class="acc-section acc-open">
+        <div class="acc-head" style="border-left:4px solid #8a1a2e"><span style="color:#8a1a2e">Civil Registry Adapter — StUF-BG SOAP</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content"><strong>Source protocol:</strong> StUF-BG SOAP/XML (Dutch municipal data exchange standard).<br><strong>Target:</strong> REST/JSON via Azure APIM SOAP policy.<br><strong>Primary key:</strong> NSN (Nationaal Sofi Nummer — national citizen ID).<br><strong>Risk:</strong> Highest adapter complexity. Secure all API documentation and WSDL files from the Civil Registry technical contact before Week 3.<br><strong>Outbox polling:</strong> 30-second interval. DLQ alert: 2 minutes.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #1a6b3c"><span>Chamber of Commerce — Oracle OData v4</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content"><strong>Source protocol:</strong> Oracle OData v4 REST (vendor-managed digital front-end).<br><strong>Primary key:</strong> CRIB number (business registration ID).<br><strong>Cross-reference:</strong> CRIB number must link to NSN (Civil Registry) for business-citizen identity.<br><strong>Risk:</strong> Low — documentation available. Board quorum rules may add decision latency.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #7a5200"><span>Tax Administration — MS Dynamics CRM</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content"><strong>Source protocol:</strong> MS Dynamics CRM internal API wrapped as REST.<br><strong>Access gate:</strong> Restricted external access. Data sharing agreement required before adapter design is finalised. Escalate to Project Steering Committee in Week 1.<br><strong>Cross-reference:</strong> CRIB number links Tax to Chamber of Commerce data.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #4a1a7a"><span>TEATT — Dynamics 365 OData v4</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content"><strong>Source protocol:</strong> D365 OData v4 endpoint.<br><strong>Licence status values:</strong> ACTIVE · SUSPENDED · EXPIRED · PENDING (all four must be handled by the adapter).<br><strong>Identity link:</strong> Licence holder NSN cross-references Civil Registry.<br><strong>Risk:</strong> Medium. OData v4 documentation is solid — no unified case management yet.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #1a5c6b"><span>VROMI Permits — ArcGIS REST Feature Service</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content"><strong>Source protocol:</strong> ArcGIS REST Feature Service + DECOS case management.<br><strong>Geometry:</strong> WKT (Well-Known Text) for parcel boundaries in response schema.<br><strong>Spatial key:</strong> Parcel ID enables spatial permit queries by location.<br><strong>Risk:</strong> Lowest of all six. Best As-Is documentation. eVROMI planned — coordinate go-live timing.</div></div>
+      </div>
+    </div>
+    <div class="q-right" style="gap:8px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">DGTP-INT-001 FEEDS INTO</div>
+      <div class="ns-grid" style="grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="ns-card"><div class="ns-top" style="background:#1a5c6b"></div>
+          <div class="ns-sprint">FEEDS INTO</div>
+          <div class="ns-title">DGTP-API-GL-001 (D4)</div>
+          <div class="ns-items">
+            <div class="ns-item">Per-registry protocol translation specs</div>
+            <div class="ns-item">Adapter API contract requirements</div>
+            <div class="ns-item">DLQ alert patterns and error handling</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#1a5c6b"></div>
+          <div class="ns-sprint">FEEDS INTO</div>
+          <div class="ns-title">DGTP-API-SPEC-REG (D5)</div>
+          <div class="ns-items">
+            <div class="ns-item">Integration guide per registry</div>
+            <div class="ns-item">Sandbox connection instructions</div>
+            <div class="ns-item">Data sharing agreement template</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#1a5c6b"></div>
+          <div class="ns-sprint">FEEDS INTO</div>
+          <div class="ns-title">DGTP-LLD-001 (D8)</div>
+          <div class="ns-items">
+            <div class="ns-item">Adapter component design specs</div>
+            <div class="ns-item">Service Bus topology + configuration</div>
+            <div class="ns-item">Outbox Pattern implementation guide</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#8a1a2e"></div>
+          <div class="ns-sprint" style="color:#8a1a2e">WEEK 1 — CRITICAL</div>
+          <div class="ns-title">Engage Kadaster Focal Point</div>
+          <div class="ns-items">
+            <div class="ns-item">Request As-Is architecture documentation</div>
+            <div class="ns-item">Target: received within 4 weeks</div>
+            <div class="ns-item">Without it: D4, D5, D8 partially blocked</div>
+          </div>
+        </div>
+      </div>
+      <div class="closing-row">
+        <div class="cbox" style="background:var(--tp);border-color:#1a5c6b44">
+          <div class="cbox-title" style="color:#1a5c6b">ALIGNED WITH</div>
+          <div class="cbox-text">DGTP-HLD-001 §5 Integration Layer · §6 Registry Landscape Fig 6.1 + 6.2 · P-04 Loose Coupling Loose Coupling · P-05 Resilience by Default Resilience by Default · P-11 Once-Only Principle Once-Only Principle · P-10 Authoritative Source Authoritative Source · P-12 Data Sovereignty Data Sovereignty · Inception Report registry landscape assessment</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div></div>
+<div class="fab-cluster">
+  <button class="fab-btn" style="background:#1a5c6b;color:#fff" onclick="openPanel('analysis')">
+    <span class="fab-tooltip">Failure Analysis</span>⚡
+  </button>
+  <button class="fab-btn" style="background:#8a1a2e;color:#fff" onclick="openPanel('challenges')">
+    <span class="fab-tooltip">Challenges</span>⚠
+  </button>
+  <button class="fab-btn" style="background:var(--ink);color:#fff" onclick="window.location='../index.html'">
+    <span class="fab-tooltip">Back to Overview</span>↩
+  </button>
+</div>
+<div id="fp-overlay" onclick="closePanel()"></div>
+<div id="fp-panel">
+  <div class="fp-panel-header">
+    <div class="fp-header-left">
+      <div class="fp-eyebrow" id="fp-eyebrow">DGTP-INT-001</div>
+      <div class="fp-title" id="fp-title">Analysis</div>
+      <div class="fp-subtitle" id="fp-subtitle"></div>
+    </div>
+    <button class="fp-close" onclick="closePanel()">&#x2715;</button>
+  </div>
+  <div class="panel-tabs">
+    <button class="panel-tab active" id="tab-analysis" onclick="switchTab('analysis')">⚡ Failure Analysis</button>
+    <button class="panel-tab" id="tab-challenges" onclick="switchTab('challenges')">⚠ Challenges</button>
+    <button class="panel-tab" id="tab-faq" onclick="switchTab('faq')">❓ FAQ</button>
+  </div>
+  <div class="fp-body" id="fp-body"></div>
+</div>
+<div id="svg-tip"><div class="tip-tag" id="tip-tag"></div><div class="tip-title" id="tip-title"></div><div class="tip-body" id="tip-body"></div></div>
+<div id="global-footnote">
+  <span class="fn-logo">ORANGE BD · DGTP SINT MAARTEN</span>
+  <span class="fn-text">Integration Architecture Document · DGTP-INT-001 · The Team · Design Phase 2026</span>
+  <span class="fn-link" style="color:#1a5c6b">— LOE</span>
+</div>
+<div id="global-footer">
+  <div id="gf-left">
+    <button class="gf-arrow" onclick="prev()">&#8592;</button>
+    <span id="gf-brand">DGTP Sint Maarten · OrangeBD · DGTP-INT-001</span>
+  </div>
+  <div id="gf-dots"></div>
+  <div id="gf-right">
+    <span id="gf-stage" style="color:#1a5c6b;background:#1a5c6b18;border:1px solid #1a5c6b44;border-radius:4px;padding:4px 12px;font-family:var(--mono);letter-spacing:.06em">DGTP-INT-001</span>
+    <span id="gf-counter">1 / 4</span>
+    <button class="gf-arrow" onclick="next()">&#8594;</button>
+  </div>
+</div>
+<span id="kbhint">&#8592; &#8594; navigate</span>
+<script>
+const slides=document.querySelectorAll('.slide'),total=slides.length;let cur=0;
+const gfDots=document.getElementById('gf-dots');
+for(let i=0;i<total;i++){const d=document.createElement('button');d.className='gf-dot'+(i===0?' on':'');d.onclick=(n=>()=>goTo(n))(i);gfDots.appendChild(d);}
+function goTo(n){slides[cur].classList.remove('active');cur=(n+total)%total;slides[cur].classList.add('active');document.querySelectorAll('.gf-dot').forEach((d,i)=>d.classList.toggle('on',i===cur));document.getElementById('gf-counter').textContent=(cur+1)+' / '+total;setTimeout(()=>slides[cur].querySelectorAll('.bar-fill[data-w]').forEach(b=>b.style.width=b.dataset.w),80);}
+function next(){goTo(cur+1)}function prev(){goTo(cur-1)}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')next();if(e.key==='ArrowLeft')prev();if(e.key==='Escape')closePanel();});
+setTimeout(()=>slides[0].querySelectorAll('.bar-fill[data-w]').forEach(b=>b.style.width=b.dataset.w),150);
+let tip,tipTag,tipTi,tipBo,tipOn=false;
+document.addEventListener('DOMContentLoaded',()=>{tip=document.getElementById('svg-tip');tipTag=document.getElementById('tip-tag');tipTi=document.getElementById('tip-title');tipBo=document.getElementById('tip-body');});
+function showTip(e,tag,ttl,body,col){if(!tip){tip=document.getElementById('svg-tip');tipTag=document.getElementById('tip-tag');tipTi=document.getElementById('tip-title');tipBo=document.getElementById('tip-body');}tipTag.textContent=tag;tipTag.style.background=(col||'#333')+'28';tipTag.style.color=col||'#333';tipTi.textContent=ttl;tipBo.innerHTML=body;tip.style.display='block';tip.style.opacity='0';tip.style.transform='translateY(4px)';requestAnimationFrame(()=>{tip.style.opacity='1';tip.style.transform='translateY(0)';});tipOn=true;posTip(e);}
+function posTip(e){if(!tipOn||!tip)return;const tw=320,th=190;let x=e.clientX+16,y=e.clientY+16;if(x+tw>window.innerWidth-8)x=e.clientX-tw-8;if(y+th>window.innerHeight-8)y=e.clientY-th-8;if(x<4)x=4;if(y<4)y=4;tip.style.left=x+'px';tip.style.top=y+'px';}
+function hideTip(){if(tip){tip.style.opacity='0';tip.style.transform='translateY(4px)';setTimeout(()=>{if(!tipOn)tip.style.display='none';},120);}tipOn=false;}
+document.addEventListener('mousemove',posTip);
+window.showTip=showTip;window.hideTip=hideTip;
+const PANEL_DATA={
+  analysis: {
+    eyebrow: "DGTP-INT-001 · FAILURE PATH ANALYSIS",
+    title: "What breaks without an Integration Architecture?",
+    subtitle: "Follow the chain from missing adapter pattern to platform-wide integration failure.",
+    svgTitle: "INTEGRATION FAILURE CHAIN — MISSING P-04 Loose Coupling Loose Coupling / P-05 Resilience by Default Resilience by Default / P-11 Once-Only Principle Once-Only Principle",
+    svg: `<svg viewBox="0 0 620 108" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans,sans-serif" style="width:100%;height:auto">
+      <defs><marker id="ia" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 2L8 5L2 8" fill="none" stroke="#e05470" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+      <rect x="2" y="16" width="130" height="68" rx="7" fill="rgba(138,26,46,.14)" stroke="#e05470" stroke-width="1.5"/>
+      <text x="67" y="36" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e05470">No P-04 Loose Coupling Loose Coupling</text>
+      <text x="67" y="52" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">25 point-to-point</text>
+      <text x="67" y="66" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)">integrations needed</text>
+      <line x1="132" y1="50" x2="158" y2="50" stroke="#e05470" stroke-width="1.5" marker-end="url(#ia)" stroke-dasharray="5 3"/>
+      <rect x="160" y="16" width="130" height="68" rx="7" fill="rgba(122,82,0,.14)" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="225" y="36" text-anchor="middle" font-size="8.5" font-weight="700" fill="#f0a500">No P-05 Resilience by Default Resilience by Default</text>
+      <text x="225" y="52" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">No Outbox Pattern</text>
+      <text x="225" y="66" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)">data lost on any outage</text>
+      <line x1="290" y1="50" x2="316" y2="50" stroke="#f0a500" stroke-width="1.5" marker-end="url(#ia)" stroke-dasharray="5 3"/>
+      <rect x="318" y="16" width="130" height="68" rx="7" fill="rgba(200,81,10,.14)" stroke="#e8722a" stroke-width="1.5"/>
+      <text x="383" y="36" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e8722a">No P-11 Once-Only Principle Once-Only Principle</text>
+      <text x="383" y="52" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">Citizens re-enter data</text>
+      <text x="383" y="66" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)">on every service</text>
+      <line x1="448" y1="50" x2="474" y2="50" stroke="#e8722a" stroke-width="1.5" marker-end="url(#ia)" stroke-dasharray="5 3"/>
+      <rect x="476" y="4" width="140" height="92" rx="7" fill="rgba(138,26,46,.2)" stroke="#e05470" stroke-width="2"/>
+      <text x="546" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#e05470">PLATFORM FAILS</text>
+      <text x="546" y="44" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">Registry upgrade breaks</text>
+      <text x="546" y="57" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">all integrations</text>
+      <text x="546" y="70" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">Data lost on outage</text>
+      <text x="546" y="83" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">Citizens re-enter all data</text>
+    </svg>`,
+    nodes: [
+      {type:"failure",icon:"⚡",label:"ROOT FAILURE — Missing P-04 Loose Coupling Loose Coupling",
+       heading:"No Adapter Pattern = 25 Bespoke Point-to-Point Integrations",
+       body:"Without P-04 Loose Coupling Loose Coupling, every service needing data from multiple registries must integrate with each registry independently. 5 registries × 5 consumers = 25 separate integrations, each with its own auth model, error handling, and protocol knowledge. A Civil Registry SOAP upgrade requires changes across all 25 integrations simultaneously. With one adapter per registry, this becomes 6 adapters shared by all consumers. A registry change affects exactly one adapter.",
+       chips:["25 integrations without P-04 Loose Coupling Loose Coupling","Registry change = 25-integration rebuild","One adapter per registry = one blast radius"]},
+      {type:"cause",icon:"💾",label:"CASCADING — Missing P-05 Resilience by Default Resilience by Default",
+       heading:"No Outbox Pattern = Silent Data Loss on Every Service Bus Outage",
+       body:"Without the Outbox Pattern, the adapter writes to the database and publishes to Service Bus in two separate operations. If the process crashes between DB write and SB publish, the registry change is in the database but never delivered to the Canonical Store. That citizen record is permanently stale with no indication anything went wrong. The Outbox Pattern makes delivery intent atomic with the data write — no crash can cause data loss.",
+       chips:["Crash between write and publish = silent data loss","No retry — data permanently lost","Canonical Store drifts from registries silently"]},
+      {type:"impact-type",icon:"🔄",label:"CITIZEN IMPACT — Missing P-11 Once-Only Principle Once-Only Principle",
+       heading:"Without Once-Only: Citizens Re-Enter Known Data on Every Service",
+       body:"Without P-11 Once-Only Principle Once-Only Principle and the Canonical Data Store, every e-service asks citizens to re-submit data the government already holds. A birth certificate application asks for the mother's name — already in Civil Registry. A business licence renewal asks for the registration number — already in COCI. An immigration form asks for an address — already in Civil Registry. P-11 Once-Only Principle Once-Only Principle eliminates all of this duplication via the Canonical Data Store with a freshness SLA of under 15 minutes.",
+       chips:["Every service: re-enter all known data","No cross-service data reuse","Freshness SLA: <15 min via Outbox Pattern"]},
+      {type:"resolve",icon:"✓",label:"SOLUTION — DGTP-INT-001 Integration Architecture",
+       heading:"Adapter Pattern + Outbox + Once-Only = Zero-Loss, Citizen-Centred Platform",
+       body:"DGTP-INT-001 defines: one dedicated adapter per registry enforcing P-04 Loose Coupling Loose Coupling, Outbox Pattern in every adapter for zero data loss per P-05 Resilience by Default Resilience by Default, circuit breakers for cascade failure prevention, Azure Service Bus Premium with zone redundancy and Geo-DR to a second EU region per P-12 Data Sovereignty Data Sovereignty, one topic per registry, DLQ monitoring within 2 minutes, and a Canonical Data Store freshness SLA of under 15 minutes implementing P-11 Once-Only Principle Once-Only Principle.",
+       chips:["P-04 Loose Coupling Loose Coupling: one adapter = isolated blast radius","P-05 Resilience by Default Resilience by Default: Outbox = zero data loss guaranteed","P-11 Once-Only Principle Once-Only Principle: citizens never re-enter known data"]}
+    ]
+  },
+  challenges: {
+    eyebrow: "DGTP-INT-001 · KNOWN CHALLENGES",
+    title: "Integration Architecture Open Challenges",
+    subtitle: "Four challenges the team must resolve before DGTP-INT-001 v1.0 can be approved.",
+    svgTitle: "CHALLENGE PRIORITY — INTEGRATION ARCHITECTURE",
+    svg: `<svg viewBox="0 0 620 90" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans,sans-serif" style="width:100%;height:auto">
+      <rect x="2" y="6" width="148" height="76" rx="6" fill="rgba(138,26,46,.16)" stroke="#e05470" stroke-width="1.5"/>
+      <text x="76" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#e05470">🔴 CRITICAL</text>
+      <text x="76" y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Kadaster As-Is</text>
+      <text x="76" y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Documentation Gap</text>
+      <text x="76" y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">Blocks D4, D5, D8 partially</text>
+      <rect x="158" y="6" width="148" height="76" rx="6" fill="rgba(138,26,46,.14)" stroke="#e05470" stroke-width="1.5"/>
+      <text x="232" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#e05470">🔴 CRITICAL</text>
+      <text x="232" y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Civil Registry SOAP</text>
+      <text x="232" y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Knowledge Concentration</text>
+      <text x="232" y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">Secure docs in Week 1</text>
+      <rect x="314" y="6" width="148" height="76" rx="6" fill="rgba(122,82,0,.14)" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="388" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#f0a500">🟡 HIGH</text>
+      <text x="388" y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Tax Admin Restricted</text>
+      <text x="388" y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Access Approval Needed</text>
+      <text x="388" y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">Escalate in Week 1</text>
+      <rect x="470" y="6" width="148" height="76" rx="6" fill="rgba(122,82,0,.10)" stroke="#f0a500" stroke-width="1.2"/>
+      <text x="544" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#f0a500">🟡 MEDIUM</text>
+      <text x="544" y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">5 Registry Protocols</text>
+      <text x="544" y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Specialist Knowledge</text>
+      <text x="544" y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">Per-adapter specialists needed</text>
+    </svg>`,
+    nodes: [
+      {type:"failure",icon:"🗺",label:"CRITICAL — P-04 Loose Coupling Loose Coupling Kadaster No As-Is Architecture",
+       heading:"Land Registry Has No As-Is Documentation — Adapter Cannot Begin",
+       body:"The Kadaster (Land Registry) is one of the six core registries but has no As-Is architecture documentation. Per P-04 Loose Coupling Loose Coupling, the adapter design must be based on documented registry architecture — its data model, APIs, and technical capabilities. Without this, the External Systems Layer is incomplete and the Kadaster adapter is formally deferred to Phase 1b. Engaging the Kadaster focal point in Design Phase Week 1 is the single most important action for the integration workstream.",
+       chips:["Week 1: engage Kadaster focal point","Target: documentation in 4 weeks","Blocks D4 partially, D5 delayed, D8 incomplete"]},
+      {type:"failure",icon:"⚠",label:"CRITICAL — Civil Registry Knowledge Concentration",
+       heading:"CASBES Knowledge Held by Very Few People",
+       body:"Civil Registry (CASBES) institutional knowledge — its StUF-BG SOAP schema, endpoint behaviour, NSN field mapping, and undocumented edge cases — is concentrated in a small number of staff. Staff rotation or unavailability would stall the Civil Registry adapter design. Schedule technical sessions with the Civil Registry technical contact in Week 1 and secure all API documentation, schema files, and WSDL definitions before Week 3.",
+       chips:["Week 1: schedule technical sessions","Retain all CASBES API docs + WSDL","SOAP schema + NSN mapping must be secured"]},
+      {type:"cause",icon:"🔒",label:"HIGH — Tax Administration Restricted Access",
+       heading:"Data Sharing Approval Required Before SIAH Adapter Design Can Begin",
+       body:"Tax Administration (SIAH) restricts external system access by policy. The data sharing agreement must be negotiated and signed before the adapter can be designed, tested, or provisioned. This is a governance risk — centralised decision-making can delay approval by weeks. Escalate the data sharing request to the Project Steering Committee with a formal written notice in Week 1.",
+       chips:["Week 1: formal data sharing request to PSC","Approval may take 4–8 weeks","Adapter design and D5 spec gated on approval"]},
+      {type:"resolve",icon:"✓",label:"RESOLUTION — Week 1 Integration Action Plan",
+       heading:"Three Actions the Integration Workstream Must Complete in Design Phase Week 1",
+       body:"1. Engage the Kadaster focal point and request As-Is architecture documentation — set a 4-week target and track weekly. 2. Schedule Civil Registry technical sessions and secure all SOAP/StUF-BG documentation, WSDL files, and schema definitions before Week 3. 3. Submit a formal data sharing agreement request for Tax Administration to the Project Steering Committee in writing. These three actions unblock D4 (API specs), D5 (spec packs to registries), and D8 (LLD component design).",
+       chips:["Week 1: Kadaster focal point engaged","Week 1: CASBES docs secured from technical contact","Week 1: SIAH data sharing request to PSC"]}
+    ]
+  },
+  faq: {
+    eyebrow: "DGTP-INT-001 · FAQ",
+    title: "Integration Architecture — Stakeholder FAQ",
+    subtitle: "Questions from registry technical teams and SXM ICT stakeholders about the integration design.",
+    nodes: [
+      {type:"cause",icon:"❓",label:"Q — P-04 Loose Coupling Loose Coupling Why one adapter per registry?",
+       heading:"Can a single universal adapter handle all six registries?",
+       body:"No. P-04 Loose Coupling Loose Coupling requires isolation. A universal adapter means a protocol change in any registry — or a bug in its connection logic — can affect all six simultaneously. With one adapter per registry, each has its own CI/CD pipeline, its own blast radius, and its own independently testable contract. A Civil Registry SOAP upgrade requires only the Civil Registry adapter to change. No other component is touched.",
+       chips:["One adapter = one blast radius (P-04 Loose Coupling Loose Coupling)","Independent CI/CD per adapter","Registry change = zero platform-wide impact"]},
+      {type:"cause",icon:"❓",label:"Q — P-05 Resilience by Default Resilience by Default Why not publish directly to Service Bus?",
+       heading:"Why does the adapter need an Outbox? Why not just publish directly?",
+       body:"Direct publishing creates the dual-write problem. If the adapter writes to the database successfully but crashes before publishing to Service Bus, the registry change is in the database but never delivered. That citizen record is permanently stale — with no indication anything went wrong. The Outbox Pattern solves this by writing both the data record and the outbox record in a single DB transaction. The background publisher then delivers reliably, retrying until Service Bus acknowledges.",
+       chips:["Dual-write without Outbox = silent data loss","Outbox = atomic write + reliable delivery","No Outbox = Canonical Store drifts silently"]},
+      {type:"cause",icon:"❓",label:"Q — P-11 Once-Only Principle Once-Only Principle How does the 15-minute freshness SLA work?",
+       heading:"How is the Canonical Data Store kept fresh within 15 minutes?",
+       body:"The 15-minute SLA is enforced by the Outbox Publisher polling interval combined with Service Bus processing time. High-priority registries (Civil, COCI) may use shorter polling intervals. Per-adapter latency is monitored individually in Azure Monitor — an alert fires when any adapter's average publish latency approaches 12 minutes, protecting the 15-minute SLA before it is breached. The Canonical Data Store never polls registries — all updates flow exclusively via the Integration Layer.",
+       chips:["Outbox polling + SB processing < 15 min total","Per-adapter latency monitored via Azure Monitor","Alert at 12 min protects the 15-min SLA"]},
+      {type:"resolve",icon:"✓",label:"TIMELINE — When must DGTP-INT-001 be approved?",
+       heading:"DGTP-INT-001 Gates D4, D5, and D8",
+       body:"Target: v0.1 draft circulated to Architecture Team in Design Phase Week 4, after Kadaster engagement (Week 1) and Civil Registry technical sessions (Weeks 1–3). Architecture Team peer review in Weeks 5–6. SXM ICT sign-off in Week 7. v1.0 approved by Week 8. This gates: DGTP-API-GL-001 (D4 API Design Guidelines), DGTP-API-SPEC-REG (D5 API Specification Pack), DGTP-LLD-001 (D8 Final Technical Specification). Kadaster documentation status will determine whether the document receives full or conditional approval.",
+       chips:["Week 4: v0.1 draft to Architecture Team","Week 7: SXM ICT sign-off","Week 8: v1.0 approved — gates D4, D5, D8"]}
+    ]
+  }
+};
+let activeTab='analysis';
+function openPanel(tab){activeTab=tab||'analysis';const ov=document.getElementById('fp-overlay'),pan=document.getElementById('fp-panel');ov.classList.add('open');pan.classList.add('open');requestAnimationFrame(()=>ov.classList.add('visible'));renderTab(activeTab);document.body.style.overflow='hidden';document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+activeTab).classList.add('active');}
+function closePanel(){const ov=document.getElementById('fp-overlay'),pan=document.getElementById('fp-panel');ov.classList.remove('visible');pan.classList.remove('open');setTimeout(()=>{ov.classList.remove('open');document.body.style.overflow='';},320);}
+function switchTab(tab){activeTab=tab;document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');renderTab(tab);}
+function renderTab(tab){
+  const body=document.getElementById('fp-body'),data=PANEL_DATA[tab];
+  if(!data)return;
+  body.innerHTML='';
+  document.getElementById('fp-eyebrow').textContent=data.eyebrow||'';
+  document.getElementById('fp-title').textContent=data.title||'';
+  document.getElementById('fp-subtitle').textContent=data.subtitle||'';
+  if(data.svg){const w=document.createElement('div');w.className='panel-svg-wrap';w.innerHTML='<div class="panel-svg-title">'+(data.svgTitle||'')+'</div>'+data.svg;body.appendChild(w);}
+  (data.nodes||[]).forEach((node,idx)=>{
+    const el=document.createElement('div');el.className='fp-node fp-node-'+node.type;
+    const icon=node.icon||{failure:'!',cause:'→','impact-type':'⚠',resolve:'✓'}[node.type]||'·';
+    el.innerHTML=`<div class="fp-node-spine"><div class="fp-node-dot">${icon}</div><div class="fp-node-line"></div></div><div class="fp-node-content"><div class="fp-node-label">${node.label}</div><div class="fp-node-heading">${node.heading}</div><div class="fp-node-body">${node.body}</div>${node.chips?'<div class="fp-node-impact">'+node.chips.map(c=>'<span class="fp-impact-chip">'+c+'</span>').join('')+'</div>':''}</div>`;
+    if(node.type==='resolve'){const sol=document.createElement('div');sol.className='fp-solution';sol.innerHTML='<div class="fp-solution-tag">✓ RESOLUTION</div><div class="fp-solution-text">'+node.body+'</div>';el.querySelector('.fp-node-body').style.display='none';el.querySelector('.fp-node-content').appendChild(sol);setTimeout(()=>sol.classList.add('visible'),(idx+1)*120+300);}
+    body.appendChild(el);setTimeout(()=>el.classList.add('visible'),idx*110+80);
+  });
+}
+document.querySelectorAll('.acc-head').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('acc-open')));
+
+function openRef(){
+  const ov=document.getElementById('ref-overlay'),m=document.getElementById('ref-modal');
+  ov.classList.add('open');requestAnimationFrame(()=>{ov.classList.add('visible');m.classList.add('visible');});
+  document.body.style.overflow='hidden';
+  document.getElementById('ref-search').focus();
+}
+function closeRef(){
+  const ov=document.getElementById('ref-overlay'),m=document.getElementById('ref-modal');
+  ov.classList.remove('visible');m.classList.remove('visible');
+  setTimeout(()=>ov.classList.remove('open'),280);
+  document.body.style.overflow='';
+  document.getElementById('ref-search').value='';filterRef('');
+}
+function showRefTab(tab){
+  document.querySelectorAll('.ref-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('rtab-'+tab).classList.add('active');
+  const ps=document.getElementById('ref-p-section');
+  const ds=document.getElementById('ref-d-section');
+  ps.style.display=(tab==='deliverables')?'none':'block';
+  ds.style.display=(tab==='principles')?'none':'block';
+}
+function filterRef(q){
+  const v=q.toLowerCase().trim();
+  document.querySelectorAll('.ref-row').forEach(row=>{
+    const t=(row.textContent||'').toLowerCase();
+    row.style.display=(!v||t.includes(v))?'':'none';
+  });
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('ref-modal').classList.contains('visible'))closeRef();});
+</script>
+
+<!-- ── REFERENCE MODAL FAB ── -->
+<button id="ref-fab" onclick="openRef()" title="Quick Reference">
+  <span class="fab-tooltip" style="position:absolute;left:58px;right:auto;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 11px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(255,255,255,.1)">Quick Reference</span>
+  ℹ
+</button>
+<div id="ref-overlay" onclick="closeRef()"></div>
+<div id="ref-modal">
+  <div class="ref-modal-head">
+    <div>
+      <div class="ref-modal-title">DGTP Quick Reference</div>
+      <div class="ref-modal-sub">DESIGN PHASE · SINT MAARTEN · 15 PRINCIPLES · 10 DELIVERABLES</div>
+    </div>
+    <button class="ref-modal-close" onclick="closeRef()">&#x2715;</button>
+  </div>
+  <div class="ref-tabs">
+    <button class="ref-tab active" id="rtab-both" onclick="showRefTab('both')">📋 All</button>
+    <button class="ref-tab" id="rtab-principles" onclick="showRefTab('principles')">⚙ Principles (P-01–P-15)</button>
+    <button class="ref-tab" id="rtab-deliverables" onclick="showRefTab('deliverables')">📦 Deliverables (D1–D10)</button>
+  </div>
+  <input id="ref-search" type="text" placeholder="Search principles or deliverables…" oninput="filterRef(this.value)"/>
+  <div class="ref-body" id="ref-body">
+    <div id="ref-p-section">
+      <div class="ref-section">⚙ ARCHITECTURE PRINCIPLES — P-01 API-First to P-15 Compliance by Design · Click any row to expand description</div>
+      
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-01</div>
+          <div class="ref-name">API-First</div>
+          <div class="ref-desc">All platform APIs documented in OpenAPI 3.0 and agreed by Architecture Team BEFORE development begins. GoSXM API Catalogue is the single source of truth.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-02</div>
+          <div class="ref-name">Cloud-Native Azure</div>
+          <div class="ref-desc">Exclusive Azure PaaS in European region. No multi-cloud, no on-premise in Phase 1. All deployments via IaC — no manual portal changes in staging or production.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-03</div>
+          <div class="ref-name">Separation of Concerns</div>
+          <div class="ref-desc">Seven enforced platform layers. Each layer has one responsibility. No cross-layer shortcutting. Experience Layer cannot query registries directly.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-04</div>
+          <div class="ref-name">Loose Coupling</div>
+          <div class="ref-desc">One dedicated, independently deployable adapter per registry. A registry changing its protocol affects only its adapter — zero platform-wide impact.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-05</div>
+          <div class="ref-name">Resilience by Default</div>
+          <div class="ref-desc">Outbox Pattern in all adapters guarantees zero data loss. Service Bus zone-redundant with Geo-DR. Circuit breakers prevent cascade failures.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-06</div>
+          <div class="ref-name">Open Standards</div>
+          <div class="ref-desc">REST/JSON, OpenAPI 3.0, OAuth2/OIDC, OData where available. Vendor lock-in minimised. All interface contracts machine-readable and publicly documented.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">P-07</div>
+          <div class="ref-name">Security by Design</div>
+          <div class="ref-desc">Security embedded at every layer from Day 1. mTLS between all services. OWASP review is a go-live gate. SAST/CVE scanning in all CI/CD pipelines.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">P-08</div>
+          <div class="ref-name">Identity-First Access</div>
+          <div class="ref-desc">Azure Entra External ID is the sole identity provider. 7 RBAC roles. JWT 15-min TTL. PIM Just-In-Time for all privileged access. No standing admin privileges.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">P-09</div>
+          <div class="ref-name">Privacy by Design</div>
+          <div class="ref-desc">Data minimisation and consent management built into every cross-registry call. Citizens can view their data access history. 90-day PII audit log in Log Analytics.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">P-10</div>
+          <div class="ref-name">Authoritative Source</div>
+          <div class="ref-desc">Each data domain has exactly one authoritative registry. Canonical Data Store is a read-model — it never becomes the source of truth. Registries own their data.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">P-11</div>
+          <div class="ref-name">Once-Only Principle</div>
+          <div class="ref-desc">Citizens submit data once. The platform reuses it across services via the Canonical Data Store with a freshness SLA of less than 15 minutes. No re-entry of known data.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">P-12</div>
+          <div class="ref-name">Data Sovereignty</div>
+          <div class="ref-desc">All citizen data stays within Azure European region at all times. Geo-DR secondary must also be European. No third-party SaaS without a signed EU data processing agreement.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">P-13</div>
+          <div class="ref-name">Observability First</div>
+          <div class="ref-desc">Structured logging, distributed tracing, and metrics from Day 1 in every component. Azure Monitor + Application Insights. Alerts on DLQ first-message within 2 minutes.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">P-14</div>
+          <div class="ref-name">Infrastructure as Code</div>
+          <div class="ref-desc">All Azure resources provisioned via Bicep/Terraform. No manual portal changes in staging or production. IaC enforces region and security constraints in every template.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">P-15</div>
+          <div class="ref-name">Compliance by Design</div>
+          <div class="ref-desc">ID-Exchange EA Ordinance approval is a hard go-live gate. Privacy Ordinance compliance built into data flows. Audit logs satisfy statutory reporting requirements.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+    </div>
+    <div id="ref-d-section">
+      <div class="ref-section">📦 DESIGN PHASE DELIVERABLES — D1 to D10 · Click any row to expand description</div>
+      
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">D1</div>
+          <div class="ref-name" style="min-width:130px">DGTP-SEC-001<span class="ref-owner">The Team (Solo)</span></div>
+          <div class="ref-desc">Security Architecture Document — zero-trust, RBAC, mTLS, Key Vault, OWASP gate, consent & PII audit.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">D2</div>
+          <div class="ref-name" style="min-width:130px">HLD Extension<span class="ref-owner">The Team + The Team</span></div>
+          <div class="ref-desc">Platform Architecture Design — seven-layer stack, SLA commitments, 15 architecture principles, recovery objectives.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">D3</div>
+          <div class="ref-name" style="min-width:130px">DGTP-INT-001<span class="ref-owner">The Team + The Team</span></div>
+          <div class="ref-desc">Integration Architecture — 6-registry adapter pattern, Outbox Pattern, Service Bus topology, once-only data flow.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">D4</div>
+          <div class="ref-name" style="min-width:130px">DGTP-API-GL-001<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">API Design Guidelines — REST/JSON standards, OpenAPI 3.0, OAuth2 patterns, rate limits, versioning rules.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:#7a5200;background:rgba(122,82,0,.08)">D5</div>
+          <div class="ref-name" style="min-width:130px">DGTP-API-SPEC-REG<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">API Specification Pack — per-registry OpenAPI bundles, integration guide, sandbox credentials, data sharing agreement template.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:#7a5200;background:rgba(122,82,0,.08)">D6</div>
+          <div class="ref-name" style="min-width:130px">DGTP-SUP-001<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">Registry Technical Support Logs — session notes, issue register, API validation results, registry sign-off per integration.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">D7</div>
+          <div class="ref-name" style="min-width:130px">DGTP-CAT-001<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">GoSXM API Catalog — Azure APIM Developer Portal, Swagger UI, role-gated access, CI/CD auto-publication.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--purple);background:rgba(74,26,122,.08)">D8</div>
+          <div class="ref-name" style="min-width:130px">DGTP-LLD-001<span class="ref-owner">Full Team</span></div>
+          <div class="ref-desc">Final Technical Specification (LLD) — component design, IaC templates, security configuration, deployment runbook.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">D9</div>
+          <div class="ref-name" style="min-width:130px">DGTP-ENV-001<span class="ref-owner">The Team (Solo)</span></div>
+          <div class="ref-desc">Environment Strategy — DEV / Staging / Production topology, IaC provisioning, Azure resource groups, CI/CD pipeline design.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">D10</div>
+          <div class="ref-name" style="min-width:130px">DGTP-3P-001<span class="ref-owner">Full Team</span></div>
+          <div class="ref-desc">3rd-Party & SaaS Readiness — vendor assessments, EU data processing agreements, integration patterns, risk register.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+    </div>
+  </div>
+</div>
+</body></html>

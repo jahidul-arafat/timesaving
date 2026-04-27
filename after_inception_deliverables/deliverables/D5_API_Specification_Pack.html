@@ -1,0 +1,2681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>API Specification Pack to Registries — DGTP Sint Maarten</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#0e1117;--ink2:#2d3340;--ink3:#6b7280;--ink4:#9ca3af;
+  --paper:#f8f7f4;--paper2:#f1efe9;--paper3:#e5e2da;--paper4:#d4cfc5;
+  --accent:#c8510a;--accent2:#e8722a;--ap:rgba(200,81,10,.1);--ag:rgba(200,81,10,.25);
+  --blue:#1a4f8a;--bp:rgba(26,79,138,.1);--bg2:rgba(26,79,138,.2);
+  --green:#1a6b3c;--gp:rgba(26,107,60,.1);--gg2:rgba(26,107,60,.22);
+  --red:#8a1a2e;--rp:rgba(138,26,46,.1);--rg2:rgba(138,26,46,.22);
+  --amber:#7a5200;--amp:rgba(122,82,0,.1);--amg:rgba(122,82,0,.22);
+  --purple:#4a1a7a;--pp:rgba(74,26,122,.1);--pg:rgba(74,26,122,.22);
+  --teal:#1a5c6b;--tp:rgba(26,92,107,.1);--tg:rgba(26,92,107,.22);
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#1a1a1c;font-family:var(--sans);height:100vh;overflow:hidden;
+  display:block;margin:0;padding:0}
+#kbhint{color:rgba(255,255,255,.28);font-size:11px;font-family:var(--mono);
+  position:fixed;bottom:10px;right:14px;letter-spacing:.05em}
+#stage{width:100vw;height:100vh;position:relative;overflow:hidden;}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;background:var(--paper);overflow:hidden;isolation:isolate}
+.slide.active{display:flex}
+
+/* ── ENTRANCE ANIMATIONS ── */
+@keyframes slideIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.slide.active .a1{animation:slideIn .38s cubic-bezier(.22,1,.36,1) both}
+.slide.active .a2{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .07s both}
+.slide.active .a3{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .14s both}
+.slide.active .a4{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .21s both}
+.slide.active .a5{animation:fadeUp .42s cubic-bezier(.22,1,.36,1) .28s both}
+@media(prefers-reduced-motion:reduce){.slide.active [class*="a"]{animation:none}}
+
+/* ── PROGRESS BAR ── */
+.prog{position:absolute;top:0;left:0;right:0;height:3px;background:var(--paper3);z-index:20}
+.prog-fill{height:100%;background:var(--accent);border-radius:0 2px 2px 0}
+
+/* ── COLOUR ID BAR ── */
+.id-bar{height:3px;flex-shrink:0}
+
+/* ── SLIDE STRUCTURE ── */
+.slide-header{padding:24px 56px 0;flex-shrink:0;position:relative;z-index:1}
+.eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.etag{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.13em;
+  padding:4px 10px;border-radius:4px;border:1px solid currentColor}
+.enum{font-family:var(--mono);font-size:10px;color:var(--ink4);letter-spacing:.06em}
+.slide-h1{font-family:var(--serif);font-size:30px;line-height:1.1;color:var(--ink);
+  margin-bottom:2px;letter-spacing:-.01em}
+.slide-sub{font-size:13px;color:var(--ink3);line-height:1.65;max-width:680px}
+.slide-body{flex:1;padding:10px 56px 78px;overflow:hidden;position:relative;z-index:1}
+.slide-footer{display:none}
+.footer-brand{font-family:var(--mono);font-size:10px;color:var(--ink4);letter-spacing:.06em}
+.footer-stage{font-size:10px;color:var(--accent);background:var(--ap);
+  border:1px solid var(--ag);border-radius:4px;padding:3px 10px;
+  font-family:var(--mono);letter-spacing:.06em}
+.footer-slide{font-family:var(--mono);font-size:10px;color:var(--ink4)}
+.footnote{display:none}
+#global-footnote{position:fixed;bottom:50px;left:0;right:0;height:22px;
+  background:rgba(248,247,244,.92);backdrop-filter:blur(8px);
+  border-top:1px solid var(--paper3);
+  display:flex;align-items:center;gap:10px;z-index:50;
+  padding:0 56px}
+.fn-logo{font-family:var(--mono);font-size:9px;font-weight:600;
+  color:var(--accent);white-space:nowrap;letter-spacing:.07em}
+.fn-text{font-size:10px;color:var(--ink3);font-style:italic;flex:1}
+.fn-link{font-family:var(--mono);font-size:9px;color:var(--accent);text-decoration:none}
+.fn-link:hover{text-decoration:underline}
+
+/* ══ SLIDE 1 TITLE ══ */
+#s1{background:var(--ink)}
+#s1 .geo{position:absolute;inset:0;overflow:hidden}
+#s1 .content{position:relative;flex:1;display:flex;flex-direction:column;
+  justify-content:center;padding:60px 80px}
+#s1 .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--accent2);
+  margin-bottom:20px;display:flex;align-items:center;gap:14px}
+#s1 .lbl::before{content:'';width:40px;height:1.5px;background:var(--accent2)}
+#s1 h1{font-family:var(--serif);font-size:62px;line-height:1.06;color:#fff;
+  margin-bottom:18px;letter-spacing:-.02em}
+#s1 h1 em{color:var(--accent2);font-style:italic}
+#s1 .tg{font-size:15px;color:rgba(255,255,255,.42);max-width:520px;line-height:1.78;
+  font-weight:300}
+#s1 .meta{margin-top:48px;display:flex;gap:38px;flex-wrap:wrap}
+#s1 .ml{font-family:var(--mono);font-size:9px;letter-spacing:.16em;
+  color:rgba(255,255,255,.22);margin-bottom:4px}
+#s1 .mv{font-size:13px;color:rgba(255,255,255,.62);font-weight:500}
+#s1 .six{position:absolute;right:78px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:8px}
+#s1 .sn{width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:11px;
+  color:rgba(255,255,255,.22)}
+#s1 .sn.on{border-color:var(--accent);color:var(--accent2);background:rgba(200,81,10,.14)}
+#s1 .sbar{position:absolute;bottom:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2))}
+
+/* ══ OVERVIEW ══ */
+.ov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.ov-card{background:var(--paper2);border:1px solid var(--paper3);border-radius:10px;
+  padding:12px;display:flex;flex-direction:column;gap:4px;
+  position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.ov-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.07)}
+.ov-top-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.ov-num{font-family:var(--mono);font-size:11px;font-weight:500;opacity:.22;line-height:1;margin-top:2px}
+.ov-title{font-size:13.5px;font-weight:600;color:var(--ink)}
+.ov-desc{font-size:11px;color:var(--ink3);line-height:1.6;flex:1}
+.ov-badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 8px;
+  border-radius:3px;width:fit-content;margin-top:6px;letter-spacing:.06em}
+.note-bar{background:var(--ap);border:1px solid var(--ag);border-radius:8px;
+  padding:7px 12px;margin-bottom:8px;font-size:11px;color:var(--ink2);line-height:1.5}
+.note-bar strong{color:var(--accent)}
+
+/* ══ QUESTION LAYOUT ══ */
+.q-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;height:100%;min-height:0}
+.q-left,.q-right{display:flex;flex-direction:column;gap:6px;overflow:hidden;min-height:0}
+.q-story{border-left:3px solid;border-radius:0 8px 8px 0;padding:7px 11px;
+  font-size:11px;color:var(--ink2);line-height:1.55;font-style:italic;flex-shrink:0}
+.q-story strong{font-style:normal;font-size:9px;font-family:var(--mono);
+  letter-spacing:.13em;display:block;margin-bottom:3px}
+.opts-label{font-family:var(--mono);font-size:9px;letter-spacing:.13em;
+  color:var(--ink4);margin-bottom:1px;font-weight:500}
+.opt{border-radius:7px;padding:6px 10px;margin-bottom:3px;border:1px solid transparent}
+.opt-head{display:flex;align-items:baseline;gap:7px;margin-bottom:3px}
+.opt-badge{font-size:9px;font-weight:700;font-family:var(--mono);
+  padding:2px 7px;border-radius:3px;letter-spacing:.06em;flex-shrink:0;color:#fff}
+.opt-name{font-size:11.5px;font-weight:600;line-height:1.2}
+.opt-pc{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.pro,.con{font-size:10px;line-height:1.4;padding-left:13px;position:relative;color:var(--ink3)}
+.pro::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700;font-size:10px}
+.con::before{content:'✗';position:absolute;left:0;color:var(--red);font-weight:700;font-size:10px}
+.opt-a{background:var(--bp)}.opt-a .opt-name{color:var(--blue)}.opt-a .opt-badge{background:var(--blue)}
+.opt-b{background:var(--gp)}.opt-b .opt-name{color:var(--green)}.opt-b .opt-badge{background:var(--green)}
+.opt-c{background:var(--pp)}.opt-c .opt-name{color:var(--purple)}.opt-c .opt-badge{background:var(--purple)}
+
+/* KPI row */
+.kpi-row{display:flex;gap:7px;flex-shrink:0}
+.kpi{background:var(--paper2);border:1px solid var(--paper3);border-radius:7px;
+  padding:5px 8px;text-align:center;flex:1;position:relative;overflow:hidden}
+.kpi-top{position:absolute;top:0;left:0;right:0;height:2px}
+.kpi-v{font-size:17px;font-weight:600;font-family:var(--mono);
+  color:var(--ink);line-height:1.1;margin-bottom:1px}
+.kpi-l{font-size:9px;color:var(--ink3)}
+
+/* Rec pill */
+.rec-pill{display:flex;align-items:center;gap:8px;background:var(--ink);
+  color:#fff;border-radius:7px;padding:6px 11px;font-size:10.5px;
+  font-weight:500;flex-shrink:0}
+.rec-pill span{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.38);
+  letter-spacing:.08em;white-space:nowrap}
+
+/* Arch SVG */
+.arch-svg-wrap{background:var(--paper2);border:1px solid var(--paper3);
+  border-radius:10px;padding:9px;flex:1;overflow:visible;min-height:100px;position:relative}
+.arch-svg-title{font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  color:var(--ink4);margin-bottom:5px;font-weight:500}
+.arch-svg-wrap svg{width:100%;height:auto;display:block}
+
+/* ══ SLIDE 9 MATRIX ══ */
+.mtbl{width:100%;border-collapse:collapse;font-size:12px}
+.mtbl th{padding:9px 13px;text-align:left;font-size:9px;font-weight:700;
+  font-family:var(--mono);letter-spacing:.1em;border-bottom:2px solid var(--paper3);
+  color:var(--ink3)}
+.mtbl td{padding:9px 13px;border-bottom:1px solid var(--paper3);
+  color:var(--ink2);vertical-align:middle}
+.mtbl tr:last-child td{border-bottom:none}
+.mtbl tr:nth-child(even) td{background:var(--paper2)}
+.mtbl tr:hover td{background:var(--paper3)}
+.dlbl{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:4px;
+  display:inline-block;font-family:var(--mono);letter-spacing:.04em}
+.crit{font-size:10.5px;color:var(--ink3);font-style:italic;line-height:1.5}
+
+/* ══ SLIDE 10 NEXT STEPS ══ */
+.ns-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:12px}
+.ns-card{background:var(--paper2);border:1px solid var(--paper3);border-radius:10px;
+  padding:14px;position:relative;overflow:hidden}
+.ns-top{position:absolute;top:0;left:0;right:0;height:3px}
+.ns-sprint{font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  color:var(--ink4);margin-bottom:6px;font-weight:500}
+.ns-title{font-size:13px;font-weight:600;margin-bottom:7px}
+.ns-items{display:flex;flex-direction:column;gap:4px}
+.ns-item{font-size:11px;color:var(--ink2);padding-left:13px;
+  position:relative;line-height:1.5}
+.ns-item::before{content:'→';position:absolute;left:0;color:var(--accent);
+  font-size:10px;font-weight:700}
+.ns-tline{height:3px;background:var(--paper3);border-radius:2px;margin-top:9px;overflow:hidden}
+.ns-tfill{height:100%;border-radius:2px}
+.closing-row{display:flex;gap:11px}
+.cbox{flex:1;border-radius:8px;padding:13px;border:1px solid transparent}
+.cbox-title{font-family:var(--mono);font-size:9px;letter-spacing:.13em;
+  font-weight:700;margin-bottom:6px}
+.cbox-text{font-size:11.5px;line-height:1.65}
+
+/* ── NAV ── */
+#nav{display:flex;align-items:center;gap:9px;margin-top:13px}
+.ndot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.18);
+  cursor:pointer;transition:all .2s}
+.ndot.on{background:#fff;transform:scale(1.4)}
+.nbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  color:rgba(255,255,255,.65);border-radius:6px;padding:6px 18px;
+  cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:500;
+  transition:all .2s}
+.nbtn:hover{background:rgba(255,255,255,.2);color:#fff}
+#sc{color:rgba(255,255,255,.32);font-family:var(--mono);font-size:11px;margin:0 5px}
+
+/* ════ FULLSCREEN + TOOLTIP ════ */
+.fs-btn{position:absolute;top:6px;right:6px;width:26px;height:26px;
+  border-radius:6px;border:1px solid var(--paper3);background:var(--paper);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:13px;z-index:5;transition:all .15s;color:var(--ink3)}
+.fs-btn:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.arch-svg-wrap{position:relative}
+#svg-tip{position:fixed;z-index:10001;background:var(--ink);color:#fff;
+  border-radius:10px;padding:12px 14px;max-width:310px;
+  pointer-events:none;display:none;
+  box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.08);
+  opacity:0;transform:translateY(4px);
+  transition:opacity .12s ease,transform .12s ease;
+  will-change:transform,opacity}
+#svg-tip .tip-title{font-size:12px;font-weight:600;margin-bottom:5px;line-height:1.3}
+#svg-tip .tip-body{font-size:11px;color:rgba(255,255,255,.65);line-height:1.65}
+#svg-tip .tip-tag{font-size:9px;font-family:var(--mono);letter-spacing:.1em;
+  font-weight:700;padding:2px 7px;border-radius:3px;display:inline-block;margin-bottom:7px}
+#fs-overlay{position:fixed;inset:0;background:rgba(10,10,14,.92);
+  backdrop-filter:blur(12px);z-index:10000;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:14px}
+#fs-overlay.open{display:flex}
+#fs-wrap{background:var(--paper);border-radius:14px;
+  border:1px solid var(--paper3);overflow:hidden;
+  width:min(92vw,1200px);max-height:88vh;display:flex;flex-direction:column;
+  box-shadow:0 48px 100px rgba(0,0,0,.6)}
+#fs-header{padding:14px 18px;border-bottom:1px solid var(--paper3);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#fs-htitle{font-size:12px;font-weight:600;color:var(--ink);
+  font-family:var(--mono);letter-spacing:.06em}
+#fs-close{width:30px;height:30px;border-radius:50%;border:1px solid var(--paper3);
+  background:transparent;cursor:pointer;font-size:16px;
+  color:var(--ink3);display:flex;align-items:center;justify-content:center;transition:all .15s}
+#fs-close:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+#fs-body{flex:1;overflow:auto;padding:20px}
+#fs-body svg{width:100%;height:auto;display:block}
+#fs-legend{display:flex;gap:10px;flex-wrap:wrap;padding:10px 18px 14px;
+  border-top:1px solid var(--paper3);flex-shrink:0}
+.fsl{display:flex;align-items:center;gap:5px;font-size:10px;
+  font-family:var(--mono);color:var(--ink3)}
+.fsld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* ── SLIDE BACKGROUND IMAGE ── */
+.slide::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:url('');
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  opacity:0.5;
+  z-index:0;
+  pointer-events:none;
+  z-index:-1;
+}
+/* Ensure all slide content sits above the bg */
+.slide-header,.slide-body,.slide-footer,.footnote,
+.prog,.id-bar,.slide-progress{position:relative;z-index:2}
+#s1 .content,#s1 .geo,#s1 .six,#s1 .sbar{z-index:2}
+
+/* ── IN-FOOTER NAVIGATION ARROWS ── */
+.nav-arrow{width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--paper3);background:transparent;
+  cursor:pointer;font-size:16px;color:var(--ink3);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;flex-shrink:0;line-height:1}
+.nav-arrow:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.footer-dots{display:flex;gap:5px;align-items:center;flex:1;justify-content:center}
+.footer-dot{width:6px;height:6px;border-radius:50%;
+  background:var(--paper3);cursor:pointer;transition:all .2s;border:none;padding:0}
+.footer-dot.on{background:var(--accent);transform:scale(1.3)}
+/* Hide old external nav */
+#dots-bar{display:none}
+#kbhint{color:rgba(255,255,255,.28);font-size:11px;font-family:var(--mono);
+  position:fixed;bottom:10px;right:14px;letter-spacing:.05em}
+
+/* ── INSIGHT PANEL (after rec-pill) ── */
+.insight-panel{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;flex-shrink:0}
+.insight-card{border-radius:7px;padding:7px 9px;border:1px solid transparent}
+.insight-card-title{font-size:9px;font-weight:700;font-family:var(--mono);
+  letter-spacing:.1em;margin-bottom:4px}
+.insight-card-text{font-size:10px;color:var(--ink2);line-height:1.55}
+.ic-risk{background:var(--rp);border-color:var(--rg2)}
+.ic-risk .insight-card-title{color:var(--red)}
+.ic-win{background:var(--gp);border-color:var(--gg2)}
+.ic-win .insight-card-title{color:var(--green)}
+.ic-ctx{background:var(--bp);border-color:var(--bg2)}
+.ic-ctx .insight-card-title{color:var(--blue)}
+.ic-dep{background:var(--amp);border-color:var(--amg)}
+.ic-dep .insight-card-title{color:var(--amber)}
+.ic-note{background:var(--pp);border-color:var(--pg)}
+.ic-note .insight-card-title{color:var(--purple)}
+
+.mx-badge{font-size:9px;font-family:var(--mono);font-weight:700;padding:2px 7px;
+  border-radius:3px;display:inline-block;letter-spacing:.04em;white-space:nowrap}
+.mx-low{background:rgba(26,107,60,.12);color:var(--green)}
+.mx-med{background:rgba(122,82,0,.12);color:var(--amber)}
+.mx-high{background:rgba(138,26,46,.12);color:var(--red)}
+.mx-prop{background:rgba(26,79,138,.12);color:var(--blue)}
+
+#global-footer{position:fixed;bottom:0;left:0;right:0;height:50px;
+  background:rgba(248,247,244,.96);backdrop-filter:blur(10px);
+  border-top:1px solid var(--paper3);
+  display:flex;align-items:center;padding:0 56px;
+  justify-content:space-between;z-index:100}
+#gf-dots{display:flex;gap:5px;align-items:center;position:absolute;
+  left:50%;transform:translateX(-50%)}
+.gf-dot{width:6px;height:6px;border-radius:50%;background:var(--paper3);
+  border:none;cursor:pointer;padding:0;transition:all .2s}
+.gf-dot.on{background:var(--accent);transform:scale(1.35)}
+#gf-left{display:flex;align-items:center;gap:12px}
+#gf-right{display:flex;align-items:center;gap:12px}
+.gf-arrow{width:32px;height:32px;border-radius:50%;border:1px solid var(--paper3);
+  background:transparent;cursor:pointer;font-size:16px;color:var(--ink3);
+  display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1}
+.gf-arrow:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+#gf-brand{font-family:var(--mono);font-size:10px;color:var(--ink4);letter-spacing:.06em}
+#gf-stage{font-size:10px;color:var(--accent);background:var(--ap);
+  border:1px solid var(--ag);border-radius:4px;padding:3px 10px;
+  font-family:var(--mono);letter-spacing:.06em}
+#gf-counter{font-family:var(--mono);font-size:10px;color:var(--ink4)}
+
+.cxi-legend-row{display:flex;align-items:center;gap:7px;padding:4px 7px;border-radius:5px;transition:background .15s}
+.cxi-legend-row:hover{background:var(--paper3)}
+.cxi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cxi-label{font-size:10px;color:var(--ink2);flex:1}
+.cxi-pct{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink)}
+.cxi-range{font-size:9px;color:var(--ink3);font-family:var(--mono);white-space:nowrap}
+.score-pref td{background:rgba(26,107,60,.07)!important}
+.score-pref .score-val{color:var(--green);font-weight:700}
+.score-bar{height:5px;border-radius:3px;background:var(--paper3);margin-top:3px}
+.score-bar-fill{height:100%;border-radius:3px}
+
+/* ── STORY SLIDE ── */
+.st-dot{width:6px;height:6px;border-radius:50%;background:var(--paper3);transition:all .2s}
+.st-dot.on{background:var(--accent);transform:scale(1.3)}
+
+/* ════ FAILURE PATH PANEL ════════════════════════════════════════════ */
+.fp-trigger {
+  position: fixed;
+  bottom: 82px; /* above footer (50px) + footnote bar (22px) + 10px gap */
+  right: 18px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 7px 14px 7px 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,.28), 0 0 0 1px rgba(255,255,255,.06);
+  transition: transform .18s, box-shadow .18s, background .18s;
+  white-space: nowrap;
+}
+.fp-trigger:hover {
+  background: #c8510a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(200,81,10,.4), 0 0 0 1px rgba(255,255,255,.10);
+}
+.fp-trigger .fp-pulse {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #e8722a;
+  animation: fp-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes fp-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(232,114,42,.6); }
+  50%      { box-shadow: 0 0 0 5px rgba(232,114,42,0); }
+}
+
+/* Overlay backdrop */
+#fp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,14,.55);
+  backdrop-filter: blur(6px);
+  z-index: 900;
+  display: none;
+  opacity: 0;
+  transition: opacity .25s;
+}
+#fp-overlay.open { display: block; }
+#fp-overlay.visible { opacity: 1; }
+
+/* Panel */
+#fp-panel {
+  position: fixed;
+  right: 0; top: 0; bottom: 0;
+  width: min(680px, 94vw);
+  background: #0e1117;
+  border-left: 1px solid rgba(255,255,255,.08);
+  z-index: 901;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .32s cubic-bezier(.22,1,.36,1);
+  overflow: hidden;
+}
+#fp-panel.open {
+  transform: translateX(0);
+}
+
+.fp-panel-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.fp-header-left { flex: 1; min-width: 0; }
+.fp-eyebrow {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .16em;
+  color: #c8510a;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.fp-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 20px;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.fp-subtitle {
+  font-size: 11px;
+  color: rgba(255,255,255,.42);
+  line-height: 1.5;
+}
+.fp-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  color: rgba(255,255,255,.6);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s, color .15s;
+}
+.fp-close:hover { background: rgba(255,255,255,.14); color: #fff; }
+
+/* Scrollable body */
+.fp-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.fp-body::-webkit-scrollbar { width: 4px; }
+.fp-body::-webkit-scrollbar-track { background: transparent; }
+.fp-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 2px; }
+
+/* Animated flowchart nodes */
+.fp-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.fp-node {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .4s ease, transform .4s ease;
+  padding: 0 0 0 2px;
+}
+.fp-node.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fp-node-spine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 28px;
+}
+.fp-node-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--mono);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.fp-node-line {
+  width: 1px;
+  flex: 1;
+  min-height: 20px;
+  background: linear-gradient(to bottom, rgba(255,255,255,.15), rgba(255,255,255,.04));
+}
+.fp-node:last-child .fp-node-line { display: none; }
+
+.fp-node-content {
+  flex: 1;
+  padding-bottom: 20px;
+}
+.fp-node-label {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: .12em;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.fp-node-heading {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 5px;
+  line-height: 1.3;
+}
+.fp-node-body {
+  font-size: 11px;
+  color: rgba(255,255,255,.58);
+  line-height: 1.65;
+}
+.fp-node-impact {
+  margin-top: 7px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.fp-impact-chip {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.45);
+  border: 1px solid rgba(255,255,255,.09);
+}
+
+/* Node type colours */
+.fp-node-failure .fp-node-dot  { background: rgba(138,26,46,.25); color: #e05470; border: 1.5px solid rgba(138,26,46,.5); }
+.fp-node-failure .fp-node-label { background: rgba(138,26,46,.2); color: #e05470; }
+.fp-node-cause   .fp-node-dot  { background: rgba(122,82,0,.25); color: #f0a500; border: 1.5px solid rgba(122,82,0,.5); }
+.fp-node-cause   .fp-node-label { background: rgba(122,82,0,.2); color: #f0a500; }
+.fp-node-impact-type .fp-node-dot { background: rgba(200,81,10,.22); color: #e8722a; border: 1.5px solid rgba(200,81,10,.45); }
+.fp-node-impact-type .fp-node-label { background: rgba(200,81,10,.18); color: #e8722a; }
+.fp-node-resolve .fp-node-dot  { background: rgba(26,107,60,.25); color: #4ade80; border: 1.5px solid rgba(26,107,60,.5); }
+.fp-node-resolve .fp-node-label { background: rgba(26,107,60,.2); color: #4ade80; }
+
+/* Branch connector for multi-path */
+.fp-branch {
+  margin: 4px 0 4px 42px;
+  border-left: 1px dashed rgba(255,255,255,.1);
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .35s ease, transform .35s ease;
+}
+.fp-branch.visible { opacity: 1; transform: translateY(0); }
+.fp-branch-item {
+  font-size: 10.5px;
+  color: rgba(255,255,255,.5);
+  line-height: 1.55;
+  position: relative;
+  padding-left: 12px;
+}
+.fp-branch-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 7px;
+  width: 6px; height: 1px;
+  background: rgba(255,255,255,.2);
+}
+.fp-branch-item strong { color: rgba(255,255,255,.75); font-weight: 600; }
+
+/* Solution footer */
+.fp-solution {
+  margin-top: 8px;
+  background: rgba(26,107,60,.12);
+  border: 1px solid rgba(26,107,60,.25);
+  border-radius: 10px;
+  padding: 14px 16px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .4s ease .1s, transform .4s ease .1s;
+}
+.fp-solution.visible { opacity: 1; transform: translateY(0); }
+.fp-solution-tag {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: .12em;
+  font-weight: 700;
+  color: #4ade80;
+  margin-bottom: 7px;
+}
+.fp-solution-text {
+  font-size: 11.5px;
+  color: rgba(255,255,255,.72);
+  line-height: 1.65;
+}
+.fp-solution-text strong { color: #4ade80; }
+
+
+/* ════ LOGIN GATE ════════════════════════════════════════════════════ */
+#login-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #0e1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+#login-gate.hidden {
+  display: none;
+}
+.lg-card {
+  width: 360px;
+  background: #16191f;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 40px 36px 36px;
+  box-shadow: 0 40px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.lg-logo {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .22em;
+  font-weight: 700;
+  color: #c8510a;
+  margin-bottom: 24px;
+}
+.lg-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 26px;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.lg-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,.35);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+.lg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.lg-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .14em;
+  font-weight: 700;
+  color: rgba(255,255,255,.35);
+}
+.lg-input {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  color: #fff;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  outline: none;
+  transition: border-color .15s, background .15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.lg-input:focus {
+  border-color: rgba(200,81,10,.6);
+  background: rgba(200,81,10,.06);
+}
+.lg-input::placeholder {
+  color: rgba(255,255,255,.18);
+}
+.lg-error {
+  font-size: 11px;
+  color: #e05470;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .06em;
+  height: 16px;
+  margin-bottom: 8px;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.lg-error.show { opacity: 1; }
+.lg-btn {
+  width: 100%;
+  padding: 12px;
+  background: #c8510a;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background .15s, transform .12s;
+  letter-spacing: .02em;
+}
+.lg-btn:hover { background: #e8722a; transform: translateY(-1px); }
+.lg-btn:active { transform: translateY(0); }
+.lg-btn.shaking {
+  animation: lg-shake .35s ease;
+}
+@keyframes lg-shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+.lg-divider {
+  height: 1px;
+  background: rgba(255,255,255,.06);
+  margin: 28px 0 20px;
+}
+.lg-footer {
+  font-size: 10px;
+  color: rgba(255,255,255,.18);
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .06em;
+}
+
+
+
+
+/* ════ GAP ANALYSIS SLIDE ════════════════════════════════════════════ */
+/* Uses the deck's standard --paper bg, --ink text, --paper2/3 cards  */
+
+#s-gap { background: var(--paper); }
+
+/* Summary stats */
+.gap-summary-bar {
+  display:flex; gap:7px; margin-bottom:10px; flex-shrink:0;
+}
+.gap-stat {
+  flex:1; background:var(--paper2);
+  border:1px solid var(--paper3); border-radius:8px;
+  padding:7px 10px; display:flex; flex-direction:column; gap:2px;
+  position:relative; overflow:hidden;
+}
+.gap-stat-bar { position:absolute; top:0; left:0; right:0; height:3px; border-radius:8px 8px 0 0; }
+.gap-stat-v {
+  font-family:var(--mono); font-size:18px; font-weight:700;
+  line-height:1; color:var(--ink);
+}
+.gap-stat-l { font-size:8.5px; color:var(--ink4); letter-spacing:.06em; font-family:var(--mono); }
+
+/* Two-column layout */
+.gap-flow {
+  display:grid; grid-template-columns:1fr 20px 1fr;
+  gap:0; flex:1; min-height:0; overflow:hidden;
+}
+
+/* Column labels */
+.gap-col-label {
+  font-family:var(--mono); font-size:8.5px; font-weight:700;
+  letter-spacing:.13em; color:var(--ink4);
+  margin-bottom:5px; flex-shrink:0;
+}
+
+/* ── Finding cards (left col) ── */
+.gap-findings-list {
+  display:flex; flex-direction:column; gap:5px;
+  overflow-y:auto; padding-right:4px;
+}
+.gap-findings-list::-webkit-scrollbar { width:3px; }
+.gap-findings-list::-webkit-scrollbar-track { background:transparent; }
+.gap-findings-list::-webkit-scrollbar-thumb { background:var(--paper3); border-radius:2px; }
+
+.gap-card {
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:9px; padding:9px 10px;
+  cursor:pointer; position:relative; overflow:hidden;
+  transition:border-color .18s, background .18s, box-shadow .18s;
+  flex-shrink:0;
+}
+.gap-card:hover {
+  border-color:var(--paper4);
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+.gap-card.expanded {
+  border-color:var(--card-color, var(--accent));
+  background:var(--paper);
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+}
+.gap-card-accent {
+  position:absolute; top:0; left:0; bottom:0; width:3px;
+  border-radius:9px 0 0 9px;
+  background:var(--card-color, var(--accent));
+}
+.gap-card-head {
+  display:flex; align-items:center; gap:7px; padding-left:6px;
+}
+.gap-card-icon { font-size:12px; flex-shrink:0; }
+.gap-card-title {
+  font-size:11px; font-weight:600; color:var(--ink);
+  line-height:1.25; flex:1;
+}
+.gap-card-badge {
+  font-family:var(--mono); font-size:7.5px; font-weight:700;
+  padding:2px 6px; border-radius:3px; letter-spacing:.05em;
+  flex-shrink:0; white-space:nowrap;
+}
+.gap-card-chevron {
+  font-size:8px; color:var(--ink4);
+  transition:transform .22s; flex-shrink:0;
+}
+.gap-card.expanded .gap-card-chevron { transform:rotate(180deg); color:var(--ink2); }
+
+/* Expandable body */
+.gap-card-body {
+  max-height:0; overflow:hidden;
+  transition:max-height .32s cubic-bezier(.22,1,.36,1), opacity .25s;
+  opacity:0; padding-left:6px;
+}
+.gap-card.expanded .gap-card-body { max-height:200px; opacity:1; }
+.gap-card-body-inner {
+  padding-top:8px; margin-top:7px;
+  border-top:1px solid var(--paper3);
+}
+.gap-card-desc {
+  font-size:10px; color:var(--ink2); line-height:1.6; margin-bottom:7px;
+}
+.gap-card-chips { display:flex; flex-wrap:wrap; gap:4px; }
+.gap-chip {
+  font-family:var(--mono); font-size:8px; padding:2px 7px;
+  border-radius:3px; border:1px solid var(--paper3);
+  color:var(--ink3); background:var(--paper2);
+}
+.gap-chip.opp {
+  border-color:rgba(26,107,60,.3);
+  color:var(--green); background:var(--gp);
+}
+
+/* ── Connector arrows ── */
+.gap-arrow-col {
+  display:flex; flex-direction:column; justify-content:center;
+  align-items:center; gap:3px;
+}
+.gap-arrow-line { width:1px; flex:1; background:var(--paper3); }
+.gap-arrow-head { color:var(--ink4); font-size:9px; }
+
+/* ── Opportunity cards (right col) ── */
+.gap-opp-list {
+  display:flex; flex-direction:column; gap:5px;
+  overflow-y:auto; padding-left:4px;
+}
+.gap-opp-list::-webkit-scrollbar { width:3px; }
+.gap-opp-list::-webkit-scrollbar-track { background:transparent; }
+.gap-opp-list::-webkit-scrollbar-thumb { background:var(--paper3); border-radius:2px; }
+
+.gap-opp-card {
+  flex:1; min-height:36px;
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:9px; padding:9px 11px;
+  cursor:pointer; transition:all .18s; position:relative; overflow:hidden;
+}
+.gap-opp-card:hover {
+  border-color:var(--paper4);
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+.gap-opp-card.active {
+  background:var(--gp); border-color:rgba(26,107,60,.35);
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+}
+.gap-opp-top {
+  position:absolute; top:0; left:0; right:0; height:3px;
+  border-radius:9px 9px 0 0; background:var(--green); opacity:.6;
+}
+.gap-opp-card.active .gap-opp-top { opacity:1; }
+.gap-opp-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:3px; }
+.gap-opp-label {
+  font-family:var(--mono); font-size:7.5px; font-weight:700;
+  letter-spacing:.1em; color:var(--green);
+}
+.gap-opp-chevron {
+  font-size:8px; color:var(--ink4);
+  transition:transform .22s;
+}
+.gap-opp-card.active .gap-opp-chevron { transform:rotate(180deg); color:var(--green); }
+.gap-opp-title {
+  font-size:10.5px; font-weight:600; color:var(--ink); line-height:1.3;
+}
+.gap-opp-body {
+  max-height:0; overflow:hidden;
+  transition:max-height .32s cubic-bezier(.22,1,.36,1), opacity .25s;
+  opacity:0;
+}
+.gap-opp-card.active .gap-opp-body { max-height:240px; opacity:1; }
+.gap-opp-body-inner {
+  font-size:10px; color:var(--ink2); line-height:1.6;
+  padding-top:7px; margin-top:7px;
+  border-top:1px solid rgba(26,107,60,.2);
+}
+.gap-opp-items { display:flex; flex-direction:column; gap:3px; margin-top:6px; }
+.gap-opp-item {
+  font-size:9.5px; color:var(--ink3); padding-left:13px;
+  position:relative; line-height:1.45;
+}
+.gap-opp-item::before {
+  content:'→'; position:absolute; left:0;
+  color:var(--green); font-size:8px; font-weight:700;
+}
+
+/* Entry animations — same timing as rest of deck */
+@keyframes gap-in {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.gap-card     { animation:gap-in .38s cubic-bezier(.22,1,.36,1) both; }
+.gap-opp-card { animation:gap-in .42s cubic-bezier(.22,1,.36,1) both; }
+
+
+/* ════ GAP ANALYSIS — 3-SLIDE SECTION ═══════════════════════════════ */
+
+/* Slide 1: Executive Summary */
+.gx-hero { display:flex; gap:10px; margin-bottom:12px; flex-shrink:0; }
+.gx-kpi {
+  flex:1; background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:10px; padding:10px 14px; position:relative; overflow:hidden;
+  transition: transform .2s, box-shadow .2s;
+}
+.gx-kpi:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.07); }
+.gx-kpi-bar { position:absolute; top:0; left:0; right:0; height:3px; border-radius:10px 10px 0 0; }
+.gx-kpi-v { font-family:var(--mono); font-size:28px; font-weight:700; line-height:1; margin-bottom:3px; }
+.gx-kpi-l { font-size:10px; color:var(--ink3); line-height:1.4; }
+.gx-kpi-sub { font-size:9px; color:var(--ink4); margin-top:4px; font-style:italic; }
+
+/* Maturity bar chart */
+.gx-maturity { display:flex; flex-direction:column; gap:5px; }
+.gx-reg-row {
+  display:flex; align-items:center; gap:10px;
+  opacity:0; transform:translateX(-12px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.gx-reg-row.visible { opacity:1; transform:translateX(0); }
+.gx-reg-name { font-size:10.5px; font-weight:600; color:var(--ink2); width:180px; flex-shrink:0; }
+.gx-reg-dept { font-size:9px; color:var(--ink4); font-family:var(--mono); }
+.gx-bar-track { flex:1; height:22px; background:var(--paper3); border-radius:5px; overflow:hidden; position:relative; }
+.gx-bar-fill {
+  height:100%; border-radius:5px; width:0;
+  transition: width 1s cubic-bezier(.22,1,.36,1);
+  display:flex; align-items:center; padding-left:8px;
+}
+.gx-bar-label { font-family:var(--mono); font-size:8.5px; font-weight:700; color:#fff; white-space:nowrap; }
+.gx-score-badge {
+  font-family:var(--mono); font-size:11px; font-weight:700;
+  width:32px; text-align:center; flex-shrink:0;
+}
+.gx-maturity-label { font-size:8.5px; color:var(--ink4); font-style:italic; }
+
+/* Finding chips below chart */
+.gx-finding-row {
+  display:flex; align-items:flex-start; gap:8px; padding:6px 0;
+  border-bottom:1px solid var(--paper3);
+  opacity:0; transform:translateY(6px);
+  transition: opacity .35s ease, transform .35s ease;
+}
+.gx-finding-row.visible { opacity:1; transform:translateY(0); }
+.gx-finding-row:last-child { border-bottom:none; }
+.gx-g-badge {
+  font-family:var(--mono); font-size:8px; font-weight:700;
+  background:var(--paper3); color:var(--ink3); border-radius:3px;
+  padding:2px 6px; flex-shrink:0; margin-top:2px;
+}
+.gx-finding-text { font-size:10.5px; color:var(--ink2); line-height:1.55; flex:1; }
+.gx-finding-impact { font-size:9.5px; color:var(--ink4); font-style:italic; }
+
+/* Slide 2: Registry cards */
+.gx-reg-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; flex:1; min-height:0; overflow:hidden; }
+.gx-reg-card {
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:10px; padding:10px 11px; display:flex; flex-direction:column;
+  gap:5px; overflow:hidden; cursor:pointer;
+  transition: border-color .18s, box-shadow .18s;
+  opacity:0; transform:translateY(12px);
+  animation: gap-in .4s cubic-bezier(.22,1,.36,1) both;
+}
+.gx-reg-card.visible { opacity:1; transform:translateY(0); }
+.gx-reg-card:hover { border-color:var(--paper4); box-shadow:0 4px 16px rgba(0,0,0,.07); }
+.gx-reg-card.open { border-color:var(--accent); }
+.gx-reg-card-top { position:absolute; top:0; left:0; right:0; height:3px; border-radius:10px 10px 0 0; }
+.gx-reg-num { font-family:var(--mono); font-size:9px; font-weight:700; color:var(--ink4); letter-spacing:.1em; }
+.gx-reg-title { font-size:12px; font-weight:700; color:var(--ink); line-height:1.25; }
+.gx-reg-subtitle { font-size:9.5px; color:var(--ink3); }
+.gx-score-row { display:flex; align-items:center; gap:6px; }
+.gx-avg-score { font-family:var(--mono); font-size:18px; font-weight:700; }
+.gx-avg-label { font-size:9px; color:var(--ink4); line-height:1.3; }
+.gx-mini-bars { display:flex; flex-direction:column; gap:2px; flex:1; }
+.gx-mini-bar { height:4px; border-radius:2px; }
+.gx-gap-count { font-family:var(--mono); font-size:9px; font-weight:700; padding:2px 7px; border-radius:3px; }
+.gx-expand-body { max-height:0; overflow:hidden; transition:max-height .35s cubic-bezier(.22,1,.36,1); }
+.gx-reg-card.open .gx-expand-body { max-height:400px; }
+.gx-gap-list { padding-top:7px; border-top:1px solid var(--paper3); margin-top:4px; display:flex; flex-direction:column; gap:3px; }
+.gx-gap-item { display:flex; gap:6px; align-items:flex-start; }
+.gx-gap-badge { font-family:var(--mono); font-size:7.5px; font-weight:700; padding:1px 5px; border-radius:2px; background:var(--ap); color:var(--accent); flex-shrink:0; margin-top:2px; }
+.gx-gap-text { font-size:9.5px; color:var(--ink2); line-height:1.5; }
+
+/* Slide 3: Cross-cutting + bridge */
+.gx-bridge { display:grid; grid-template-columns:1fr 1fr; gap:14px; flex:1; min-height:0; }
+.gx-cross-col { display:flex; flex-direction:column; gap:8px; overflow:hidden; }
+.gx-cross-card {
+  background:var(--paper2); border:1px solid var(--paper3);
+  border-radius:9px; padding:10px 12px;
+  opacity:0; transform:translateY(10px);
+  transition:opacity .4s ease, transform .4s ease;
+}
+.gx-cross-card.visible { opacity:1; transform:translateY(0); }
+.gx-cross-label { font-family:var(--mono); font-size:8px; font-weight:700; letter-spacing:.12em; color:var(--ink4); margin-bottom:5px; }
+.gx-cross-title { font-size:11.5px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+.gx-cross-body { font-size:10px; color:var(--ink2); line-height:1.6; }
+.gx-cross-chips { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
+.gx-chip { font-family:var(--mono); font-size:8px; padding:2px 7px; border-radius:3px; border:1px solid var(--paper3); color:var(--ink3); background:var(--paper2); }
+.gx-chip.red { border-color:var(--rg2); color:var(--red); background:var(--rp); }
+.gx-chip.amber { border-color:var(--amg); color:var(--amber); background:var(--amp); }
+.gx-chip.green { border-color:var(--gg2); color:var(--green); background:var(--gp); }
+
+/* Bridge panel — right col slide 3 */
+.gx-bridge-panel {
+  background:var(--ink); border-radius:12px; padding:20px 22px;
+  display:flex; flex-direction:column; gap:10px; overflow:hidden;
+  opacity:0; transform:translateX(16px);
+  transition:opacity .5s ease .2s, transform .5s ease .2s;
+}
+.gx-bridge-panel.visible { opacity:1; transform:translateX(0); }
+.gx-bridge-eyebrow { font-family:var(--mono); font-size:8.5px; letter-spacing:.18em; font-weight:700; color:var(--accent2); margin-bottom:2px; }
+.gx-bridge-title { font-family:var(--serif); font-size:22px; color:#fff; line-height:1.2; margin-bottom:6px; }
+.gx-bridge-title em { color:var(--accent2); font-style:italic; }
+.gx-bridge-sub { font-size:11px; color:rgba(255,255,255,.45); line-height:1.6; margin-bottom:6px; }
+.gx-decision-pill {
+  display:flex; align-items:center; gap:9px;
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+  border-radius:7px; padding:7px 10px;
+  opacity:0; transform:translateX(10px);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.gx-decision-pill.visible { opacity:1; transform:translateX(0); }
+.gx-decision-pill:hover { background:rgba(255,255,255,.09); }
+.gx-pill-q { font-family:var(--mono); font-size:9px; font-weight:700; padding:2px 7px; border-radius:3px; flex-shrink:0; }
+.gx-pill-text { font-size:10.5px; color:rgba(255,255,255,.75); flex:1; font-weight:500; }
+.gx-pill-arrow { font-size:10px; color:rgba(255,255,255,.25); }
+
+</style>
+<style>
+
+/* ── 30% FONT SIZE INCREASE OVERRIDES ── */
+.slide-h1{font-size:39px!important}
+.slide-sub{font-size:17px!important;max-width:820px!important}
+.kpi-v{font-size:22px!important}
+.kpi-l{font-size:12px!important}
+.ov-title{font-size:16px!important;font-weight:600}
+.ov-desc{font-size:13.5px!important;line-height:1.6}
+.ov-num{font-size:13px!important}
+.ov-badge{font-size:11px!important}
+.etag{font-size:12px!important;padding:5px 12px!important}
+.enum{font-size:12px!important}
+.note-bar{font-size:13.5px!important;padding:9px 14px!important}
+.note-bar strong{font-size:13.5px!important}
+.opt-name{font-size:14px!important}
+.opt-badge{font-size:11px!important}
+.pro,.con{font-size:12.5px!important;line-height:1.5}
+.ns-title{font-size:16px!important}
+.ns-item{font-size:13px!important}
+.ns-sprint{font-size:11px!important;letter-spacing:.08em}
+.cbox-text{font-size:14px!important}
+.cbox-title{font-size:11px!important}
+.rec-pill{font-size:13px!important}
+.rec-pill span{font-size:11px!important}
+.q-story{font-size:13.5px!important}
+.mtbl{font-size:14px!important}
+.mtbl th{font-size:11px!important}
+.fp-title{font-size:26px!important}
+.fp-subtitle{font-size:13px!important}
+.fp-node-heading{font-size:16px!important}
+.fp-node-body{font-size:13.5px!important;line-height:1.7}
+.fp-node-label{font-size:10.5px!important}
+.fp-impact-chip{font-size:11px!important}
+.fp-solution-text{font-size:13.5px!important;line-height:1.7}
+.fp-solution-tag{font-size:10.5px!important}
+.fp-eyebrow{font-size:11px!important}
+#gf-brand{font-size:12px!important}
+#gf-counter{font-size:12px!important}
+#gf-stage{font-size:12px!important}
+.fn-text{font-size:12px!important}
+.fn-logo{font-size:11px!important}
+#kbhint{font-size:12.5px!important}
+
+.acc-section{border:1px solid var(--paper3);border-radius:8px;overflow:hidden;margin-bottom:5px}
+.acc-head{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:pointer;user-select:none;transition:background .12s;font-size:14px;font-weight:600}
+.acc-head:hover{background:var(--paper2)}
+.acc-chev{margin-left:auto;font-size:12px;color:var(--ink4);transition:transform .22s}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .32s cubic-bezier(.22,1,.36,1)}
+.acc-open .acc-body{max-height:600px}
+.acc-open .acc-chev{transform:rotate(180deg)}
+.acc-content{padding:10px 14px 12px;font-size:14px;color:var(--ink2);line-height:1.7}
+.oq-card{background:var(--ink);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden}
+.oq-card::before{content:'?';position:absolute;right:12px;top:2px;font-family:var(--serif);font-size:90px;color:rgba(255,255,255,.035);line-height:1}
+.oq-label{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;color:#7a5200;margin-bottom:7px;text-transform:uppercase}
+.oq-q{font-family:var(--serif);font-size:17px;color:#fff;line-height:1.35;margin-bottom:5px}
+.oq-context{font-size:13px;color:rgba(255,255,255,.48);line-height:1.65}
+.bar-fill{transition:width 1s cubic-bezier(.22,1,.36,1)}
+@keyframes dash-flow{to{stroke-dashoffset:-24}}
+.svg-flow{stroke-dasharray:7 4;animation:dash-flow 1.5s linear infinite}
+.fab-cluster{position:fixed;bottom:72px;right:16px;display:flex;flex-direction:column;gap:9px;z-index:200}
+.fab-btn{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 16px rgba(0,0,0,.22);transition:transform .15s,box-shadow .15s;position:relative}
+.fab-btn:hover{transform:scale(1.1);box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.fab-tooltip{position:absolute;right:58px;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;padding:5px 11px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(255,255,255,.1)}
+.fab-btn:hover .fab-tooltip{opacity:1}
+#fp-overlay{position:fixed;inset:0;background:rgba(10,10,14,.55);backdrop-filter:blur(6px);z-index:900;display:none;opacity:0;transition:opacity .25s}
+#fp-overlay.open{display:block}
+#fp-overlay.visible{opacity:1}
+#fp-panel{position:fixed;right:0;top:0;bottom:0;width:min(700px,94vw);background:#0e1117;border-left:1px solid rgba(255,255,255,.08);z-index:901;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .32s cubic-bezier(.22,1,.36,1);overflow:hidden}
+#fp-panel.open{transform:translateX(0)}
+.fp-panel-header{padding:22px 26px 18px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.fp-header-left{flex:1;min-width:0}
+.fp-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.fp-close:hover{background:rgba(255,255,255,.14);color:#fff}
+.fp-body{flex:1;overflow-y:auto;padding:20px 26px 36px;display:flex;flex-direction:column;gap:0}
+.fp-body::-webkit-scrollbar{width:4px}
+.fp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+.fp-node{display:flex;align-items:flex-start;gap:14px;opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .4s ease;padding:0 0 0 2px}
+.fp-node.visible{opacity:1;transform:translateY(0)}
+.fp-node-spine{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:30px}
+.fp-node-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--mono);flex-shrink:0;position:relative;z-index:1}
+.fp-node-line{width:1px;flex:1;min-height:22px;background:linear-gradient(to bottom,rgba(255,255,255,.15),rgba(255,255,255,.04))}
+.fp-node:last-child .fp-node-line{display:none}
+.fp-node-content{flex:1;padding-bottom:22px}
+.fp-node-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;font-weight:700;padding:3px 9px;border-radius:3px;display:inline-block;margin-bottom:7px}
+.fp-node-heading{font-size:16px;font-weight:600;color:#fff;margin-bottom:6px;line-height:1.3}
+.fp-node-body{font-size:13.5px;color:rgba(255,255,255,.6);line-height:1.7}
+.fp-node-impact{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+.fp-impact-chip{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:12px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.09)}
+.fp-node-failure .fp-node-dot{background:rgba(138,26,46,.25);color:#e05470;border:1.5px solid rgba(138,26,46,.5)}
+.fp-node-failure .fp-node-label{background:rgba(138,26,46,.2);color:#e05470}
+.fp-node-cause .fp-node-dot{background:rgba(122,82,0,.25);color:#f0a500;border:1.5px solid rgba(122,82,0,.5)}
+.fp-node-cause .fp-node-label{background:rgba(122,82,0,.2);color:#f0a500}
+.fp-node-impact-type .fp-node-dot{background:rgba(200,81,10,.22);color:#e8722a;border:1.5px solid rgba(200,81,10,.45)}
+.fp-node-impact-type .fp-node-label{background:rgba(200,81,10,.18);color:#e8722a}
+.fp-node-resolve .fp-node-dot{background:rgba(26,107,60,.25);color:#4ade80;border:1.5px solid rgba(26,107,60,.5)}
+.fp-node-resolve .fp-node-label{background:rgba(26,107,60,.2);color:#4ade80}
+.fp-solution{margin-top:9px;background:rgba(26,107,60,.12);border:1px solid rgba(26,107,60,.25);border-radius:10px;padding:15px 17px;opacity:0;transform:translateY(10px);transition:opacity .4s ease .1s,transform .4s ease .1s}
+.fp-solution.visible{opacity:1;transform:translateY(0)}
+.fp-solution-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;font-weight:700;color:#4ade80;margin-bottom:8px}
+.fp-solution-text{font-size:13.5px;color:rgba(255,255,255,.72);line-height:1.7}
+.fp-solution-text strong{color:#fff}
+.panel-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.panel-tab{flex:1;padding:13px 10px;text-align:center;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.35);transition:color .2s;border:none;background:transparent;border-bottom:2px solid transparent}
+.panel-tab:hover{color:rgba(255,255,255,.7)}
+.panel-tab.active{color:#7a5200;border-bottom-color:#7a5200}
+.panel-svg-wrap{margin:14px 0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px}
+.panel-svg-title{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.35);margin-bottom:10px;font-weight:700;text-transform:uppercase}
+
+/* ── REFERENCE MODAL ──────────────────────────────────────────────── */
+#ref-fab{
+  position:fixed;bottom:72px;left:16px;z-index:200;
+  width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--ink2);color:#fff;font-size:18px;font-weight:700;
+  box-shadow:0 4px 16px rgba(0,0,0,.28);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s,box-shadow .15s;font-family:var(--mono);
+  position:fixed;
+}
+#ref-fab:hover{transform:scale(1.1);box-shadow:0 8px 28px rgba(0,0,0,.35)}
+#ref-fab .fab-tooltip{right:auto;left:58px}
+
+#ref-overlay{
+  position:fixed;inset:0;background:rgba(10,10,14,.6);
+  backdrop-filter:blur(8px);z-index:1000;
+  display:none;opacity:0;transition:opacity .25s;
+}
+#ref-overlay.open{display:block}
+#ref-overlay.visible{opacity:1}
+
+#ref-modal{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);
+  width:min(920px,96vw);max-height:88vh;
+  background:var(--paper);border:1px solid var(--paper3);
+  border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.28);
+  z-index:1001;display:flex;flex-direction:column;
+  opacity:0;transition:opacity .28s,transform .28s cubic-bezier(.22,1,.36,1);
+  overflow:hidden;
+}
+#ref-modal.visible{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+.ref-modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px 14px;border-bottom:1px solid var(--paper3);flex-shrink:0;
+}
+.ref-modal-title{font-family:var(--serif);font-size:22px;color:var(--ink);line-height:1.2}
+.ref-modal-sub{font-size:12px;color:var(--ink4);font-family:var(--mono);letter-spacing:.06em;margin-top:3px}
+.ref-modal-close{
+  width:32px;height:32px;border-radius:50%;background:var(--paper2);
+  border:1px solid var(--paper3);color:var(--ink3);cursor:pointer;
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+  transition:background .12s;flex-shrink:0;
+}
+.ref-modal-close:hover{background:var(--paper3);color:var(--ink)}
+
+.ref-tabs{
+  display:flex;border-bottom:1px solid var(--paper3);flex-shrink:0;
+  background:var(--paper2);
+}
+.ref-tab{
+  flex:1;padding:11px 16px;text-align:center;cursor:pointer;
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;
+  color:var(--ink4);transition:color .15s;border:none;background:transparent;
+  border-bottom:2px solid transparent;
+}
+.ref-tab:hover{color:var(--ink2)}
+.ref-tab.active{color:var(--ink);border-bottom-color:var(--ink)}
+
+.ref-body{flex:1;overflow-y:auto;padding:0}
+.ref-body::-webkit-scrollbar{width:4px}
+.ref-body::-webkit-scrollbar-thumb{background:var(--paper3);border-radius:2px}
+
+.ref-section{padding:10px 20px 4px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.14em;color:var(--ink4);font-weight:700;
+  border-bottom:1px solid var(--paper3);background:var(--paper2)}
+
+.ref-row{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:11px 20px;border-bottom:1px solid var(--paper3);
+  cursor:pointer;transition:background .12s;
+}
+.ref-row:hover{background:var(--paper2)}
+.ref-row.ref-expanded{background:var(--paper2)}
+.ref-row.ref-expanded .ref-desc{-webkit-line-clamp:unset;display:block}
+.ref-row.ref-expanded .ref-chev{transform:rotate(180deg)}
+
+.ref-code{
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  padding:4px 9px;border-radius:5px;white-space:nowrap;
+  flex-shrink:0;min-width:52px;text-align:center;letter-spacing:.04em;
+}
+.ref-name{
+  font-size:13.5px;font-weight:600;color:var(--ink);
+  min-width:160px;flex-shrink:0;line-height:1.4;
+}
+.ref-owner{
+  display:block;font-size:10.5px;color:var(--ink4);font-weight:400;
+  font-family:var(--mono);letter-spacing:.04em;margin-top:2px;
+}
+.ref-desc{
+  font-size:12.5px;color:var(--ink3);line-height:1.6;flex:1;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;
+  transition:all .2s;
+}
+.ref-chev{font-size:11px;color:var(--ink4);flex-shrink:0;margin-top:2px;transition:transform .2s}
+
+#ref-search{
+  width:100%;padding:10px 20px;border:none;border-bottom:1px solid var(--paper3);
+  background:var(--paper);font-family:var(--sans);font-size:13px;color:var(--ink);
+  outline:none;flex-shrink:0;
+}
+#ref-search::placeholder{color:var(--ink4)}
+#ref-search:focus{background:var(--paper2)}
+
+
+/* playground extras */
+#spec-box::-webkit-scrollbar{width:3px}
+#spec-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+#resp-body::-webkit-scrollbar,#resp-headers::-webkit-scrollbar,#resp-schema::-webkit-scrollbar{width:3px}
+#resp-body::-webkit-scrollbar-thumb,#resp-headers::-webkit-scrollbar-thumb,#resp-schema::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="stage">
+<div class="slide active" id="d5s1"><div class="prog"><div class="prog-fill" style="width:17%"></div></div><div class="id-bar" style="background:#7a5200"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#7a5200;border-color:#7a5200">D5 · The Team · DGTP-API-SPEC-REG</span>
+    <span class="enum">API Specification Pack to Registries · Design Phase 2026</span>
+  </div>
+  <h2 class="slide-h1 a2">API Specification Pack to Registries</h2>
+  <p class="slide-sub a3">Five per-registry bundles — each containing the approved OpenAPI 3.0 spec, auth setup guide, rate limit documentation, sandbox connection instructions, and a data sharing agreement template. Kadaster deferred to Phase 1b.</p>
+</div>
+<div class="slide-body a4">
+  <div class="ov-grid" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">
+    <div class="ov-card">
+      <div class="ov-top-bar" style="background:#7a5200"></div>
+      <div class="ov-num">API Spec Bundle</div>
+      <div class="ov-title">Per-Registry Pack</div>
+      <div class="ov-desc">One pack per registry containing: approved OpenAPI 3.0 spec, authentication setup guide (OAuth2 client registration steps), rate limit documentation (500 req/min default), sandbox connection instructions, and data sharing agreement template for legal sign-off.</div>
+      <span class="ov-badge" style="background:var(--amp);color:#7a5200">5 PACKS (1 DEFERRED)</span>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top-bar" style="background:#7a5200"></div>
+      <div class="ov-num">Sandbox Access</div>
+      <div class="ov-title">rg-dgtp-staging</div>
+      <div class="ov-desc">Full platform replica in the staging Azure resource group. Mock data per registry. Dedicated sandbox credentials per registry technical contact. Sandbox must be provisioned and validated before any spec pack is delivered — it is the integration test environment.</div>
+      <span class="ov-badge" style="background:var(--amp);color:#7a5200">STAGING MUST BE READY</span>
+    </div>
+    <div class="ov-card">
+      <div class="ov-top-bar" style="background:#7a5200"></div>
+      <div class="ov-num">Legal Gate</div>
+      <div class="ov-title">Data Sharing Agreements</div>
+      <div class="ov-desc">No live data exchange is permitted without a signed data sharing agreement per registry. Begin legal negotiations during D4 work — not after specs are finalised. Tax Administration agreement must be approved before its spec pack can be packaged and delivered.</div>
+      <span class="ov-badge" style="background:var(--rp);color:#8a1a2e">BEGIN IN D4 — NOT AFTER</span>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-top" style="background:#7a5200"></div><div class="kpi-v">5</div><div class="kpi-l">Spec packs (ready)</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#7a5200"></div><div class="kpi-v">1</div><div class="kpi-l">Deferred (Kadaster)</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#7a5200"></div><div class="kpi-v">3 weeks</div><div class="kpi-l">LOE after D4</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#7a5200"></div><div class="kpi-v">Sandbox</div><div class="kpi-l">Must be live first</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#7a5200"></div><div class="kpi-v">DSA</div><div class="kpi-l">Per registry (legal)</div></div>
+    <div class="kpi"><div class="kpi-top" style="background:#8a1a2e"></div><div class="kpi-v">4–8 w</div><div class="kpi-l">DSA negotiation time</div></div>
+  </div>
+  <div class="note-bar" style="margin-top:10px">
+    <strong>Critical Timing Risk — P-01 API-First API-First:</strong> D4 (API Guidelines + Specs) takes 4–5 weeks. D5 (packaging + delivery) takes 3 weeks — and cannot begin until D4 is complete. Data sharing agreement negotiations take 4–8 weeks. Begin legal agreement drafting in Design Phase Week 1 — in parallel with D4, not after it.
+  </div>
+</div>
+</div>
+<div class="slide" id="d5s2"><div class="prog"><div class="prog-fill" style="width:38%"></div></div><div class="id-bar" style="background:#7a5200"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#7a5200;border-color:#7a5200">D5 · P-01 API-First · P-04 Loose Coupling</span>
+    <span class="enum">Registry Delivery Sequence &amp; Pack Contents</span>
+  </div>
+  <h2 class="slide-h1 a2">Delivery Sequence & Spec Pack Contents</h2>
+  <p class="slide-sub a3">Lowest-risk registries receive their spec packs first. Tax Administration is gated on PSC data sharing approval. Kadaster is formally deferred to Phase 1b. Each pack must be delivered alongside sandbox credentials.</p>
+</div>
+<div class="slide-body a4">
+  <div class="q-layout">
+    <div class="q-left" style="gap:8px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">REGISTRY DELIVERY SEQUENCE</div>
+
+      <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:12px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span style="font-size:14px;font-weight:600;color:#1a6b3c">COCI + VROMI — lowest risk, deliver first</span>
+          <span style="font-family:var(--mono);font-size:10px;color:#7a5200">Week 1–2</span>
+        </div>
+        <div style="height:5px;background:var(--paper3);border-radius:3px;overflow:hidden;margin-bottom:6px">
+          <div class="bar-fill" data-w="65%" style="width:0%;height:100%;background:#1a6b3c;border-radius:3px"></div>
+        </div>
+        <div style="font-size:13px;color:var(--ink3);line-height:1.6">Best As-Is documentation. Vendors cooperative. Begin in parallel immediately — do not wait for Civil Registry spec to complete.</div>
+      </div>
+
+      <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:12px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span style="font-size:14px;font-weight:600;color:#8a1a2e">Civil Registry (CASBES) — highest complexity</span>
+          <span style="font-family:var(--mono);font-size:10px;color:#7a5200">Week 2–3</span>
+        </div>
+        <div style="height:5px;background:var(--paper3);border-radius:3px;overflow:hidden;margin-bottom:6px">
+          <div class="bar-fill" data-w="30%" style="width:0%;height:100%;background:#8a1a2e;border-radius:3px"></div>
+        </div>
+        <div style="font-size:13px;color:var(--ink3);line-height:1.6">StUF-BG SOAP spec requires the most work. Technical sessions with the Civil Registry technical contact must be scheduled in D4 Week 1 before this pack can be finalised.</div>
+      </div>
+
+      <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:12px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span style="font-size:14px;font-weight:600;color:#4a1a7a">TEATT (BLISS) — medium risk</span>
+          <span style="font-family:var(--mono);font-size:10px;color:#7a5200">Week 2–3</span>
+        </div>
+        <div style="height:5px;background:var(--paper3);border-radius:3px;overflow:hidden;margin-bottom:6px">
+          <div class="bar-fill" data-w="40%" style="width:0%;height:100%;background:#4a1a7a;border-radius:3px"></div>
+        </div>
+        <div style="font-size:13px;color:var(--ink3);line-height:1.6">D365 OData v4 spec is well-documented. Deliver alongside Civil Registry in Week 2–3.</div>
+      </div>
+
+      <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:12px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span style="font-size:14px;font-weight:600;color:#7a5200">Tax Admin (SIAH) — gated on PSC approval</span>
+          <span style="font-family:var(--mono);font-size:10px;color:#8a1a2e">Conditional</span>
+        </div>
+        <div style="height:5px;background:var(--paper3);border-radius:3px;overflow:hidden;margin-bottom:6px">
+          <div class="bar-fill" data-w="15%" style="width:0%;height:100%;background:#7a5200;border-radius:3px"></div>
+        </div>
+        <div style="font-size:13px;color:var(--ink3);line-height:1.6">Data sharing agreement must be signed before spec pack can be delivered. Begin legal process in Design Phase Week 1 — even before D4 begins.</div>
+      </div>
+
+      <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:12px 14px;opacity:.65">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span style="font-size:14px;font-weight:600;color:#9ca3af">Kadaster — formally deferred to Phase 1b</span>
+          <span style="font-family:var(--mono);font-size:10px;color:#9ca3af">Deferred</span>
+        </div>
+        <div style="height:5px;background:var(--paper3);border-radius:3px;overflow:hidden;margin-bottom:6px">
+          <div class="bar-fill" data-w="5%" style="width:0%;height:100%;background:#9ca3af;border-radius:3px"></div>
+        </div>
+        <div style="font-size:13px;color:var(--ink3);line-height:1.6">No As-Is architecture document exists. Spec cannot be written. Track via Kadaster focal point — target: As-Is documentation received within 4 weeks of engagement.</div>
+      </div>
+    </div>
+    <div class="q-right" style="gap:7px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">WHAT EACH SPEC PACK CONTAINS</div>
+      <div class="acc-section acc-open">
+        <div class="acc-head" style="border-left:4px solid #7a5200"><span>① OpenAPI 3.0 Spec Bundle</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">The approved OpenAPI 3.0 spec for that registry. All endpoints, request/response schemas, error codes (RFC 7807 format), authentication patterns, and rate limit documentation. Swagger UI rendering link on Azure APIM developer portal for interactive exploration.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #7a5200"><span>② Authentication Setup Guide</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Step-by-step OAuth2 client registration instructions for the registry technical team. Covers: Entra External ID app registration, client credentials setup (M2M), sandbox token acquisition, JWT validation, and RBAC role assignment for the registry's integration account.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #7a5200"><span>③ Sandbox Connection Instructions</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Dedicated sandbox credentials for the registry technical contact. rg-dgtp-staging base URL, mock data schema per registry, how to make test calls via APIM, expected response shapes, and error scenario testing guide. Sandbox must be fully provisioned before this section can be completed.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #8a1a2e"><span>④ Data Sharing Agreement Template</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Legal template for the registry's legal/management team to review and sign. Covers: data scope (what fields are shared), purpose limitation, consent requirements, retention periods, access controls, P-12 Data Sovereignty Data Sovereignty clause (EU region only), breach notification obligations, and review frequency. Must be signed before any live data exchange begins.</div></div>
+      </div>
+      <div class="oq-card" style="margin-top:6px">
+        <div class="oq-label">Timing Risk</div>
+        <div class="oq-q">Can data sharing agreements be negotiated and signed within the 3-week D5 delivery window?</div>
+        <div class="oq-context">DSA negotiations typically take 4–8 weeks. If started only after D4 completes, they will delay registry implementation. Response: begin DSA drafting in Design Phase Week 1 — in parallel with D4, not after it.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="slide" id="d5s3"><div class="prog"><div class="prog-fill" style="width:65%"></div></div><div class="id-bar" style="background:#7a5200"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#7a5200;border-color:#7a5200">D5 · P-05 Resilience by Default · P-07 Security by Design</span>
+    <span class="enum">Sandbox Environment &amp; Spec Pack Governance</span>
+  </div>
+  <h2 class="slide-h1 a2">Sandbox Environment & Spec Pack Governance</h2>
+  <p class="slide-sub a3">rg-dgtp-staging is the integration test environment. Registry technical contacts use it to validate the spec pack before sign-off. Governance defines what happens when a registry refuses or requests spec changes.</p>
+</div>
+<div class="slide-body a4">
+  <div class="q-layout">
+    <div class="q-left" style="gap:7px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:4px;font-weight:700">SANDBOX ENVIRONMENT — rg-dgtp-staging</div>
+      <div class="kpi-row" style="margin-bottom:8px">
+        <div class="kpi"><div class="kpi-top" style="background:#7a5200"></div><div class="kpi-v">Staging</div><div class="kpi-l">Azure RG</div></div>
+        <div class="kpi"><div class="kpi-top" style="background:#7a5200"></div><div class="kpi-v">6</div><div class="kpi-l">Mock registry datasets</div></div>
+        <div class="kpi"><div class="kpi-top" style="background:#7a5200"></div><div class="kpi-v">Dedicated</div><div class="kpi-l">Credentials per registry</div></div>
+        <div class="kpi"><div class="kpi-top" style="background:#7a5200"></div><div class="kpi-v">No SLA</div><div class="kpi-l">Dev/staging only</div></div>
+      </div>
+      <div class="acc-section acc-open">
+        <div class="acc-head" style="border-left:4px solid #7a5200"><span>Sandbox Must Be Ready Before D5 Delivery Begins</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">The sandbox environment (rg-dgtp-staging) must be fully provisioned and validated — with mock data per registry and working APIM mock policies — before any spec pack can be delivered. Registry technical contacts must be able to make real API calls and see real (mock) responses. Sandbox provisioning is a parallel track to D4, not a dependency that starts after D4 completes.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #7a5200"><span>Mock Data Requirements Per Registry</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Each registry mock dataset must contain: at least 10 representative records covering all status types and edge cases, cross-registry linkage records (NSN → CRIB → licence chains), error scenario triggers (invalid IDs, expired tokens, rate limit responses), and WKT geometry samples for VROMI. No real citizen data permitted in staging — all mock data must be synthetically generated.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #7a5200"><span>Sandbox Credentials — Per Registry Contact</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">Each registry technical contact receives dedicated OAuth2 client credentials scoped to their registry's sandbox endpoints only. Credentials expire after 90 days and must be renewed. Credentials are delivered via a secure channel — never by email in plain text. The DGTP Integration Admin manages credential issuance and rotation in Azure Entra External ID per P-08 Identity-First Access Identity-First Access.</div></div>
+      </div>
+      <div class="acc-section">
+        <div class="acc-head" style="border-left:4px solid #8a1a2e"><span>If a Registry Refuses to Sign the DSA</span><span class="acc-chev">▾</span></div>
+        <div class="acc-body"><div class="acc-content">No live data exchange is permitted. The registry adapter operates in mock mode only — using the staging mock dataset. Escalate to Project Steering Committee with a formal written notice immediately. No exceptions to this rule: a refusal to sign means no live integration, regardless of timeline pressure.</div></div>
+      </div>
+    </div>
+    <div class="q-right" style="gap:7px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">SPEC PACK GOVERNANCE PROCESS</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:#7a5200;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">1</div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Deliver spec pack + sandbox credentials</div><div style="font-size:12px;color:var(--ink3);line-height:1.6">Registry technical contact receives the bundle and can begin making calls to rg-dgtp-staging immediately.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:#7a5200;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">2</div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Registry validates in sandbox (D6 begins)</div><div style="font-size:12px;color:var(--ink3);line-height:1.6">Registry technical contact makes real API calls, validates endpoint behaviour, response schemas, error handling. D6 support sessions run in parallel.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:#7a5200;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">3</div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Registry requests changes (if any)</div><div style="font-size:12px;color:var(--ink3);line-height:1.6">Formal change request via Architecture Team. Breaking changes: D4 versioning process. Non-breaking: fast-tracked with AT sign-off.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:#1a6b3c;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">✓</div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:3px;color:#1a6b3c">Registry sign-off — D6 log closed</div><div style="font-size:12px;color:var(--ink3);line-height:1.6">Written confirmation that spec reflects system capabilities and registry can implement. D6 support log entry closed. DSA signed. Development Phase integration begins.</div></div>
+        </div>
+      </div>
+      <div class="oq-card">
+        <div class="oq-label">Open Question</div>
+        <div class="oq-q">What is the minimum time commitment per week required from each registry technical contact to meet the D5 validation timeline?</div>
+        <div class="oq-context">D5 requires active participation from registry staff who also have full-time operational duties. A minimum 4 hours/week commitment should be formalised in the DSA to protect the timeline. Without it, validation drags into the Build Phase.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="slide" id="d5s4"><div class="prog"><div class="prog-fill" style="width:80%"></div></div><div class="id-bar" style="background:#7a5200"></div>
+
+<div class="slide-header">
+  <div class="eyebrow a1">
+    <span class="etag" style="color:#7a5200;border-color:#7a5200">D5 · API Specification Pack</span>
+    <span class="enum">Critical Path, Prerequisites &amp; Document Map</span>
+  </div>
+  <h2 class="slide-h1 a2">Critical Path & Document Map</h2>
+  <p class="slide-sub a3">D5 is the delivery mechanism that gets approved specs into the hands of registry technical teams. It gates D6 (support logs) and the Development Phase registry implementations.</p>
+</div>
+<div class="slide-body a4">
+  <div class="q-layout">
+    <div class="q-left" style="gap:8px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">CRITICAL PATH — D4 → D5 → D6</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:11px 14px;display:flex;gap:12px;align-items:center">
+          <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:#1a6b3c;flex-shrink:0">D4 (4–5w)</span>
+          <span style="font-size:13px;color:var(--ink2)">API Design Guidelines + OpenAPI 3.0 specs per registry · Architecture Team approved</span>
+        </div>
+        <div style="text-align:center;font-size:18px;color:var(--ink4)">↓</div>
+        <div style="background:#fff;border:1px solid #7a520044;border-radius:8px;padding:11px 14px;display:flex;gap:12px;align-items:center;border-width:2px">
+          <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:#7a5200;flex-shrink:0">D5 (3w)</span>
+          <span style="font-size:13px;color:var(--ink2)">Package spec per registry · Deliver with sandbox credentials · DSA template → legal sign-off</span>
+        </div>
+        <div style="text-align:center;font-size:18px;color:var(--ink4)">↓</div>
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:11px 14px;display:flex;gap:12px;align-items:center">
+          <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:#7a5200;flex-shrink:0">D6 (parallel)</span>
+          <span style="font-size:13px;color:var(--ink2)">Registry technical support · Sandbox validation sessions · Sign-off confirmation per registry</span>
+        </div>
+        <div style="text-align:center;font-size:18px;color:var(--ink4)">↓</div>
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:8px;padding:11px 14px;display:flex;gap:12px;align-items:center">
+          <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:#4a1a7a;flex-shrink:0">Dev Phase</span>
+          <span style="font-size:13px;color:var(--ink2)">Registries begin implementation · DSAs signed · Live adapter integration begins</span>
+        </div>
+      </div>
+      <div class="note-bar">
+        <strong>End-to-end timeline:</strong> D4 (4–5w) + D5 (3w) = 7–8 weeks sequential. DSA negotiations run in parallel from Week 1. Sandbox must be provisioned by end of Week 5 — before D5 delivery begins.
+      </div>
+    </div>
+    <div class="q-right" style="gap:8px">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink4);margin-bottom:5px;font-weight:700">PREREQUISITES + FEEDS INTO</div>
+      <div class="ns-grid" style="grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="ns-card"><div class="ns-top" style="background:#7a5200"></div>
+          <div class="ns-sprint">REQUIRES</div><div class="ns-title">DGTP-API-GL-001 (D4)</div>
+          <div class="ns-items">
+            <div class="ns-item">D5 cannot begin until D4 specs approved</div>
+            <div class="ns-item">D4 standards define what goes in each pack</div>
+            <div class="ns-item">OpenAPI specs come from D4 output</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#7a5200"></div>
+          <div class="ns-sprint">REQUIRES</div><div class="ns-title">Staging Sandbox</div>
+          <div class="ns-items">
+            <div class="ns-item">rg-dgtp-staging must be live before delivery</div>
+            <div class="ns-item">Mock data per registry must be validated</div>
+            <div class="ns-item">APIM mock policies must be deployed</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#7a5200"></div>
+          <div class="ns-sprint">FEEDS INTO</div><div class="ns-title">DGTP-SUP-001 (D6)</div>
+          <div class="ns-items">
+            <div class="ns-item">D6 support begins after D5 delivery</div>
+            <div class="ns-item">Support sessions use D5 spec pack</div>
+            <div class="ns-item">D6 closes when registry signs off on D5 pack</div>
+          </div>
+        </div>
+        <div class="ns-card"><div class="ns-top" style="background:#8a1a2e"></div>
+          <div class="ns-sprint" style="color:#8a1a2e">LEGAL — WEEK 1</div><div class="ns-title">DSA Negotiations</div>
+          <div class="ns-items">
+            <div class="ns-item">Begin drafting DSAs in Design Phase Week 1</div>
+            <div class="ns-item">4–8 weeks to negotiate and sign</div>
+            <div class="ns-item">No live integration without signed DSA</div>
+          </div>
+        </div>
+      </div>
+      <div class="closing-row">
+        <div class="cbox" style="background:var(--amp);border-color:#7a520044">
+          <div class="cbox-title" style="color:#7a5200">ALIGNED WITH</div>
+          <div class="cbox-text">DGTP-API-GL-001 (D4) · DGTP-INT-001 (D3) · DGTP-SEC-001 (D1) · P-01 API-First API-First · P-04 Loose Coupling Loose Coupling · P-07 Security by Design Security by Design · P-12 Data Sovereignty Data Sovereignty (EU region only in DSA)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div></div>
+
+<div class="slide" id="d5s5">
+  <div class="prog"><div class="prog-fill" style="width:80%"></div></div>
+  <div class="id-bar" style="background:#7a5200"></div>
+  <div class="slide-header">
+    <div class="eyebrow a1">
+      <span class="etag" style="color:#7a5200;border-color:#7a5200">D5 · LIVE SIMULATION</span>
+      <span class="enum">Sample OpenAPI 3.0 Spec &amp; Interactive API Playground</span>
+    </div>
+    <h2 class="slide-h1 a2">Sample Spec &amp; Live API Simulation</h2>
+    <p class="slide-sub a3">This is what a registry receives in their spec pack. Select a registry, choose an endpoint, and fire a simulated request to see the exact response shape, headers, and error handling defined in the OpenAPI 3.0 contract.</p>
+  </div>
+  <div class="slide-body a4" style="padding-top:8px">
+    <div style="display:grid;grid-template-columns:320px 1fr;gap:12px;height:100%;min-height:0">
+
+      <!-- LEFT: OpenAPI spec sample -->
+      <div style="display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ink4);font-weight:700">OPENAPI 3.0 SPEC SAMPLE</div>
+
+        <!-- Registry selector -->
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button class="reg-btn active" data-reg="civil" onclick="selectReg(this,'civil')" style="font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 10px;border-radius:5px;border:1.5px solid #8a1a2e;background:#fff5f5;color:#8a1a2e;cursor:pointer;transition:all .15s">Civil</button>
+          <button class="reg-btn" data-reg="coci"  onclick="selectReg(this,'coci')"  style="font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 10px;border-radius:5px;border:1.5px solid #d4cfc5;background:#fff;color:var(--ink3);cursor:pointer;transition:all .15s">COCI</button>
+          <button class="reg-btn" data-reg="teatt" onclick="selectReg(this,'teatt')" style="font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 10px;border-radius:5px;border:1.5px solid #d4cfc5;background:#fff;color:var(--ink3);cursor:pointer;transition:all .15s">TEATT</button>
+          <button class="reg-btn" data-reg="vromi" onclick="selectReg(this,'vromi')" style="font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 10px;border-radius:5px;border:1.5px solid #d4cfc5;background:#fff;color:var(--ink3);cursor:pointer;transition:all .15s">VROMI</button>
+        </div>
+
+        <!-- Spec display -->
+        <div id="spec-box" style="flex:1;background:#0e1117;border-radius:9px;padding:12px 14px;overflow-y:auto;min-height:0;font-family:var(--mono);font-size:11px;line-height:1.7">
+          <div id="spec-content"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Playground -->
+      <div style="display:flex;flex-direction:column;gap:8px;min-height:0">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ink4);font-weight:700">LIVE API SIMULATION — GOSXM PLATFORM GATEWAY</div>
+
+        <!-- Request builder -->
+        <div style="background:#fff;border:1px solid var(--paper3);border-radius:9px;padding:12px 14px;flex-shrink:0">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+            <span id="method-badge" style="font-family:var(--mono);font-size:11px;font-weight:700;padding:4px 10px;border-radius:5px;background:#1a6b3c18;color:#1a6b3c;flex-shrink:0">GET</span>
+            <div id="url-display" style="font-family:var(--mono);font-size:11px;color:var(--ink2);background:var(--paper2);border-radius:5px;padding:5px 10px;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis"></div>
+            <button onclick="fireRequest()" style="font-family:var(--mono);font-size:11px;font-weight:700;padding:6px 16px;border-radius:6px;border:none;background:#7a5200;color:#fff;cursor:pointer;flex-shrink:0;transition:opacity .15s" id="fire-btn">▶ Send</button>
+          </div>
+          <!-- Param inputs -->
+          <div id="param-inputs" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+          <!-- Auth row -->
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--paper3)">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--ink4);font-weight:700">AUTH</span>
+            <div style="display:flex;gap:5px">
+              <span id="auth-pill" style="font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:12px;background:#8a1a2e18;color:#8a1a2e;border:1px solid #8a1a2e33">Bearer JWT — 15 min TTL</span>
+              <span id="scope-pill" style="font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:12px;background:var(--paper2);color:var(--ink4);border:1px solid var(--paper3)"></span>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:5px">
+              <button onclick="triggerError('401')" style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid #8a1a2e44;background:#fff5f5;color:#8a1a2e;cursor:pointer">Test 401</button>
+              <button onclick="triggerError('429')" style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid #7a520044;background:#fff5e6;color:#7a5200;cursor:pointer">Test 429</button>
+              <button onclick="triggerError('404')" style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid var(--paper3);background:#fff;color:var(--ink3);cursor:pointer">Test 404</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoint tabs -->
+        <div id="endpoint-tabs" style="display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0"></div>
+
+        <!-- Response panel -->
+        <div style="flex:1;display:flex;flex-direction:column;gap:0;min-height:0;background:#0e1117;border-radius:9px;overflow:hidden">
+          <!-- Response header bar -->
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0">
+            <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:rgba(255,255,255,.3)">RESPONSE</span>
+            <span id="status-badge" style="font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 10px;border-radius:5px;display:none"></span>
+            <span id="latency-badge" style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.3);display:none"></span>
+            <span id="header-pills" style="display:flex;gap:5px;margin-left:auto"></span>
+          </div>
+          <!-- Response tabs -->
+          <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0">
+            <button class="resp-tab active" id="rtab-body"    onclick="switchRespTab('body')"    style="padding:7px 14px;font-family:var(--mono);font-size:10px;font-weight:700;color:rgba(255,255,255,.6);border:none;background:transparent;cursor:pointer;border-bottom:2px solid #7a5200">Body</button>
+            <button class="resp-tab"        id="rtab-headers" onclick="switchRespTab('headers')" style="padding:7px 14px;font-family:var(--mono);font-size:10px;font-weight:700;color:rgba(255,255,255,.3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent">Headers</button>
+            <button class="resp-tab"        id="rtab-schema"  onclick="switchRespTab('schema')"  style="padding:7px 14px;font-family:var(--mono);font-size:10px;font-weight:700;color:rgba(255,255,255,.3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent">Schema</button>
+          </div>
+          <!-- Response content -->
+          <div id="resp-body"    style="flex:1;overflow-y:auto;padding:12px 14px;font-family:var(--mono);font-size:11px;line-height:1.7;min-height:0">
+            <div style="color:rgba(255,255,255,.2);font-size:12px;padding-top:20px;text-align:center">Select a registry and endpoint above, then click ▶ Send to simulate a request</div>
+          </div>
+          <div id="resp-headers" style="flex:1;overflow-y:auto;padding:12px 14px;font-family:var(--mono);font-size:11px;line-height:1.7;display:none;min-height:0"></div>
+          <div id="resp-schema"  style="flex:1;overflow-y:auto;padding:12px 14px;font-family:var(--mono);font-size:11px;line-height:1.7;display:none;min-height:0"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="fab-cluster">
+  <button class="fab-btn" style="background:#7a5200;color:#fff" onclick="openPanel('analysis')">
+    <span class="fab-tooltip">Failure Analysis</span>⚡
+  </button>
+  <button class="fab-btn" style="background:#8a1a2e;color:#fff" onclick="openPanel('challenges')">
+    <span class="fab-tooltip">Challenges</span>⚠
+  </button>
+  <button class="fab-btn" style="background:var(--ink);color:#fff" onclick="window.location='../index.html'">
+    <span class="fab-tooltip">Back to Overview</span>↩
+  </button>
+</div>
+<div id="fp-overlay" onclick="closePanel()"></div>
+<div id="fp-panel">
+  <div class="fp-panel-header">
+    <div class="fp-header-left">
+      <div class="fp-eyebrow" id="fp-eyebrow">DGTP-API-SPEC-REG</div>
+      <div class="fp-title" id="fp-title">Analysis</div>
+      <div class="fp-subtitle" id="fp-subtitle"></div>
+    </div>
+    <button class="fp-close" onclick="closePanel()">&#x2715;</button>
+  </div>
+  <div class="panel-tabs">
+    <button class="panel-tab active" id="tab-analysis" onclick="switchTab('analysis')">⚡ Failure Analysis</button>
+    <button class="panel-tab" id="tab-challenges" onclick="switchTab('challenges')">⚠ Challenges</button>
+    <button class="panel-tab" id="tab-faq" onclick="switchTab('faq')">❓ FAQ</button>
+  </div>
+  <div class="fp-body" id="fp-body"></div>
+</div>
+<div id="svg-tip"><div class="tip-tag" id="tip-tag"></div><div class="tip-title" id="tip-title"></div><div class="tip-body" id="tip-body"></div></div>
+<div id="global-footnote">
+  <span class="fn-logo">ORANGE BD · DGTP SINT MAARTEN</span>
+  <span class="fn-text">API Specification Pack to Registries · DGTP-API-SPEC-REG · The Team · Design Phase 2026</span>
+  <span class="fn-link" style="color:#7a5200">Medium · 3 weeks</span>
+</div>
+<div id="global-footer">
+  <div id="gf-left">
+    <button class="gf-arrow" onclick="prev()">&#8592;</button>
+    <span id="gf-brand">DGTP Sint Maarten · OrangeBD · DGTP-API-SPEC-REG</span>
+  </div>
+  <div id="gf-dots"></div>
+  <div id="gf-right">
+    <span id="gf-stage" style="color:#7a5200;background:#7a520018;border:1px solid #7a520044;border-radius:4px;padding:4px 12px;font-family:var(--mono);letter-spacing:.06em">DGTP-API-SPEC-REG</span>
+    <span id="gf-counter">1 / 5</span>
+    <button class="gf-arrow" onclick="next()">&#8594;</button>
+  </div>
+</div>
+<span id="kbhint">&#8592; &#8594; navigate</span>
+<script>
+const slides=document.querySelectorAll('.slide'),total=slides.length;let cur=0;
+const gfDots=document.getElementById('gf-dots');
+for(let i=0;i<total;i++){const d=document.createElement('button');d.className='gf-dot'+(i===0?' on':'');d.onclick=(n=>()=>goTo(n))(i);gfDots.appendChild(d);}
+function goTo(n){slides[cur].classList.remove('active');cur=(n+total)%total;slides[cur].classList.add('active');document.querySelectorAll('.gf-dot').forEach((d,i)=>d.classList.toggle('on',i===cur));document.getElementById('gf-counter').textContent=(cur+1)+' / '+total;setTimeout(()=>slides[cur].querySelectorAll('.bar-fill[data-w]').forEach(b=>b.style.width=b.dataset.w),80);}
+function next(){goTo(cur+1)}function prev(){goTo(cur-1)}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')next();if(e.key==='ArrowLeft')prev();if(e.key==='Escape')closePanel();});
+setTimeout(()=>slides[0].querySelectorAll('.bar-fill[data-w]').forEach(b=>b.style.width=b.dataset.w),150);
+let tip,tipTag,tipTi,tipBo,tipOn=false;
+document.addEventListener('DOMContentLoaded',()=>{tip=document.getElementById('svg-tip');tipTag=document.getElementById('tip-tag');tipTi=document.getElementById('tip-title');tipBo=document.getElementById('tip-body');});
+function showTip(e,tag,ttl,body,col){if(!tip){tip=document.getElementById('svg-tip');tipTag=document.getElementById('tip-tag');tipTi=document.getElementById('tip-title');tipBo=document.getElementById('tip-body');}tipTag.textContent=tag;tipTag.style.background=(col||'#333')+'28';tipTag.style.color=col||'#333';tipTi.textContent=ttl;tipBo.innerHTML=body;tip.style.display='block';tip.style.opacity='0';tip.style.transform='translateY(4px)';requestAnimationFrame(()=>{tip.style.opacity='1';tip.style.transform='translateY(0)';});tipOn=true;posTip(e);}
+function posTip(e){if(!tipOn||!tip)return;const tw=320,th=190;let x=e.clientX+16,y=e.clientY+16;if(x+tw>window.innerWidth-8)x=e.clientX-tw-8;if(y+th>window.innerHeight-8)y=e.clientY-th-8;if(x<4)x=4;if(y<4)y=4;tip.style.left=x+'px';tip.style.top=y+'px';}
+function hideTip(){if(tip){tip.style.opacity='0';tip.style.transform='translateY(4px)';setTimeout(()=>{if(!tipOn)tip.style.display='none';},120);}tipOn=false;}
+document.addEventListener('mousemove',posTip);
+window.showTip=showTip;window.hideTip=hideTip;
+const PANEL_DATA={
+  analysis: {
+    eyebrow: "DGTP-API-SPEC-REG · FAILURE PATH ANALYSIS",
+    title: "What breaks without API Specification Packs?",
+    subtitle: "From no per-registry spec delivery to blocked registry implementations and failed Build Phase.",
+    svgTitle: "DELIVERY FAILURE CHAIN — NO D5 SPEC PACKS TO REGISTRIES",
+    svg: `<svg viewBox="0 0 620 108" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans,sans-serif" style="width:100%;height:auto">
+      <defs><marker id="da" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 2L8 5L2 8" fill="none" stroke="#e05470" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+      <rect x="2"   y="16" width="130" height="68" rx="7" fill="rgba(138,26,46,.14)" stroke="#e05470" stroke-width="1.5"/>
+      <text x="67"  y="36" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e05470">No D5 Packs</text>
+      <text x="67"  y="52" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">Specs stay internal</text>
+      <text x="67"  y="66" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)">Registries have nothing</text>
+      <line x1="132" y1="50" x2="158" y2="50" stroke="#e05470" stroke-width="1.5" marker-end="url(#da)" stroke-dasharray="5 3"/>
+      <rect x="160" y="16" width="130" height="68" rx="7" fill="rgba(122,82,0,.14)" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="225" y="36" text-anchor="middle" font-size="8.5" font-weight="700" fill="#f0a500">No Sandbox Access</text>
+      <text x="225" y="52" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">Registries cannot test</text>
+      <text x="225" y="66" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)">No auth setup guide</text>
+      <line x1="290" y1="50" x2="316" y2="50" stroke="#f0a500" stroke-width="1.5" marker-end="url(#da)" stroke-dasharray="5 3"/>
+      <rect x="318" y="16" width="130" height="68" rx="7" fill="rgba(200,81,10,.14)" stroke="#e8722a" stroke-width="1.5"/>
+      <text x="383" y="36" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e8722a">No DSA Signed</text>
+      <text x="383" y="52" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">No live data exchange</text>
+      <text x="383" y="66" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)">Legal gate not cleared</text>
+      <line x1="448" y1="50" x2="474" y2="50" stroke="#e8722a" stroke-width="1.5" marker-end="url(#da)" stroke-dasharray="5 3"/>
+      <rect x="476" y="4" width="142" height="92" rx="7" fill="rgba(138,26,46,.2)" stroke="#e05470" stroke-width="2"/>
+      <text x="547" y="28" text-anchor="middle" font-size="9" font-weight="700" fill="#e05470">BUILD PHASE FAILS</text>
+      <text x="547" y="44" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">Registries cannot integrate</text>
+      <text x="547" y="57" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">No mock — no real data</text>
+      <text x="547" y="70" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">Platform stays disconnected</text>
+      <text x="547" y="83" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.55)">6 mock adapters only</text>
+    </svg>`,
+    nodes: [
+      {type:"failure",icon:"📦",label:"ROOT FAILURE — No Spec Packs Delivered to Registries",
+       heading:"Approved Specs Stay Internal — Registries Have Nothing to Implement",
+       body:"Without D5, the approved OpenAPI 3.0 specs from D4 remain inside the DGTP team. Registry technical contacts have no structured bundle to work from — no auth setup guide, no sandbox credentials, no integration guide, no DSA template. Even if the specs are perfect, registries cannot begin implementation without a delivery mechanism. D5 is that delivery mechanism.",
+       chips:["D4 specs stay internal without D5","Registry contacts: no auth guide, no sandbox","No DSA template = no legal process started"]},
+      {type:"cause",icon:"🔌",label:"CASCADING — No Sandbox = No Integration Testing",
+       heading:"Without Sandbox Credentials, Registries Cannot Validate the Spec",
+       body:"Registry technical contacts cannot validate whether the spec accurately reflects their system without making real API calls. Without rg-dgtp-staging running and sandbox credentials delivered, the spec is a document — not a testable interface. Validation errors discovered late (during Build Phase) cost 5–10× more to fix than errors caught during D5/D6.",
+       chips:["No sandbox = spec is untestable","Validation errors in Build Phase: 5-10x more costly","Sandbox must be live before D5 delivery begins"]},
+      {type:"impact-type",icon:"⚖",label:"LEGAL — No DSA = No Live Data Exchange Ever",
+       heading:"Without Signed Data Sharing Agreements, No Live Data Exchange Permitted",
+       body:"Even after a perfect Build Phase, a registry without a signed DSA cannot exchange live citizen data. The DSA is the legal prerequisite for live operation per P-09 Privacy by Design Privacy by Design and P-12 Data Sovereignty Data Sovereignty. If DSA negotiations begin only after D5 is delivered (too late), they add 4–8 weeks of delay before any live integration can happen.",
+       chips:["No DSA = no live data — ever","DSA negotiations: 4–8 weeks — start Week 1","P-09 Privacy by Design: consent + legal basis required for data exchange"]},
+      {type:"resolve",icon:"✓",label:"SOLUTION — D5 Spec Pack as Registry Onboarding Bundle",
+       heading:"D5 Is the Bridge Between Architecture and Registry Implementation",
+       body:"DGTP-API-SPEC-REG packages the approved OpenAPI 3.0 spec, auth setup guide, sandbox credentials, and DSA template into a structured, registry-specific bundle. Delivered alongside D6 (technical support), it gives each registry technical contact everything they need to begin integration — spec to read, sandbox to test against, legal template to progress, and support sessions to resolve issues.",
+       chips:["D5 = approved spec + sandbox + DSA template","D6 support runs in parallel from Day 1 of delivery","Registries go from nothing to testable integration"]}
+    ]
+  },
+  challenges: {
+    eyebrow: "DGTP-API-SPEC-REG · KNOWN CHALLENGES",
+    title: "API Spec Pack Open Challenges",
+    subtitle: "Four challenges that must be resolved before D5 packs can be delivered to all registries.",
+    svgTitle: "CHALLENGE PRIORITY — D5 DELIVERY",
+    svg: `<svg viewBox="0 0 620 90" xmlns="http://www.w3.org/2000/svg" font-family="DM Sans,sans-serif" style="width:100%;height:auto">
+      <rect x="2"   y="6" width="148" height="76" rx="6" fill="rgba(138,26,46,.16)" stroke="#e05470" stroke-width="1.5"/>
+      <text x="76"  y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#e05470">🔴 CRITICAL</text>
+      <text x="76"  y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">DSA Negotiations</text>
+      <text x="76"  y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Not Started</text>
+      <text x="76"  y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">Begin Week 1 — not after D4</text>
+      <rect x="158" y="6" width="148" height="76" rx="6" fill="rgba(138,26,46,.14)" stroke="#e05470" stroke-width="1.5"/>
+      <text x="232" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#e05470">🔴 CRITICAL</text>
+      <text x="232" y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Sandbox Not Yet</text>
+      <text x="232" y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Provisioned</text>
+      <text x="232" y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">Must be ready by Week 5</text>
+      <rect x="314" y="6" width="148" height="76" rx="6" fill="rgba(122,82,0,.14)" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="388" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#f0a500">🟡 HIGH</text>
+      <text x="388" y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Registry Staff</text>
+      <text x="388" y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Bandwidth</text>
+      <text x="388" y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">Min 4hrs/week per registry</text>
+      <rect x="470" y="6" width="148" height="76" rx="6" fill="rgba(122,82,0,.10)" stroke="#f0a500" stroke-width="1.2"/>
+      <text x="544" y="28" text-anchor="middle" font-size="9.5" font-weight="700" fill="#f0a500">🟡 MEDIUM</text>
+      <text x="544" y="44" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Tax + Kadaster</text>
+      <text x="544" y="57" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.7)">Packs Incomplete</text>
+      <text x="544" y="74" text-anchor="middle" font-size="7.5" fill="rgba(255,255,255,.35)">D5 v1.0 conditional</text>
+    </svg>`,
+    nodes: [
+      {type:"failure",icon:"⚖",label:"CRITICAL — DSA Negotiations Not Yet Started",
+       heading:"4–8 Week DSA Timeline Will Delay Live Integration Without Early Start",
+       body:"Data sharing agreement negotiations typically take 4–8 weeks with government registries. If negotiations begin only after D5 is delivered, they add a full 4–8 week delay before any live data exchange can happen — pushing the Development Phase start date. Response: begin DSA drafting for all 6 registries in Design Phase Week 1, in parallel with D4 spec work. Legal teams can negotiate while the technical spec is being finalised.",
+       chips:["4–8 weeks to negotiate and sign","Start Week 1 — not after D4 or D5","Tax Admin DSA is the most complex — prioritise first"]},
+      {type:"failure",icon:"🖥",label:"CRITICAL — Sandbox Not Yet Provisioned",
+       heading:"rg-dgtp-staging Must Be Live Before D5 Delivery Can Begin",
+       body:"The sandbox environment (rg-dgtp-staging) requires Azure subscription provisioning, IaC template deployment, APIM mock policy configuration, mock data generation per registry, and credential issuance. This is a 2–3 week provisioning effort that must begin immediately — it cannot wait for D4 to complete. Track sandbox readiness as a blocking dependency for D5.",
+       chips:["2–3 weeks to provision sandbox","Begin immediately — parallel to D4","Must be ready by end of Week 5"]},
+      {type:"cause",icon:"⏱",label:"HIGH — Registry Staff Bandwidth",
+       heading:"Registry Technical Staff Must Commit Minimum 4 Hours Per Week",
+       body:"D5 validation requires active participation from registry technical staff who also have full-time operational roles. Without a formalised time commitment in the DSA, registry contacts may deprioritise D5 validation — dragging the sign-off into the Build Phase. Recommend: formalise a minimum 4 hours/week commitment per registry technical contact in the DSA terms.",
+       chips:["Minimum 4hrs/week per registry contact","Formalise in DSA — not just verbal agreement","Without commitment: sign-off delays into Build Phase"]},
+      {type:"resolve",icon:"✓",label:"RESOLUTION — D5 Delivery Action Plan",
+       heading:"Three Parallel Tracks Starting in Design Phase Week 1",
+       body:"1. Begin DSA negotiations with all 6 registries immediately — draft templates in Week 1, submit to registry legal teams by Week 2. 2. Begin sandbox provisioning (rg-dgtp-staging) as a parallel track to D4 — target completion by end of Week 5. 3. Identify and confirm registry technical contacts and their available hours — formalise in the DSA before delivery. D5 delivery then takes 3 weeks after D4 specs are approved.",
+       chips:["Week 1: DSA drafting begins + registry contacts confirmed","Week 5: sandbox live and validated","Week 8: first spec packs delivered (COCI + VROMI)"]}
+    ]
+  },
+  faq: {
+    eyebrow: "DGTP-API-SPEC-REG · FAQ",
+    title: "API Specification Pack — FAQ",
+    subtitle: "Questions from registry technical teams and SXM ICT about the spec pack delivery process.",
+    nodes: [
+      {type:"cause",icon:"❓",label:"Q — Why can't we just email the OpenAPI spec file?",
+       heading:"Why is a structured spec pack necessary — why not just share the spec file?",
+       body:"A raw OpenAPI 3.0 YAML file requires significant context to act on. The registry technical contact needs to know: how to register an OAuth2 client in Entra External ID, what the sandbox base URL is, what mock data is available for testing, what the legal process for live data exchange is, and who to contact when something breaks. The spec pack bundles all of this into one structured delivery — reducing the support burden and accelerating implementation.",
+       chips:["Raw spec file: high support burden","Spec pack: self-contained onboarding bundle","Includes auth guide + sandbox + DSA + support contact"]},
+      {type:"cause",icon:"❓",label:"Q — Can registry teams request changes after receiving the pack?",
+       heading:"What happens if a registry technical contact finds the spec is inaccurate?",
+       body:"Yes — formal change requests are welcome during the D5/D6 validation phase. Non-breaking additions (new optional fields, additional error codes) are fast-tracked with Architecture Team sign-off. Breaking changes (different endpoint paths, auth model changes, required field changes) trigger the D4 versioning process and require a 4-week deprecation notice to all other consumers. The sooner validation issues are raised, the cheaper they are to fix.",
+       chips:["Non-breaking changes: fast-tracked with AT sign-off","Breaking changes: D4 versioning process","Raise issues during D5/D6 — not during Build Phase"]},
+      {type:"cause",icon:"❓",label:"Q — What if a registry refuses to engage during D5?",
+       heading:"What is the escalation path if a registry technical contact is unresponsive?",
+       body:"Level 1: escalate to the registry focal point within 2 business days of non-response. Level 2: if unresolved within 5 business days, formal escalation to SXM Project Steering Committee in writing. Level 3: if registry integration is blocked for more than 2 weeks, the registry adapter operates in mock mode for the Development Phase — the Build Phase does not wait. No timeline can be held hostage by a single registry's unresponsiveness.",
+       chips:["Level 1: registry focal point (2 days)","Level 2: PSC formal notice (5 days)","Level 3: mock mode — Build Phase does not wait"]},
+      {type:"resolve",icon:"✓",label:"TIMELINE — When do spec packs get delivered?",
+       heading:"D5 Delivers Spec Packs 7–8 Weeks After D4 Begins",
+       body:"D4 (4–5 weeks) → D5 (3 weeks) = 7–8 weeks from D4 start to first spec pack delivery. COCI and VROMI packs delivered first (Week 8), Civil Registry and TEATT in Week 9. Tax Administration conditional (Week 10 if PSC approval received). Sandbox must be live by Week 5. DSAs must be in negotiation by Week 2. D6 support sessions begin immediately after first pack delivery.",
+       chips:["Week 8: COCI + VROMI packs delivered","Week 9: Civil Registry + TEATT packs","Week 10: Tax Admin (conditional on DSA approval)"]}
+    ]
+  }
+};
+let activeTab='analysis';
+function openPanel(tab){activeTab=tab||'analysis';const ov=document.getElementById('fp-overlay'),pan=document.getElementById('fp-panel');ov.classList.add('open');pan.classList.add('open');requestAnimationFrame(()=>ov.classList.add('visible'));renderTab(activeTab);document.body.style.overflow='hidden';document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+activeTab).classList.add('active');}
+function closePanel(){const ov=document.getElementById('fp-overlay'),pan=document.getElementById('fp-panel');ov.classList.remove('visible');pan.classList.remove('open');setTimeout(()=>{ov.classList.remove('open');document.body.style.overflow='';},320);}
+function switchTab(tab){activeTab=tab;document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');renderTab(tab);}
+function renderTab(tab){
+  const body=document.getElementById('fp-body'),data=PANEL_DATA[tab];
+  if(!data)return;
+  body.innerHTML='';
+  document.getElementById('fp-eyebrow').textContent=data.eyebrow||'';
+  document.getElementById('fp-title').textContent=data.title||'';
+  document.getElementById('fp-subtitle').textContent=data.subtitle||'';
+  if(data.svg){const w=document.createElement('div');w.className='panel-svg-wrap';w.innerHTML='<div class="panel-svg-title">'+(data.svgTitle||'')+'</div>'+data.svg;body.appendChild(w);}
+  (data.nodes||[]).forEach((node,idx)=>{
+    const el=document.createElement('div');el.className='fp-node fp-node-'+node.type;
+    const icon=node.icon||{failure:'!',cause:'→','impact-type':'⚠',resolve:'✓'}[node.type]||'·';
+    el.innerHTML=`<div class="fp-node-spine"><div class="fp-node-dot">${icon}</div><div class="fp-node-line"></div></div><div class="fp-node-content"><div class="fp-node-label">${node.label}</div><div class="fp-node-heading">${node.heading}</div><div class="fp-node-body">${node.body}</div>${node.chips?'<div class="fp-node-impact">'+node.chips.map(c=>'<span class="fp-impact-chip">'+c+'</span>').join('')+'</div>':''}</div>`;
+    if(node.type==='resolve'){const sol=document.createElement('div');sol.className='fp-solution';sol.innerHTML='<div class="fp-solution-tag">✓ RESOLUTION</div><div class="fp-solution-text">'+node.body+'</div>';el.querySelector('.fp-node-body').style.display='none';el.querySelector('.fp-node-content').appendChild(sol);setTimeout(()=>sol.classList.add('visible'),(idx+1)*120+300);}
+    body.appendChild(el);setTimeout(()=>el.classList.add('visible'),idx*110+80);
+  });
+}
+document.querySelectorAll('.acc-head').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('acc-open')));
+
+function openRef(){
+  const ov=document.getElementById('ref-overlay'),m=document.getElementById('ref-modal');
+  ov.classList.add('open');requestAnimationFrame(()=>{ov.classList.add('visible');m.classList.add('visible');});
+  document.body.style.overflow='hidden';
+  document.getElementById('ref-search').focus();
+}
+function closeRef(){
+  const ov=document.getElementById('ref-overlay'),m=document.getElementById('ref-modal');
+  ov.classList.remove('visible');m.classList.remove('visible');
+  setTimeout(()=>ov.classList.remove('open'),280);
+  document.body.style.overflow='';
+  document.getElementById('ref-search').value='';filterRef('');
+}
+function showRefTab(tab){
+  document.querySelectorAll('.ref-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('rtab-'+tab).classList.add('active');
+  const ps=document.getElementById('ref-p-section');
+  const ds=document.getElementById('ref-d-section');
+  ps.style.display=(tab==='deliverables')?'none':'block';
+  ds.style.display=(tab==='principles')?'none':'block';
+}
+function filterRef(q){
+  const v=q.toLowerCase().trim();
+  document.querySelectorAll('.ref-row').forEach(row=>{
+    const t=(row.textContent||'').toLowerCase();
+    row.style.display=(!v||t.includes(v))?'':'none';
+  });
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('ref-modal').classList.contains('visible'))closeRef();});
+
+
+// ── API PLAYGROUND DATA ──────────────────────────────────────────────
+const AMBER_COL = '#7a5200';
+const REGISTRIES = {
+  civil: {
+    name: 'Civil Registry (CASBES)',
+    color: '#8a1a2e',
+    auth: 'Bearer JWT — 15 min TTL',
+    scope: 'scope: civil.read',
+    baseUrl: 'https://apim.gosxm.gov.sx/v1/civil',
+    spec: `<span style="color:#4ade80">openapi:</span> <span style="color:#fbbf24">"3.0.3"</span>
+<span style="color:#4ade80">info:</span>
+  <span style="color:#4ade80">title:</span> <span style="color:#fbbf24">"Civil Registry API"</span>
+  <span style="color:#4ade80">version:</span> <span style="color:#fbbf24">"1.0.0"</span>
+  <span style="color:#4ade80">description:</span> <span style="color:#fbbf24">"CASBES StUF-BG → REST"</span>
+<span style="color:#4ade80">servers:</span>
+  - <span style="color:#4ade80">url:</span> <span style="color:#fbbf24">https://apim.gosxm.gov.sx/v1/civil</span>
+<span style="color:#4ade80">security:</span>
+  - <span style="color:#4ade80">oauth2_pkce:</span> [civil.read]
+<span style="color:#4ade80">paths:</span>
+  <span style="color:#60a5fa">/persons/{nsn}:</span>
+    <span style="color:#4ade80">get:</span>
+      <span style="color:#4ade80">summary:</span> <span style="color:#fbbf24">"Get person by NSN"</span>
+      <span style="color:#4ade80">parameters:</span>
+        - <span style="color:#4ade80">name:</span> nsn
+          <span style="color:#4ade80">in:</span> path
+          <span style="color:#4ade80">required:</span> <span style="color:#f472b6">true</span>
+          <span style="color:#4ade80">schema:</span>
+            <span style="color:#4ade80">type:</span> string
+            <span style="color:#4ade80">pattern:</span> <span style="color:#fbbf24">"^[0-9]{9}$"</span>
+      <span style="color:#4ade80">responses:</span>
+        <span style="color:#fbbf24">"200":</span>
+          <span style="color:#4ade80">description:</span> Person record
+        <span style="color:#fbbf24">"404":</span>
+          <span style="color:#4ade80">description:</span> NSN not found
+        <span style="color:#fbbf24">"401":</span>
+          <span style="color:#4ade80">description:</span> Unauthorised
+  <span style="color:#60a5fa">/persons/{nsn}/registrations:</span>
+    <span style="color:#4ade80">get:</span>
+      <span style="color:#4ade80">summary:</span> <span style="color:#fbbf24">"Get all registry links"</span>`,
+    endpoints: [
+      {
+        id: 'civil-person', label: 'GET /persons/{nsn}',
+        method: 'GET', path: '/persons/{nsn}',
+        params: [{key:'nsn', label:'NSN', placeholder:'e.g. 123456789', value:'123456789'}],
+        response200: {
+          nsn: "123456789",
+          firstName: "Maria",
+          lastName: "Martina",
+          dateOfBirth: "1985-04-12",
+          placeOfBirth: "Philipsburg",
+          nationality: "Dutch",
+          registrationStatus: "ACTIVE",
+          address: {
+            street: "Backstreet 14",
+            district: "Philipsburg",
+            island: "Sint Maarten"
+          },
+          _links: {
+            self: { href: "/v1/civil/persons/123456789" },
+            registrations: { href: "/v1/civil/persons/123456789/registrations" }
+          }
+        },
+        schema: `<span style="color:#4ade80">type:</span> object
+<span style="color:#4ade80">required:</span> [nsn, firstName, lastName, dateOfBirth, registrationStatus]
+<span style="color:#4ade80">properties:</span>
+  <span style="color:#60a5fa">nsn:</span>         <span style="color:#fbbf24">{ type: string, pattern: "^[0-9]{9}$" }</span>
+  <span style="color:#60a5fa">firstName:</span>   <span style="color:#fbbf24">{ type: string }</span>
+  <span style="color:#60a5fa">lastName:</span>    <span style="color:#fbbf24">{ type: string }</span>
+  <span style="color:#60a5fa">dateOfBirth:</span> <span style="color:#fbbf24">{ type: string, format: date }</span>
+  <span style="color:#60a5fa">registrationStatus:</span>
+    <span style="color:#4ade80">type:</span> string
+    <span style="color:#4ade80">enum:</span> [ACTIVE, DECEASED, EMIGRATED, UNKNOWN]
+  <span style="color:#60a5fa">address:</span>     <span style="color:#fbbf24">{ $ref: "#/components/schemas/Address" }</span>
+  <span style="color:#60a5fa">_links:</span>      <span style="color:#fbbf24">{ $ref: "#/components/schemas/Links" }</span>`
+      },
+      {
+        id: 'civil-reg', label: 'GET /persons/{nsn}/registrations',
+        method: 'GET', path: '/persons/{nsn}/registrations',
+        params: [{key:'nsn', label:'NSN', placeholder:'e.g. 123456789', value:'123456789'}],
+        response200: {
+          nsn: "123456789",
+          registrations: [
+            { registry: "COCI",  cribNumber: "SXM-2018-004521", role: "DIRECTOR",  since: "2018-03-01" },
+            { registry: "TEATT", licenceId: "LIC-2021-00891",  type: "CONTRACTOR", status: "ACTIVE"     },
+            { registry: "VROMI", parcelId:  "SXM-PHIL-0142",   role: "OWNER",      since: "2020-07-15"  }
+          ]
+        },
+        schema: `<span style="color:#4ade80">type:</span> object
+<span style="color:#4ade80">properties:</span>
+  <span style="color:#60a5fa">nsn:</span>           <span style="color:#fbbf24">{ type: string }</span>
+  <span style="color:#60a5fa">registrations:</span>
+    <span style="color:#4ade80">type:</span> array
+    <span style="color:#4ade80">items:</span>
+      <span style="color:#4ade80">type:</span> object
+      <span style="color:#4ade80">properties:</span>
+        <span style="color:#60a5fa">registry:</span> <span style="color:#fbbf24">{ type: string, enum: [COCI,TEATT,VROMI,SIAH] }</span>
+        <span style="color:#60a5fa">role:</span>     <span style="color:#fbbf24">{ type: string }</span>
+        <span style="color:#60a5fa">since:</span>    <span style="color:#fbbf24">{ type: string, format: date }</span>`
+      }
+    ]
+  },
+
+  coci: {
+    name: 'Chamber of Commerce (COCI)',
+    color: '#1a6b3c',
+    auth: 'Bearer JWT — 15 min TTL',
+    scope: 'scope: coci.read',
+    baseUrl: 'https://apim.gosxm.gov.sx/v1/coci',
+    spec: `<span style="color:#4ade80">openapi:</span> <span style="color:#fbbf24">"3.0.3"</span>
+<span style="color:#4ade80">info:</span>
+  <span style="color:#4ade80">title:</span> <span style="color:#fbbf24">"Chamber of Commerce API"</span>
+  <span style="color:#4ade80">version:</span> <span style="color:#fbbf24">"1.0.0"</span>
+  <span style="color:#4ade80">description:</span> <span style="color:#fbbf24">"COCI OData v4 → REST"</span>
+<span style="color:#4ade80">paths:</span>
+  <span style="color:#60a5fa">/businesses/{crib}:</span>
+    <span style="color:#4ade80">get:</span>
+      <span style="color:#4ade80">summary:</span> <span style="color:#fbbf24">"Get business by CRIB number"</span>
+      <span style="color:#4ade80">parameters:</span>
+        - <span style="color:#4ade80">name:</span> crib
+          <span style="color:#4ade80">in:</span> path
+          <span style="color:#4ade80">required:</span> <span style="color:#f472b6">true</span>
+          <span style="color:#4ade80">schema:</span>
+            <span style="color:#4ade80">type:</span> string
+            <span style="color:#4ade80">pattern:</span> <span style="color:#fbbf24">"^SXM-[0-9]{4}-[0-9]{6}$"</span>`,
+    endpoints: [
+      {
+        id: 'coci-biz', label: 'GET /businesses/{crib}',
+        method: 'GET', path: '/businesses/{crib}',
+        params: [{key:'crib', label:'CRIB', placeholder:'e.g. SXM-2018-004521', value:'SXM-2018-004521'}],
+        response200: {
+          cribNumber: "SXM-2018-004521",
+          tradeName: "Martina Consulting NV",
+          legalForm: "NV",
+          status: "ACTIVE",
+          registeredDate: "2018-03-01",
+          sectorCode: "6201",
+          directors: [
+            { nsn: "123456789", name: "Maria Martina", role: "DIRECTOR", since: "2018-03-01" }
+          ],
+          address: {
+            street: "W.J.A. Nisbeth Road 22",
+            district: "Philipsburg",
+            island: "Sint Maarten"
+          },
+          _links: {
+            self: { href: "/v1/coci/businesses/SXM-2018-004521" },
+            directors: { href: "/v1/coci/businesses/SXM-2018-004521/directors" }
+          }
+        },
+        schema: `<span style="color:#4ade80">type:</span> object
+<span style="color:#4ade80">required:</span> [cribNumber, tradeName, legalForm, status]
+<span style="color:#4ade80">properties:</span>
+  <span style="color:#60a5fa">cribNumber:</span>     <span style="color:#fbbf24">{ type: string }</span>
+  <span style="color:#60a5fa">tradeName:</span>      <span style="color:#fbbf24">{ type: string }</span>
+  <span style="color:#60a5fa">legalForm:</span>      <span style="color:#fbbf24">{ type: string, enum: [NV, BV, EENMANSZAAK, VZW] }</span>
+  <span style="color:#60a5fa">status:</span>
+    <span style="color:#4ade80">type:</span> string
+    <span style="color:#4ade80">enum:</span> [ACTIVE, SUSPENDED, DISSOLVED, PENDING]
+  <span style="color:#60a5fa">directors:</span>
+    <span style="color:#4ade80">type:</span> array
+    <span style="color:#4ade80">items:</span>
+      <span style="color:#4ade80">properties:</span>
+        <span style="color:#60a5fa">nsn:</span>  <span style="color:#fbbf24">{ type: string }</span>  <span style="color:rgba(255,255,255,.35)"># cross-ref Civil Registry</span>
+        <span style="color:#60a5fa">role:</span> <span style="color:#fbbf24">{ type: string }</span>`
+      }
+    ]
+  },
+
+  teatt: {
+    name: 'TEATT Licenses (BLISS)',
+    color: '#4a1a7a',
+    auth: 'Bearer JWT — 15 min TTL',
+    scope: 'scope: teatt.read',
+    baseUrl: 'https://apim.gosxm.gov.sx/v1/teatt',
+    spec: `<span style="color:#4ade80">openapi:</span> <span style="color:#fbbf24">"3.0.3"</span>
+<span style="color:#4ade80">info:</span>
+  <span style="color:#4ade80">title:</span> <span style="color:#fbbf24">"TEATT Licenses API"</span>
+  <span style="color:#4ade80">version:</span> <span style="color:#fbbf24">"1.0.0"</span>
+  <span style="color:#4ade80">description:</span> <span style="color:#fbbf24">"BLISS D365 OData v4 → REST"</span>
+<span style="color:#4ade80">paths:</span>
+  <span style="color:#60a5fa">/licences/{id}:</span>
+    <span style="color:#4ade80">get:</span>
+      <span style="color:#4ade80">summary:</span> <span style="color:#fbbf24">"Get licence by ID"</span>
+  <span style="color:#60a5fa">/licences:</span>
+    <span style="color:#4ade80">get:</span>
+      <span style="color:#4ade80">summary:</span> <span style="color:#fbbf24">"Search licences"</span>
+      <span style="color:#4ade80">parameters:</span>
+        - <span style="color:#4ade80">name:</span> nsn
+          <span style="color:#4ade80">in:</span> query
+        - <span style="color:#4ade80">name:</span> status
+          <span style="color:#4ade80">in:</span> query
+          <span style="color:#4ade80">schema:</span>
+            <span style="color:#4ade80">enum:</span> [ACTIVE,SUSPENDED,EXPIRED,PENDING]`,
+    endpoints: [
+      {
+        id: 'teatt-search', label: 'GET /licences?nsn=',
+        method: 'GET', path: '/licences',
+        params: [
+          {key:'nsn', label:'NSN', placeholder:'e.g. 123456789', value:'123456789'},
+          {key:'status', label:'Status', placeholder:'ACTIVE | SUSPENDED | EXPIRED | PENDING', value:'ACTIVE'}
+        ],
+        response200: {
+          total: 2,
+          items: [
+            { licenceId: "LIC-2021-00891", type: "CONTRACTOR", category: "ELECTRICAL", status: "ACTIVE",   holderNsn: "123456789", issuedDate: "2021-06-01", expiryDate: "2024-05-31", conditions: [] },
+            { licenceId: "LIC-2019-00312", type: "BUSINESS",   category: "RETAIL",     status: "EXPIRED",  holderNsn: "123456789", issuedDate: "2019-01-15", expiryDate: "2022-01-14", conditions: ["Must display licence prominently"] }
+          ],
+          _links: { self: { href: "/v1/teatt/licences?nsn=123456789" } }
+        },
+        schema: `<span style="color:#4ade80">type:</span> object
+<span style="color:#4ade80">properties:</span>
+  <span style="color:#60a5fa">total:</span>  <span style="color:#fbbf24">{ type: integer }</span>
+  <span style="color:#60a5fa">items:</span>
+    <span style="color:#4ade80">type:</span> array
+    <span style="color:#4ade80">items:</span>
+      <span style="color:#4ade80">properties:</span>
+        <span style="color:#60a5fa">licenceId:</span>   <span style="color:#fbbf24">{ type: string }</span>
+        <span style="color:#60a5fa">status:</span>
+          <span style="color:#4ade80">type:</span> string
+          <span style="color:#4ade80">enum:</span> [ACTIVE, SUSPENDED, EXPIRED, PENDING]
+        <span style="color:#60a5fa">holderNsn:</span>   <span style="color:#fbbf24">{ type: string }</span>  <span style="color:rgba(255,255,255,.35)"># cross-ref Civil Registry</span>
+        <span style="color:#60a5fa">expiryDate:</span>  <span style="color:#fbbf24">{ type: string, format: date }</span>`
+      }
+    ]
+  },
+
+  vromi: {
+    name: 'VROMI Permits (ArcGIS)',
+    color: '#1a5c6b',
+    auth: 'Bearer JWT — 15 min TTL',
+    scope: 'scope: vromi.read',
+    baseUrl: 'https://apim.gosxm.gov.sx/v1/vromi',
+    spec: `<span style="color:#4ade80">openapi:</span> <span style="color:#fbbf24">"3.0.3"</span>
+<span style="color:#4ade80">info:</span>
+  <span style="color:#4ade80">title:</span> <span style="color:#fbbf24">"VROMI Permits API"</span>
+  <span style="color:#4ade+80">version:</span> <span style="color:#fbbf24">"1.0.0"</span>
+  <span style="color:#4ade80">description:</span> <span style="color:#fbbf24">"ArcGIS REST → OpenAPI 3.0"</span>
+<span style="color:#4ade80">paths:</span>
+  <span style="color:#60a5fa">/parcels/{parcelId}:</span>
+    <span style="color:#4ade80">get:</span>
+      <span style="color:#4ade80">summary:</span> <span style="color:#fbbf24">"Get parcel + permits"</span>
+  <span style="color:#60a5fa">/permits/{permitId}:</span>
+    <span style="color:#4ade80">get:</span>
+      <span style="color:#4ade80">summary:</span> <span style="color:#fbbf24">"Get permit details"</span>
+      <span style="color:#4ade80">description:</span> <span style="color:#fbbf24">"WKT geometry in response"</span>`,
+    endpoints: [
+      {
+        id: 'vromi-parcel', label: 'GET /parcels/{parcelId}',
+        method: 'GET', path: '/parcels/{parcelId}',
+        params: [{key:'parcelId', label:'Parcel ID', placeholder:'e.g. SXM-PHIL-0142', value:'SXM-PHIL-0142'}],
+        response200: {
+          parcelId: "SXM-PHIL-0142",
+          district: "Philipsburg",
+          ownerNsn: "123456789",
+          area_m2: 312.5,
+          geometry: { type: "Polygon", wkt: "POLYGON((63.0498 18.0237, 63.0501 18.0237, 63.0501 18.0240, 63.0498 18.0240, 63.0498 18.0237))" },
+          permits: [
+            { permitId: "PERM-2022-0441", type: "BUILDING", status: "APPROVED", issuedDate: "2022-08-10", expiryDate: "2025-08-09" },
+            { permitId: "PERM-2020-0187", type: "ZONING",   status: "ACTIVE",   issuedDate: "2020-03-01", expiryDate: null }
+          ],
+          _links: { self: { href: "/v1/vromi/parcels/SXM-PHIL-0142" } }
+        },
+        schema: `<span style="color:#4ade80">type:</span> object
+<span style="color:#4ade80">properties:</span>
+  <span style="color:#60a5fa">parcelId:</span>  <span style="color:#fbbf24">{ type: string }</span>
+  <span style="color:#60a5fa">ownerNsn:</span> <span style="color:#fbbf24">{ type: string }</span>  <span style="color:rgba(255,255,255,.35)"># cross-ref Civil Registry</span>
+  <span style="color:#60a5fa">geometry:</span>
+    <span style="color:#4ade80">type:</span> object
+    <span style="color:#4ade80">properties:</span>
+      <span style="color:#60a5fa">wkt:</span>  <span style="color:#fbbf24">{ type: string }</span>  <span style="color:rgba(255,255,255,.35)"># Well-Known Text polygon</span>
+      <span style="color:#60a5fa">type:</span> <span style="color:#fbbf24">{ type: string, enum: [Polygon, MultiPolygon] }</span>
+  <span style="color:#60a5fa">permits:</span>
+    <span style="color:#4ade80">type:</span> array
+    <span style="color:#4ade80">items:</span>
+      <span style="color:#4ade80">properties:</span>
+        <span style="color:#60a5fa">status:</span> <span style="color:#fbbf24">{ enum: [APPROVED, ACTIVE, EXPIRED, REVOKED] }</span>`
+      }
+    ]
+  }
+};
+
+// ── RFC 7807 error responses ─────────────────────────────────────────
+const ERRORS = {
+  '401': {
+    status: 401, statusText: 'Unauthorized',
+    body: { type: "https://gosxm.gov.sx/errors/unauthorized", title: "Unauthorized", status: 401, detail: "Bearer token missing, expired, or invalid. JWT TTL is 15 minutes — re-authenticate via Azure Entra External ID.", instance: "/v1/civil/persons/123456789" },
+    headers: { 'WWW-Authenticate': 'Bearer realm="gosxm", error="invalid_token"', 'X-Request-Id': 'req-' + Math.random().toString(36).slice(2,10) }
+  },
+  '429': {
+    status: 429, statusText: 'Too Many Requests',
+    body: { type: "https://gosxm.gov.sx/errors/rate-limit-exceeded", title: "Too Many Requests", status: 429, detail: "Rate limit exceeded: 500 requests/minute per consumer. Retry after the Retry-After interval.", instance: "/v1/civil/persons/123456789", retryAfter: 47 },
+    headers: { 'Retry-After': '47', 'X-RateLimit-Limit': '500', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': String(Math.floor(Date.now()/1000)+47) }
+  },
+  '404': {
+    status: 404, statusText: 'Not Found',
+    body: { type: "https://gosxm.gov.sx/errors/not-found", title: "Not Found", status: 404, detail: "The requested resource could not be found. Verify the identifier and try again.", instance: "/v1/civil/persons/000000000" },
+    headers: {}
+  }
+};
+
+// ── State ─────────────────────────────────────────────────────────────
+let currentReg  = 'civil';
+let currentEp   = null;
+let currentRespTab = 'body';
+let lastResponse   = null;
+let lastHeaders    = null;
+let lastSchema     = null;
+
+// ── Init ──────────────────────────────────────────────────────────────
+function initPlayground() {
+  selectReg(document.querySelector('.reg-btn[data-reg="civil"]'), 'civil');
+}
+
+function selectReg(btn, regKey) {
+  if (!REGISTRIES[regKey]) return;
+  currentReg = regKey;
+  const reg = REGISTRIES[regKey];
+
+  // Update registry buttons
+  document.querySelectorAll('.reg-btn').forEach(b => {
+    b.style.background = '#fff';
+    b.style.color = 'var(--ink3)';
+    b.style.borderColor = 'var(--paper3)';
+  });
+  if (btn) {
+    btn.style.background = reg.color + '18';
+    btn.style.color = reg.color;
+    btn.style.borderColor = reg.color + '88';
+  }
+
+  // Update spec
+  document.getElementById('spec-content').innerHTML = reg.spec;
+  document.getElementById('auth-pill').textContent = reg.auth;
+  document.getElementById('auth-pill').style.background = reg.color + '18';
+  document.getElementById('auth-pill').style.color = reg.color;
+  document.getElementById('auth-pill').style.borderColor = reg.color + '44';
+  document.getElementById('scope-pill').textContent = reg.scope;
+
+  // Build endpoint tabs
+  const tabsEl = document.getElementById('endpoint-tabs');
+  tabsEl.innerHTML = '';
+  reg.endpoints.forEach((ep, i) => {
+    const t = document.createElement('button');
+    t.textContent = ep.label;
+    t.dataset.epId = ep.id;
+    t.style.cssText = `font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 12px;border-radius:5px;border:1.5px solid ${i===0 ? reg.color+'88' : 'var(--paper3)'};background:${i===0 ? reg.color+'14' : '#fff'};color:${i===0 ? reg.color : 'var(--ink3)'};cursor:pointer;transition:all .15s`;
+    t.onclick = () => selectEndpoint(t, ep.id);
+    tabsEl.appendChild(t);
+  });
+
+  // Select first endpoint
+  selectEndpoint(tabsEl.firstChild, reg.endpoints[0].id);
+
+  // Clear response
+  clearResponse();
+}
+
+function selectEndpoint(btn, epId) {
+  const reg = REGISTRIES[currentReg];
+  const ep  = reg.endpoints.find(e => e.id === epId);
+  if (!ep) return;
+  currentEp = ep;
+
+  // Update tab styles
+  document.querySelectorAll('#endpoint-tabs button').forEach(b => {
+    b.style.background = '#fff';
+    b.style.color = 'var(--ink3)';
+    b.style.borderColor = 'var(--paper3)';
+  });
+  if (btn) {
+    btn.style.background = reg.color + '14';
+    btn.style.color = reg.color;
+    btn.style.borderColor = reg.color + '88';
+  }
+
+  // Update method + URL
+  document.getElementById('method-badge').textContent = ep.method;
+  document.getElementById('method-badge').style.background = ep.method === 'GET' ? '#1a6b3c18' : '#7a520018';
+  document.getElementById('method-badge').style.color = ep.method === 'GET' ? '#1a6b3c' : '#7a5200';
+
+  let url = reg.baseUrl + ep.path;
+  document.getElementById('url-display').textContent = url;
+
+  // Build param inputs
+  const paramsEl = document.getElementById('param-inputs');
+  paramsEl.innerHTML = '';
+  (ep.params || []).forEach(p => {
+    const label = document.createElement('label');
+    label.style.cssText = 'display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--ink3)';
+    label.textContent = p.label + ':';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = p.value || '';
+    input.placeholder = p.placeholder || '';
+    input.dataset.key = p.key;
+    input.style.cssText = 'font-family:var(--mono);font-size:10px;padding:4px 9px;border:1px solid var(--paper3);border-radius:5px;background:var(--paper2);color:var(--ink2);width:160px;outline:none';
+    input.oninput = updateUrl;
+    label.appendChild(input);
+    paramsEl.appendChild(label);
+  });
+
+  updateUrl();
+  clearResponse();
+}
+
+function updateUrl() {
+  if (!currentEp) return;
+  const reg = REGISTRIES[currentReg];
+  let path = currentEp.path;
+  const queryParams = [];
+  document.querySelectorAll('#param-inputs input').forEach(inp => {
+    const key = inp.dataset.key;
+    const val = inp.value || inp.placeholder.split(' ')[1] || '';
+    if (path.includes('{' + key + '}')) {
+      path = path.replace('{' + key + '}', encodeURIComponent(val));
+    } else if (val) {
+      queryParams.push(key + '=' + encodeURIComponent(val));
+    }
+  });
+  const url = reg.baseUrl + path + (queryParams.length ? '?' + queryParams.join('&') : '');
+  document.getElementById('url-display').textContent = url;
+}
+
+function fireRequest() {
+  if (!currentEp) return;
+  const btn = document.getElementById('fire-btn');
+  btn.textContent = '⏳ Sending…';
+  btn.disabled = true;
+
+  const latency = 120 + Math.random() * 180;
+  setTimeout(() => {
+    btn.textContent = '▶ Send';
+    btn.disabled = false;
+    showResponse(200, currentEp.response200, currentEp.schema, Math.round(latency));
+  }, latency);
+}
+
+function triggerError(code) {
+  const err = ERRORS[code];
+  if (!err) return;
+  const latency = 40 + Math.round(Math.random() * 80);
+  const allHeaders = {
+    'Content-Type': 'application/problem+json',
+    'X-Request-Id': 'req-' + Math.random().toString(36).slice(2,10),
+    'X-Correlation-Id': 'corr-' + Math.random().toString(36).slice(2,12),
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    ...err.headers
+  };
+  showResponse(err.status, err.body, null, latency, err.statusText, allHeaders);
+}
+
+function showResponse(status, body, schema, latency, statusText, headers) {
+  const isOk = status >= 200 && status < 300;
+  const reg   = REGISTRIES[currentReg];
+
+  // Status badge
+  const sb = document.getElementById('status-badge');
+  sb.style.display = 'inline-block';
+  sb.textContent = status + (statusText ? ' ' + statusText : ' OK');
+  sb.style.background = isOk ? '#1a6b3c22' : '#8a1a2e22';
+  sb.style.color       = isOk ? '#4ade80'   : '#e05470';
+  sb.style.border      = `1px solid ${isOk ? '#1a6b3c44' : '#8a1a2e44'}`;
+
+  // Latency badge
+  const lb = document.getElementById('latency-badge');
+  lb.style.display = 'inline-block';
+  lb.textContent   = latency + ' ms';
+
+  // Header pills
+  const hpEl = document.getElementById('header-pills');
+  hpEl.innerHTML = '';
+  const contentType = isOk ? 'application/json' : 'application/problem+json';
+  [contentType, 'X-RateLimit-Limit: 500'].forEach(h => {
+    const pill = document.createElement('span');
+    pill.textContent = h;
+    pill.style.cssText = 'font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.1)';
+    hpEl.appendChild(pill);
+  });
+
+  // Default headers
+  if (!headers) {
+    headers = {
+      'Content-Type': 'application/json',
+      'X-Request-Id': 'req-' + Math.random().toString(36).slice(2,10),
+      'X-Correlation-Id': 'corr-' + Math.random().toString(36).slice(2,12),
+      'X-RateLimit-Limit': '500',
+      'X-RateLimit-Remaining': String(499 - Math.floor(Math.random()*50)),
+      'X-RateLimit-Reset': String(Math.floor(Date.now()/1000)+60),
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff'
+    };
+  }
+
+  lastResponse = body;
+  lastHeaders  = headers;
+  lastSchema   = schema;
+
+  renderRespTab(currentRespTab);
+}
+
+function renderRespTab(tab) {
+  const bodyEl    = document.getElementById('resp-body');
+  const headersEl = document.getElementById('resp-headers');
+  const schemaEl  = document.getElementById('resp-schema');
+
+  [bodyEl, headersEl, schemaEl].forEach(el => el.style.display = 'none');
+
+  if (tab === 'body') {
+    bodyEl.style.display = 'block';
+    if (lastResponse) bodyEl.innerHTML = syntaxHighlight(lastResponse);
+  } else if (tab === 'headers') {
+    headersEl.style.display = 'block';
+    if (lastHeaders) {
+      headersEl.innerHTML = Object.entries(lastHeaders).map(([k,v]) =>
+        `<div style="display:flex;gap:10px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="color:#60a5fa;min-width:220px">${k}:</span><span style="color:#fbbf24">${v}</span></div>`
+      ).join('');
+    }
+  } else if (tab === 'schema') {
+    schemaEl.style.display = 'block';
+    schemaEl.innerHTML = lastSchema || '<span style="color:rgba(255,255,255,.3)">Schema not available for error responses</span>';
+  }
+}
+
+function switchRespTab(tab) {
+  currentRespTab = tab;
+  document.querySelectorAll('.resp-tab').forEach(t => {
+    t.style.color = 'rgba(255,255,255,.3)';
+    t.style.borderBottom = '2px solid transparent';
+  });
+  const activeTab = document.getElementById('rtab-' + tab);
+  if (activeTab) {
+    activeTab.style.color = 'rgba(255,255,255,.6)';
+    activeTab.style.borderBottom = '2px solid ' + AMBER_COL;
+  }
+  renderRespTab(tab);
+}
+
+function clearResponse() {
+  lastResponse = lastHeaders = lastSchema = null;
+  document.getElementById('status-badge').style.display = 'none';
+  document.getElementById('latency-badge').style.display = 'none';
+  document.getElementById('header-pills').innerHTML = '';
+  document.getElementById('resp-body').innerHTML = '<div style="color:rgba(255,255,255,.2);font-size:12px;padding-top:20px;text-align:center">Click ▶ Send to simulate the request</div>';
+  document.getElementById('resp-headers').innerHTML = '';
+  document.getElementById('resp-schema').innerHTML  = '';
+}
+
+function syntaxHighlight(obj) {
+  const json = JSON.stringify(obj, null, 2);
+  return json
+    .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) return `<span style="color:#60a5fa">${match}</span>`;
+        return `<span style="color:#fbbf24">${match}</span>`;
+      }
+      if (/true|false/.test(match)) return `<span style="color:#f472b6">${match}</span>`;
+      if (/null/.test(match))       return `<span style="color:#9ca3af">${match}</span>`;
+      return `<span style="color:#4ade80">${match}</span>`;
+    })
+    .replace(/\n/g, '<br>').replace(/ {2}/g, '&nbsp;&nbsp;');
+}
+
+// Init after DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPlayground);
+} else {
+  initPlayground();
+}
+
+</script>
+
+<!-- ── REFERENCE MODAL FAB ── -->
+<button id="ref-fab" onclick="openRef()" title="Quick Reference">
+  <span class="fab-tooltip" style="position:absolute;left:58px;right:auto;background:var(--ink);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 11px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;border:1px solid rgba(255,255,255,.1)">Quick Reference</span>
+  ℹ
+</button>
+<div id="ref-overlay" onclick="closeRef()"></div>
+<div id="ref-modal">
+  <div class="ref-modal-head">
+    <div>
+      <div class="ref-modal-title">DGTP Quick Reference</div>
+      <div class="ref-modal-sub">DESIGN PHASE · SINT MAARTEN · 15 PRINCIPLES · 10 DELIVERABLES</div>
+    </div>
+    <button class="ref-modal-close" onclick="closeRef()">&#x2715;</button>
+  </div>
+  <div class="ref-tabs">
+    <button class="ref-tab active" id="rtab-both" onclick="showRefTab('both')">📋 All</button>
+    <button class="ref-tab" id="rtab-principles" onclick="showRefTab('principles')">⚙ Principles (P-01–P-15)</button>
+    <button class="ref-tab" id="rtab-deliverables" onclick="showRefTab('deliverables')">📦 Deliverables (D1–D10)</button>
+  </div>
+  <input id="ref-search" type="text" placeholder="Search principles or deliverables…" oninput="filterRef(this.value)"/>
+  <div class="ref-body" id="ref-body">
+    <div id="ref-p-section">
+      <div class="ref-section">⚙ ARCHITECTURE PRINCIPLES — P-01 to P-15 · Click any row to expand description</div>
+      
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-01</div>
+          <div class="ref-name">API-First</div>
+          <div class="ref-desc">All platform APIs documented in OpenAPI 3.0 and agreed by Architecture Team BEFORE development begins. GoSXM API Catalogue is the single source of truth.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-02</div>
+          <div class="ref-name">Cloud-Native Azure</div>
+          <div class="ref-desc">Exclusive Azure PaaS in European region. No multi-cloud, no on-premise in Phase 1. All deployments via IaC — no manual portal changes in staging or production.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-03</div>
+          <div class="ref-name">Separation of Concerns</div>
+          <div class="ref-desc">Seven enforced platform layers. Each layer has one responsibility. No cross-layer shortcutting. Experience Layer cannot query registries directly.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-04</div>
+          <div class="ref-name">Loose Coupling</div>
+          <div class="ref-desc">One dedicated, independently deployable adapter per registry. A registry changing its protocol affects only its adapter — zero platform-wide impact.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-05</div>
+          <div class="ref-name">Resilience by Default</div>
+          <div class="ref-desc">Outbox Pattern in all adapters guarantees zero data loss. Service Bus zone-redundant with Geo-DR. Circuit breakers prevent cascade failures.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">P-06</div>
+          <div class="ref-name">Open Standards</div>
+          <div class="ref-desc">REST/JSON, OpenAPI 3.0, OAuth2/OIDC, OData where available. Vendor lock-in minimised. All interface contracts machine-readable and publicly documented.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">P-07</div>
+          <div class="ref-name">Security by Design</div>
+          <div class="ref-desc">Security embedded at every layer from Day 1. mTLS between all services. OWASP review is a go-live gate. SAST/CVE scanning in all CI/CD pipelines.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">P-08</div>
+          <div class="ref-name">Identity-First Access</div>
+          <div class="ref-desc">Azure Entra External ID is the sole identity provider. 7 RBAC roles. JWT 15-min TTL. PIM Just-In-Time for all privileged access. No standing admin privileges.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">P-09</div>
+          <div class="ref-name">Privacy by Design</div>
+          <div class="ref-desc">Data minimisation and consent management built into every cross-registry call. Citizens can view their data access history. 90-day PII audit log in Log Analytics.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">P-10</div>
+          <div class="ref-name">Authoritative Source</div>
+          <div class="ref-desc">Each data domain has exactly one authoritative registry. Canonical Data Store is a read-model — it never becomes the source of truth. Registries own their data.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">P-11</div>
+          <div class="ref-name">Once-Only Principle</div>
+          <div class="ref-desc">Citizens submit data once. The platform reuses it across services via the Canonical Data Store with a freshness SLA of less than 15 minutes. No re-entry of known data.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">P-12</div>
+          <div class="ref-name">Data Sovereignty</div>
+          <div class="ref-desc">All citizen data stays within Azure European region at all times. Geo-DR secondary must also be European. No third-party SaaS without a signed EU data processing agreement.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">P-13</div>
+          <div class="ref-name">Observability First</div>
+          <div class="ref-desc">Structured logging, distributed tracing, and metrics from Day 1 in every component. Azure Monitor + Application Insights. Alerts on DLQ first-message within 2 minutes.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">P-14</div>
+          <div class="ref-name">Infrastructure as Code</div>
+          <div class="ref-desc">All Azure resources provisioned via Bicep/Terraform. No manual portal changes in staging or production. IaC enforces region and security constraints in every template.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">P-15</div>
+          <div class="ref-name">Compliance by Design</div>
+          <div class="ref-desc">ID-Exchange EA Ordinance approval is a hard go-live gate. Privacy Ordinance compliance built into data flows. Audit logs satisfy statutory reporting requirements.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+    </div>
+    <div id="ref-d-section">
+      <div class="ref-section">📦 DESIGN PHASE DELIVERABLES — D1 to D10 · Click any row to expand description</div>
+      
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--red);background:var(--rp)">D1</div>
+          <div class="ref-name" style="min-width:130px">DGTP-SEC-001<span class="ref-owner">The Team (Solo)</span></div>
+          <div class="ref-desc">Security Architecture Document — zero-trust, RBAC, mTLS, Key Vault, OWASP gate, consent & PII audit.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">D2</div>
+          <div class="ref-name" style="min-width:130px">HLD Extension<span class="ref-owner">The Team + The Team</span></div>
+          <div class="ref-desc">Platform Architecture Design — seven-layer stack, SLA commitments, 15 architecture principles, recovery objectives.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--teal);background:var(--tp)">D3</div>
+          <div class="ref-name" style="min-width:130px">DGTP-INT-001<span class="ref-owner">The Team + The Team</span></div>
+          <div class="ref-desc">Integration Architecture — 6-registry adapter pattern, Outbox Pattern, Service Bus topology, once-only data flow.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">D4</div>
+          <div class="ref-name" style="min-width:130px">DGTP-API-GL-001<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">API Design Guidelines — REST/JSON standards, OpenAPI 3.0, OAuth2 patterns, rate limits, versioning rules.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:#7a5200;background:rgba(122,82,0,.08)">D5</div>
+          <div class="ref-name" style="min-width:130px">DGTP-API-SPEC-REG<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">API Specification Pack — per-registry OpenAPI bundles, integration guide, sandbox credentials, data sharing agreement template.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:#7a5200;background:rgba(122,82,0,.08)">D6</div>
+          <div class="ref-name" style="min-width:130px">DGTP-SUP-001<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">Registry Technical Support Logs — session notes, issue register, API validation results, registry sign-off per integration.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">D7</div>
+          <div class="ref-name" style="min-width:130px">DGTP-CAT-001<span class="ref-owner">The Team + The Team + Dev</span></div>
+          <div class="ref-desc">GoSXM API Catalog — Azure APIM Developer Portal, Swagger UI, role-gated access, CI/CD auto-publication.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--purple);background:rgba(74,26,122,.08)">D8</div>
+          <div class="ref-name" style="min-width:130px">DGTP-LLD-001<span class="ref-owner">The Team</span></div>
+          <div class="ref-desc">Final Technical Specification (LLD) — component design, IaC templates, security configuration, deployment runbook.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--blue);background:var(--bp)">D9</div>
+          <div class="ref-name" style="min-width:130px">DGTP-ENV-001<span class="ref-owner">The Team (Solo)</span></div>
+          <div class="ref-desc">Environment Strategy — DEV / Staging / Production topology, IaC provisioning, Azure resource groups, CI/CD pipeline design.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+        <div class="ref-row" onclick="this.classList.toggle('ref-expanded')">
+          <div class="ref-code" style="color:var(--green);background:var(--gp)">D10</div>
+          <div class="ref-name" style="min-width:130px">DGTP-3P-001<span class="ref-owner">The Team</span></div>
+          <div class="ref-desc">3rd-Party & SaaS Readiness — vendor assessments, EU data processing agreements, integration patterns, risk register.</div>
+          <div class="ref-chev">▾</div>
+        </div>
+    </div>
+  </div>
+</div>
+</body></html>
