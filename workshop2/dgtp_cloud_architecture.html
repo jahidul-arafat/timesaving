@@ -1,0 +1,2469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DGTP Sint Maarten — Azure Cloud Architecture · Part 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#e8e4dc;--ink2:rgba(232,228,220,.6);--ink3:rgba(232,228,220,.3);--ink4:rgba(232,228,220,.14);
+  --bg:#0c1520;--bg2:#0f1b2a;--bg3:rgba(255,255,255,.04);
+  --teal:#22c792;--coral:#e8533a;--violet:#9b87f5;--amber:#f5a623;--blue:#60a5fa;--rose:#f87171;
+  --plan-a:#22c792;--plan-b:#60a5fa;--plan-c:#9b87f5;
+  --serif:'DM Serif Display',serif;--sans:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --r:9px;--r2:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;overflow-x:hidden;}
+
+/* ── scrollable slides ── */
+.slide{min-height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden;padding:56px 0 0;}
+.slide::before{content:'';position:absolute;inset:0;background:inherit;z-index:-1;}
+.si{padding:24px 2.8rem 32px;flex:1;display:flex;flex-direction:column;max-width:1200px;width:100%;margin:0 auto;}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;gap:0;
+  background:rgba(12,21,32,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  padding:0 2.8rem;height:52px;}
+nav .ntitle{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.15em;color:var(--ink3);margin-right:auto;}
+.navbtn{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;
+  padding:6px 12px;border-radius:4px;border:none;background:none;color:var(--ink3);cursor:pointer;
+  transition:color .15s,background .15s;white-space:nowrap;}
+.navbtn:hover,.navbtn.on{background:rgba(255,255,255,.07);color:var(--ink);}
+.navsep{width:1px;height:20px;background:rgba(255,255,255,.08);flex-shrink:0;}
+
+/* typography */
+.eyebrow{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.18em;color:var(--ink3);margin-bottom:.6rem;}
+h1{font-family:var(--serif);font-size:clamp(2.2rem,4vw,3.6rem);line-height:1.05;color:var(--ink);}
+h2{font-family:var(--serif);font-size:clamp(1.4rem,2.4vw,2rem);line-height:1.1;color:var(--ink);}
+h3{font-family:var(--serif);font-size:1.1rem;line-height:1.2;color:var(--ink);}
+.lead{font-size:.92rem;color:var(--ink2);line-height:1.75;max-width:720px;}
+.rule{width:40px;height:2px;border-radius:2px;margin:10px 0 14px;}
+.stag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-family:var(--mono);font-size:.56rem;text-transform:uppercase;letter-spacing:.12em;border:1px solid;margin-bottom:.7rem;}
+.stag-teal{background:rgba(34,199,146,.1);border-color:rgba(34,199,146,.35);color:var(--teal);}
+.stag-violet{background:rgba(155,135,245,.1);border-color:rgba(155,135,245,.35);color:var(--violet);}
+.stag-blue{background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.35);color:var(--blue);}
+
+/* ── plan comparison cards ── */
+.plans{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:1.2rem;}
+.plan{border-radius:12px;border:1.5px solid;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s;}
+.plan:hover{transform:translateY(-2px);}
+.plan-head{padding:16px 18px 12px;border-bottom:1px solid rgba(255,255,255,.07);}
+.plan-letter{font-family:var(--mono);font-size:2.2rem;font-weight:500;line-height:1;margin-bottom:4px;}
+.plan-name{font-family:var(--serif);font-size:1.15rem;color:var(--ink);}
+.plan-sub{font-family:var(--mono);font-size:.6rem;color:var(--ink3);margin-top:2px;}
+.plan-body{padding:14px 18px;flex:1;display:flex;flex-direction:column;gap:10px;}
+.plan-desc{font-size:.82rem;color:var(--ink2);line-height:1.65;}
+.plan-verdict{font-family:var(--mono);font-size:.62rem;border-radius:5px;padding:6px 10px;margin-top:4px;}
+
+/* plan A */
+.plan-a{border-color:rgba(34,199,146,.3);background:rgba(34,199,146,.03);}
+.plan-a .plan-letter{color:var(--plan-a);}
+.plan-a .plan-verdict{background:rgba(34,199,146,.08);color:var(--plan-a);}
+/* plan B */
+.plan-b{border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.03);}
+.plan-b .plan-letter{color:var(--plan-b);}
+.plan-b .plan-verdict{background:rgba(96,165,250,.08);color:var(--plan-b);}
+/* plan C */
+.plan-c{border-color:rgba(155,135,245,.3);background:rgba(155,135,245,.03);}
+.plan-c .plan-letter{color:var(--plan-c);}
+.plan-c .plan-verdict{background:rgba(155,135,245,.08);color:var(--plan-c);}
+
+/* ── layer stack ── */
+.lstack{display:flex;flex-direction:column;gap:4px;margin-top:1rem;}
+.layer{border-radius:8px;border:1px solid rgba(255,255,255,.08);overflow:hidden;}
+.layer-head{display:grid;grid-template-columns:42px 1fr auto;align-items:center;padding:10px 14px;cursor:pointer;transition:background .15s;}
+.layer-head:hover{background:rgba(255,255,255,.03);}
+.layer.open .layer-head{background:var(--lbg);}
+.layer-num{font-family:var(--mono);font-size:.6rem;color:var(--ink3);}
+.layer.open .layer-num{color:var(--lc);}
+.layer-title{font-family:var(--serif);font-size:.95rem;color:var(--ink);}
+.layer-arr{font-family:var(--mono);font-size:.65rem;color:var(--ink3);transition:transform .2s;}
+.layer.open .layer-arr{transform:rotate(90deg);color:var(--lc);}
+.layer-body{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1);}
+.layer.open .layer-body{max-height:600px;}
+.layer-inner{padding:0 14px 14px 56px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+/* plan cells inside layer */
+.lc-cell{border-radius:6px;padding:10px 12px;border:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.15);}
+.lc-plan{font-family:var(--mono);font-size:.52rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+.lc-plan-a{color:var(--plan-a);}
+.lc-plan-b{color:var(--plan-b);}
+.lc-plan-c{color:var(--plan-c);}
+.lc-component{font-family:var(--mono);font-size:.72rem;color:var(--ink);margin-bottom:3px;line-height:1.35;}
+.lc-note{font-size:.7rem;color:var(--ink2);line-height:1.5;}
+.lc-locked{font-family:var(--mono);font-size:.58rem;color:var(--rose);margin-top:4px;}
+.lc-tradeoff{font-family:var(--mono);font-size:.58rem;color:var(--amber);margin-top:4px;line-height:1.4;}
+
+/* ── comparison table ── */
+.ctable{width:100%;border-collapse:collapse;margin-top:1rem;}
+.ctable th{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);padding:7px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.1);}
+.ctable th.pa{color:var(--plan-a);}
+.ctable th.pb{color:var(--plan-b);}
+.ctable th.pc{color:var(--plan-c);}
+.ctable td{padding:8px 12px;font-size:.78rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;}
+.ctable tr:hover td{background:rgba(255,255,255,.02);}
+.ctable td.cat{font-family:var(--mono);font-size:.65rem;color:var(--ink3);white-space:nowrap;}
+.ctable td.pa{color:var(--plan-a);font-family:var(--mono);font-size:.7rem;}
+.ctable td.pb{color:var(--plan-b);font-family:var(--mono);font-size:.7rem;}
+.ctable td.pc{color:var(--plan-c);font-family:var(--mono);font-size:.7rem;}
+.ctable .locked::before{content:'🔒 ';font-size:.65rem;}
+.badge-locked{display:inline-block;font-family:var(--mono);font-size:.52rem;padding:1px 6px;border-radius:3px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--rose);margin-left:4px;}
+.badge-warn{display:inline-block;font-family:var(--mono);font-size:.52rem;padding:1px 6px;border-radius:3px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);color:var(--amber);margin-left:4px;}
+
+/* ── metrics row ── */
+.mrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.2rem;}
+.met{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;gap:2px;min-width:110px;}
+.mv{font-family:var(--serif);font-size:1.5rem;line-height:1;}
+.ml{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-top:2px;}
+.mv-teal{color:var(--teal);}
+.mv-blue{color:var(--blue);}
+.mv-violet{color:var(--violet);}
+.mv-amber{color:var(--amber);}
+.mv-rose{color:var(--rose);}
+
+/* ── slide backgrounds ── */
+#s0{background:radial-gradient(ellipse 80% 60% at 60% 40%,rgba(34,199,146,.07) 0%,transparent 65%),radial-gradient(ellipse 50% 40% at 20% 80%,rgba(155,135,245,.06) 0%,transparent 60%),var(--bg);}
+#s1{background:linear-gradient(135deg,rgba(96,165,250,.05) 0%,var(--bg) 50%,rgba(34,199,146,.04) 100%);}
+#s2{background:linear-gradient(160deg,rgba(155,135,245,.05) 0%,var(--bg) 55%,rgba(96,165,250,.04) 100%);}
+#s3{background:linear-gradient(140deg,rgba(34,199,146,.04) 0%,var(--bg) 50%,rgba(155,135,245,.04) 100%);}
+#s4{background:linear-gradient(150deg,rgba(245,166,35,.04) 0%,var(--bg) 55%,rgba(34,199,146,.04) 100%);}
+#s5{background:linear-gradient(135deg,rgba(232,83,58,.04) 0%,var(--bg) 55%,rgba(96,165,250,.04) 100%);}
+#s6{background:radial-gradient(ellipse 70% 50% at 50% 50%,rgba(34,199,146,.06) 0%,transparent 65%),var(--bg);}
+
+/* ── grid utilities ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+
+/* ── canvas bg ── */
+canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
+
+/* ── decision matrix ── */
+.dmatrix{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:0;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.08);margin-top:1rem;}
+.dm-h{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;padding:8px 12px;background:rgba(255,255,255,.04);color:var(--ink3);}
+.dm-h.ha{color:var(--plan-a);background:rgba(34,199,146,.06);}
+.dm-h.hb{color:var(--plan-b);background:rgba(96,165,250,.06);}
+.dm-h.hc{color:var(--plan-c);background:rgba(155,135,245,.06);}
+.dm-row{display:contents;}
+.dm-row:hover .dm-cat,.dm-row:hover .dm-cell{background:rgba(255,255,255,.025);}
+.dm-cat{font-family:var(--mono);font-size:.65rem;color:var(--ink2);padding:8px 12px;border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;white-space:nowrap;}
+.dm-cell{font-size:.75rem;color:var(--ink2);padding:8px 12px;border-top:1px solid rgba(255,255,255,.05);line-height:1.45;}
+.dm-cell.a{border-left:2px solid rgba(34,199,146,.2);}
+.dm-cell.b{border-left:2px solid rgba(96,165,250,.2);}
+.dm-cell.c{border-left:2px solid rgba(155,135,245,.2);}
+.dot-a{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--plan-a);margin-right:5px;vertical-align:middle;}
+.dot-b{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--plan-b);margin-right:5px;vertical-align:middle;}
+.dot-c{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--plan-c);margin-right:5px;vertical-align:middle;}
+
+/* ── locked items band ── */
+.locked-band{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.18);border-radius:8px;padding:10px 14px;margin-top:1rem;}
+.locked-band-title{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:8px;}
+.locked-items{display:flex;flex-wrap:wrap;gap:6px;}
+.locked-item{font-family:var(--mono);font-size:.64rem;padding:3px 9px;border-radius:4px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:rgba(248,113,113,.8);}
+
+/* ── footer ── */
+.sfooter{font-family:var(--mono);font-size:.58rem;color:var(--ink3);margin-top:auto;padding-top:1.4rem;letter-spacing:.08em;}
+
+/* scroll nav dots */
+.sdots{position:fixed;right:1.2rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:50;}
+.sdot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.15);cursor:pointer;transition:all .2s;border:none;}
+.sdot.on{background:var(--teal);transform:scale(1.3);}
+
+/* ── LLD map ── */
+.lld-map{display:grid;grid-template-columns:200px 1fr 1fr 1fr;gap:0;margin-top:1rem;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.08);}
+.lm-head{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;padding:8px 12px;background:rgba(255,255,255,.05);color:var(--ink3);}
+.lm-head.ha{color:var(--plan-a);background:rgba(34,199,146,.06);}
+.lm-head.hb{color:var(--plan-b);background:rgba(96,165,250,.06);}
+.lm-head.hc{color:var(--plan-c);background:rgba(155,135,245,.06);}
+.lm-component{font-family:var(--mono);font-size:.65rem;color:var(--ink2);padding:7px 12px;border-top:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);display:flex;align-items:center;}
+.lm-cell{font-size:.72rem;color:var(--ink2);padding:7px 12px;border-top:1px solid rgba(255,255,255,.05);line-height:1.4;}
+.lm-cell.a{border-left:2px solid rgba(34,199,146,.15);}
+.lm-cell.b{border-left:2px solid rgba(96,165,250,.15);}
+.lm-cell.c{border-left:2px solid rgba(155,135,245,.15);}
+.lm-grp{font-family:var(--mono);font-size:.56rem;text-transform:uppercase;letter-spacing:.1em;padding:5px 12px;background:rgba(255,255,255,.03);color:var(--ink3);grid-column:1/-1;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="ntitle">DGTP Sint Maarten · Part 2 — Azure Cloud Architecture</span>
+  <button class="navbtn on" onclick="goSlide(0)">Overview</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(1)">3 Plans</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(2)" style="color:var(--plan-a);">Plan A</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(3)" style="color:var(--plan-b);">Plan B</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(4)" style="color:var(--plan-c);">Plan C</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(5)" style="color:#9b87f5;">Dep. Graph</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(6)">Layer Stack</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(7)">LLD → Azure</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(8)">Decision Matrix</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(9)">Locked Items</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(10)">Recommendation</button>
+</nav>
+
+<!-- SCROLL DOTS -->
+<div class="sdots" id="sdots">
+  <button class="sdot on" onclick="goSlide(0)"></button>
+  <button class="sdot" onclick="goSlide(1)"></button>
+  <button class="sdot" style="background:rgba(34,199,146,.4);" onclick="goSlide(2)"></button>
+  <button class="sdot" style="background:rgba(96,165,250,.4);" onclick="goSlide(3)"></button>
+  <button class="sdot" style="background:rgba(155,135,245,.4);" onclick="goSlide(4)"></button>
+  <button class="sdot" onclick="goSlide(5)"></button>
+  <button class="sdot" onclick="goSlide(6)"></button>
+  <button class="sdot" onclick="goSlide(7)"></button>
+  <button class="sdot" style="background:rgba(155,135,245,.35);" onclick="goSlide(5)"></button>
+  <button class="sdot" onclick="goSlide(6)"></button>
+  <button class="sdot" onclick="goSlide(7)"></button>
+  <button class="sdot" onclick="goSlide(8)"></button>
+  <button class="sdot" onclick="goSlide(9)"></button>
+  <button class="sdot" onclick="goSlide(10)"></button>
+</div>
+
+<!-- ══════════════ SLIDE 0 — COVER ══════════════ -->
+<section class="slide" id="s0">
+<canvas class="bgc" id="bgc0"></canvas>
+<div class="si">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:2rem;max-width:900px;">
+    <div>
+      <div class="eyebrow" style="margin-bottom:.8rem;">Technical Workshop · Part 2 · May 2026</div>
+      <h1>Azure Cloud<br/>Architecture<br/><em style="color:var(--teal);font-style:italic;">Three Adaptable Plans</em></h1>
+      <p class="lead" style="margin-top:1.2rem;">Mapping every DGTP LLD component to an Azure service — then offering three cost tiers designed for Sint Maarten's 50,000-person population. Plan A gets you live. Plan B gets you production-ready. Plan C is the full enterprise stack.</p>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:1px solid rgba(34,199,146,.25);background:rgba(34,199,146,.05);">
+        <span style="font-family:var(--mono);font-size:1.2rem;color:var(--plan-a);">A</span>
+        <div><div style="font-family:var(--mono);font-size:.65rem;color:var(--plan-a);">MINIMAL</div><div style="font-size:.75rem;color:var(--ink2);">Core platform · lean stack</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:1px solid rgba(96,165,250,.25);background:rgba(96,165,250,.05);">
+        <span style="font-family:var(--mono);font-size:1.2rem;color:var(--plan-b);">B</span>
+        <div><div style="font-family:var(--mono);font-size:.65rem;color:var(--plan-b);">STANDARD</div><div style="font-size:.75rem;color:var(--ink2);">Balanced · DEV/STG pattern</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:1px solid rgba(155,135,245,.25);background:rgba(155,135,245,.05);">
+        <span style="font-family:var(--mono);font-size:1.2rem;color:var(--plan-c);">C</span>
+        <div><div style="font-family:var(--mono);font-size:.65rem;color:var(--plan-c);">FULL CLOUD</div><div style="font-size:.75rem;color:var(--ink2);">PROD v2 aggressive · enterprise</div></div>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="met"><span class="mv mv-teal">7</span><div class="ml">Architecture layers</div></div>
+      <div class="met"><span class="mv mv-blue">6</span><div class="ml">Registry adapters</div></div>
+      <div class="met"><span class="mv mv-violet">22</span><div class="ml">Azure subscriptions</div></div>
+      <div class="met"><span class="mv mv-amber">50k</span><div class="ml">Population served</div></div>
+      <div class="met"><span class="mv mv-rose">7</span><div class="ml">Locked components</div></div>
+    </div>
+  </div>
+  <div class="sfooter">DGTP-LLD-001 v1.0 · Government of Sint Maarten · Orangebd · scroll to navigate</div>
+</div>
+</section>
+
+<!-- ══════════════ SLIDE 1 — THREE PLANS ══════════════ -->
+<section class="slide" id="s1">
+<div class="si">
+  <span class="stag stag-teal">Cloud Strategy</span>
+  <div class="rule" style="background:var(--teal);"></div>
+  <h2>Three Adaptable Plans</h2>
+  <p class="lead">The XLS PROD v2 aggressive stack is over-engineered for 50,000 citizens at launch. These three plans let DGTP start lean, validate demand, and scale only what the data justifies.</p>
+
+  <div class="plans" style="margin-top:1.4rem;">
+
+    <!-- PLAN A -->
+    <div class="plan plan-a">
+      <div class="plan-head">
+        <div class="plan-letter">A</div>
+        <div class="plan-name">Minimal Cloud</div>
+        <div class="plan-sub">Core platform · lean stack · go-live ready</div>
+      </div>
+      <div class="plan-body">
+        <p class="plan-desc">Everything needed to run DGTP end-to-end for 50,000 citizens — and nothing more. Mirrors the optimised DEV environment pattern scaled for production use. Single instances, no geo-redundancy, Standard service tiers, Basic firewall. Sentinel excluded. AI Search on free tier.</p>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px;">
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-a);flex-shrink:0;">✓</span>All 6 registry adapters live</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-a);flex-shrink:0;">✓</span>APIM + Entra + Service Bus Standard</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-a);flex-shrink:0;">✓</span>SQL MI GP 4 vCore + Cosmos Serverless</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-a);flex-shrink:0;">✓</span>Front Door Standard + Firewall Basic</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.6);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">✗</span>No DDoS Standard · No Sentinel · No HA</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.6);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">✗</span>No zone-redundancy · No geo-DR</div>
+        </div>
+        <div class="plan-verdict">Best for: Phase 1 Go-Live · Validate demand · First 6–12 months</div>
+        <p style="font-size:.7rem;color:var(--ink3);font-family:var(--mono);margin-top:6px;">Upgrade path: each component swappable independently — add DDoS Standard first, then HA ASE, then Sentinel SOAR</p>
+      </div>
+    </div>
+
+    <!-- PLAN B -->
+    <div class="plan plan-b">
+      <div class="plan-head">
+        <div class="plan-letter">B</div>
+        <div class="plan-name">Standard Cloud</div>
+        <div class="plan-sub">Balanced · prod-pattern fidelity · right-sized</div>
+      </div>
+      <div class="plan-body">
+        <p class="plan-desc">Matches the XLS optimised STG configuration scaled for production. Basic HA (2-instance ASE), Front Door Premium for WAF, Sentinel active, Service Bus Standard with quarterly Premium validation windows. SQL MI GP 8 vCore. Cosmos autoscale. Firewall Premium for IDPS.</p>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px;">
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>Front Door Premium + WAF v2</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>2-instance ASE (basic HA per tier)</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>Sentinel + Defender P2 active</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>Firewall Premium · VPN Gateway</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.7);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">△</span>No DDoS Standard (Front Door edge only)</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.7);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">△</span>No 3-AZ spread · No geo-DR</div>
+        </div>
+        <div class="plan-verdict">Best for: Post-UAT production · Months 6–18 · Proven demand</div>
+        <p style="font-size:.7rem;color:var(--ink3);font-family:var(--mono);margin-top:6px;">Upgrade path: add DDoS Standard ($2,944) + 3rd ASE instance per tier to reach Plan C</p>
+      </div>
+    </div>
+
+    <!-- PLAN C -->
+    <div class="plan plan-c">
+      <div class="plan-head">
+        <div class="plan-letter">C</div>
+        <div class="plan-name">Full Cloud</div>
+        <div class="plan-sub">PROD v2 aggressive · full enterprise · all NFRs met</div>
+      </div>
+      <div class="plan-body">
+        <p class="plan-desc">The XLS PROD v2 aggressive configuration in full. 3-AZ zone-redundant ASE (3 frontend + 4 backend), DDoS Standard, SQL MI GP 16 vCore with 1yr RI, Cosmos autoscale 50k RU/s, Service Bus Premium 1MU with geo-DR, AI Search S2 ×2, full Sentinel + Purview 8CU. All locked items active.</p>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px;">
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>3-AZ zone-redundant ASE (7 instances)</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>DDoS Standard + Sentinel SOAR P2</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>SQL MI GP 16vCore RI + Cosmos 50k RU/s</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>Service Bus Premium + geo-DR</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>Full NFR-01–08 · RTO &lt;5min · 99.9%+ SLA</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.7);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">△</span>Aggressive for 50k population at launch</div>
+        </div>
+        <div class="plan-verdict">Best for: Scale-up trigger · High-volume validated · 18+ months</div>
+        <p style="font-size:.7rem;color:var(--ink3);font-family:var(--mono);margin-top:6px;">ADR required: ADR-011 (SQL MI GP) · ADR-005 update (KV Premium vs MHSM) · QSA sign-off</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="sfooter">Scroll → Layer Stack Architecture</div>
+</div>
+</section>
+
+<!-- ══════════════ SLIDE 2 — PLAN A DEEP DIVE ══════════════ -->
+<section class="slide" id="spa" style="background:linear-gradient(150deg,rgba(34,199,146,.06) 0%,rgba(12,21,32,1) 50%,rgba(34,199,146,.03) 100%);">
+<div class="si">
+
+<style>
+/* ── story box ── */
+.storybox{border-radius:10px;padding:14px 18px;margin-bottom:8px;display:flex;gap:14px;align-items:flex-start;border:1px solid;}
+.storybox-icon{font-size:1.6rem;flex-shrink:0;line-height:1;margin-top:2px;}
+.storybox-body{flex:1;min-width:0;}
+.storybox-label{font-family:var(--mono);font-size:.56rem;text-transform:uppercase;letter-spacing:.12em;margin-bottom:3px;}
+.storybox-title{font-family:var(--serif);font-size:1.05rem;color:var(--ink);margin-bottom:4px;line-height:1.2;}
+.storybox-text{font-size:.8rem;color:var(--ink2);line-height:1.65;}
+.storybox-text strong{color:var(--ink);}
+/* ── component pill grid ── */
+.pill-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:.6rem;}
+.pill{font-family:var(--mono);font-size:.62rem;padding:3px 10px;border-radius:12px;white-space:nowrap;}
+.pill-on{background:rgba(34,199,146,.1);border:1px solid rgba(34,199,146,.3);color:var(--plan-a);}
+.pill-on-b{background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.3);color:var(--plan-b);}
+.pill-on-c{background:rgba(155,135,245,.1);border:1px solid rgba(155,135,245,.3);color:var(--plan-c);}
+.pill-off{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:rgba(232,228,220,.3);}
+.pill-warn{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25);color:var(--amber);}
+.pill-danger{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:var(--rose);}
+/* ── analogy card ── */
+.analogy{border-radius:10px;padding:14px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);}
+.analogy-eyebrow{font-family:var(--mono);font-size:.55rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);margin-bottom:5px;}
+.analogy-text{font-family:var(--serif);font-size:1rem;color:var(--ink2);line-height:1.5;font-style:italic;}
+.analogy-text em{color:var(--plan-a);font-style:normal;}
+/* ── upgrade trigger bar ── */
+.utrigger{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:6px;background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.15);margin-bottom:5px;}
+.utrigger-icon{font-size:.9rem;flex-shrink:0;}
+.utrigger-text{font-size:.78rem;color:var(--ink2);line-height:1.4;}
+.utrigger-text strong{color:var(--amber);}
+</style>
+
+  <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:.4rem;">
+    <span style="font-family:var(--mono);font-size:3rem;font-weight:500;color:var(--plan-a);line-height:1;">A</span>
+    <div>
+      <div class="eyebrow" style="margin-bottom:2px;">Plan A · Minimal Cloud</div>
+      <h2 style="font-size:1.5rem;">Start here. Get citizens online. Spend only what you need.</h2>
+    </div>
+  </div>
+
+  <div class="analogy" style="margin-bottom:1.2rem;">
+    <div class="analogy-eyebrow">Non-technical analogy</div>
+    <div class="analogy-text">Think of Plan A as <em>renting a reliable car</em> — not buying a fleet. It gets you everywhere Sint Maarten's 50,000 citizens need to go. If demand grows and you need more, you upgrade. You don't buy the fleet before you know the routes.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;">
+    <div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--plan-a);margin-bottom:8px;">What Plan A includes</div>
+
+      <div class="storybox" style="background:rgba(34,199,146,.05);border-color:rgba(34,199,146,.2);">
+        <div class="storybox-icon">🚪</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-a);">The front door</div>
+          <div class="storybox-title">Azure Front Door Standard + App Gateway</div>
+          <div class="storybox-text">Citizens reach the GoSXM portal through a global content delivery network with basic security rules. <strong>Think of it as a secure reception desk</strong> — it checks everyone at the door, handles the queue, and routes them to the right service. The Standard tier includes protection against the most common web attacks.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(34,199,146,.05);border-color:rgba(34,199,146,.2);">
+        <div class="storybox-icon">⚙️</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-a);">The engine room</div>
+          <div class="storybox-title">1 server per tier — all 6 registries connected</div>
+          <div class="storybox-text">One server handles the front-end, one handles the back-end processing. <strong>No backup server</strong> — if this server has a problem, there is a brief outage. For 50,000 citizens at launch, a single reliable server is the right call. All six government registries (Civil, Commerce, Tax, TEATT, Permits, Land) are connected and live.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(34,199,146,.05);border-color:rgba(34,199,146,.2);">
+        <div class="storybox-icon">🗄️</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-a);">The data safe</div>
+          <div class="storybox-title">SQL Database + Smart Cache + Audit Log</div>
+          <div class="storybox-text">Citizen data is stored securely in a SQL database with a 4-core processor. A smart cache means most portal requests are answered in milliseconds — not by calling the registry every time. <strong>Every action is permanently logged for 7 years</strong> (legal requirement), and citizen identities are stored as scrambled codes — never as plain names.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(34,199,146,.05);border-color:rgba(34,199,146,.2);">
+        <div class="storybox-icon">🔒</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-a);">Security baseline</div>
+          <div class="storybox-title">Firewall + Identity + Secrets Vault</div>
+          <div class="storybox-text">A network firewall blocks all uninvited traffic. Citizens log in with the national eID via a secure identity service (Entra). All system passwords and API keys are stored in a locked vault — <strong>no credentials are ever hardcoded or visible</strong>. Security event logs are monitored via Azure Defender.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:rgba(248,113,113,.7);margin-bottom:8px;">What Plan A does NOT include — and why that's fine</div>
+
+      <div class="storybox" style="background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.15);margin-bottom:8px;">
+        <div class="storybox-icon">🛡️</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--rose);">No DDoS Standard protection</div>
+          <div class="storybox-title">Front Door edge protection is sufficient at launch</div>
+          <div class="storybox-text">DDoS Standard costs <strong>$2,944/month</strong> and protects the entire network perimeter. For a 50,000-citizen government portal at launch, the Azure Front Door edge protection (included in Standard tier) handles realistic attack scenarios. DDoS Standard becomes important when Sint Maarten's digital services are a high-value target — not at Go-Live.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.15);margin-bottom:8px;">
+        <div class="storybox-icon">📊</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--rose);">No Sentinel (security operations centre)</div>
+          <div class="storybox-title">Security investigations via Azure Defender alerts</div>
+          <div class="storybox-text">Microsoft Sentinel is a full security intelligence platform — powerful, but adds significant cost and requires a trained security team to interpret its findings. <strong>Without a dedicated SOC, activating Sentinel creates noise, not insight.</strong> Plan A uses Azure Defender alerts and log queries instead — the same data, simpler tooling.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.15);margin-bottom:8px;">
+        <div class="storybox-icon">⚖️</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--rose);">No high-availability failover</div>
+          <div class="storybox-title">Single server — single point of failure</div>
+          <div class="storybox-text">If the single server has a problem, there is a brief service interruption. For a portal serving 50,000 citizens with moderate usage patterns, this risk is acceptable at launch. <strong>A brief outage during the first year — while you gather real usage data — is less costly than over-spending on infrastructure that may never be needed.</strong></div>
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--amber);margin-bottom:8px;margin-top:1rem;">When to upgrade from Plan A</div>
+      <div class="utrigger"><div class="utrigger-icon">📈</div><div class="utrigger-text"><strong>Portal traffic grows beyond projections</strong> — response times slow, or the server CPU is consistently above 70%</div></div>
+      <div class="utrigger"><div class="utrigger-icon">⚖️</div><div class="utrigger-text"><strong>Regulator mandates DDoS Standard</strong> — this is the single biggest cost jump; only commit when required</div></div>
+      <div class="utrigger"><div class="utrigger-icon">🔐</div><div class="utrigger-text"><strong>A security incident occurs</strong> that requires Sentinel's advanced threat hunting capability</div></div>
+      <div class="utrigger"><div class="utrigger-icon">🏛️</div><div class="utrigger-text"><strong>GoSXM establishes a dedicated SOC</strong> — then Sentinel becomes valuable, not noise</div></div>
+    </div>
+  </div>
+
+  <div class="pill-grid" style="margin-top:1rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.07);">
+    <span style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);align-self:center;margin-right:4px;">Plan A includes:</span>
+    <span class="pill pill-on">All 6 registry adapters</span>
+    <span class="pill pill-on">APIM 8-stage pipeline</span>
+    <span class="pill pill-on">eID login via Entra</span>
+    <span class="pill pill-on">7yr audit log</span>
+    <span class="pill pill-on">CMF data cache</span>
+    <span class="pill pill-on">Service Bus events</span>
+    <span class="pill pill-on">Terraform IaC</span>
+    <span class="pill pill-on">Secrets vault</span>
+    <span class="pill pill-off">DDoS Standard</span>
+    <span class="pill pill-off">Sentinel</span>
+    <span class="pill pill-off">HA failover</span>
+    <span class="pill pill-off">Zone-redundancy</span>
+    <span class="pill pill-off">Geo-DR</span>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════ SLIDE 3 — PLAN B DEEP DIVE ══════════════ -->
+<section class="slide" id="spb" style="background:linear-gradient(150deg,rgba(96,165,250,.06) 0%,rgba(12,21,32,1) 50%,rgba(96,165,250,.03) 100%);">
+<div class="si">
+  <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:.4rem;">
+    <span style="font-family:var(--mono);font-size:3rem;font-weight:500;color:var(--plan-b);line-height:1;">B</span>
+    <div>
+      <div class="eyebrow" style="margin-bottom:2px;">Plan B · Standard Cloud</div>
+      <h2 style="font-size:1.5rem;">Proven demand. Production-ready. Balanced investment.</h2>
+    </div>
+  </div>
+
+  <div class="analogy" style="margin-bottom:1.2rem;">
+    <div class="analogy-eyebrow">Non-technical analogy</div>
+    <div class="analogy-text">Plan B is like <em>upgrading from one checkout lane to two</em> in a supermarket — you can handle twice the queue without turning anyone away. You've proven the shop is popular. Now you invest in the second lane, better security cameras, and a manager watching the floor.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;">
+    <div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--plan-b);margin-bottom:8px;">What Plan B adds over Plan A</div>
+
+      <div class="storybox" style="background:rgba(96,165,250,.05);border-color:rgba(96,165,250,.2);">
+        <div class="storybox-icon">🔁</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-b);">Basic high-availability</div>
+          <div class="storybox-title">2 servers per tier — if one fails, the other takes over</div>
+          <div class="storybox-text">Plan B runs <strong>two servers instead of one</strong> at each tier. If one has a problem, the other continues without interruption. This is the minimum for a government service that citizens are relying on daily. The switchover is automatic — citizens notice nothing.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(96,165,250,.05);border-color:rgba(96,165,250,.2);">
+        <div class="storybox-icon">🛡️</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-b);">Upgraded security inspection</div>
+          <div class="storybox-title">Firewall Premium — reads inside encrypted traffic</div>
+          <div class="storybox-text">Plan B upgrades to a Premium firewall with IDPS — it can inspect encrypted (HTTPS) traffic for threats, not just the outside of the packet. <strong>Think of it as upgrading from a metal detector at the door to an X-ray machine</strong> — it sees what's inside. Required to validate security rules before deploying to the full production environment.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(96,165,250,.05);border-color:rgba(96,165,250,.2);">
+        <div class="storybox-icon">📡</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-b);">Security monitoring activated</div>
+          <div class="storybox-title">Microsoft Sentinel — threat detection and alerting</div>
+          <div class="storybox-text">Plan B turns on Microsoft Sentinel — a security intelligence platform that monitors all activity and flags suspicious patterns. <strong>It's the difference between a security camera that records and one that alerts the guard when it sees something unusual.</strong> At advisory mode initially — alerts are reviewed by the Orangebd team before automated responses are activated.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(96,165,250,.05);border-color:rgba(96,165,250,.2);">
+        <div class="storybox-icon">🔗</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-b);">Premium WAF + secure origin connections</div>
+          <div class="storybox-title">Front Door Premium — encrypted private connections to servers</div>
+          <div class="storybox-text">Plan B upgrades the front door to Premium tier, which allows the CDN to connect to backend servers via private encrypted links (not public internet). <strong>Citizen data never travels over the public internet between the front door and the servers.</strong> Also enables advanced WAF rules for sophisticated attack patterns.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--ink3);margin-bottom:8px;">What stays the same as Plan A</div>
+      <div class="storybox" style="background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08);margin-bottom:1rem;">
+        <div class="storybox-icon">✅</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--ink3);">Unchanged components</div>
+          <div class="storybox-text">All 6 registry connections work identically. The citizen login process (eID + Entra) is unchanged. The 7-year audit log and SHA-256 identity scrambling are unchanged. The CMF data cache, Service Bus message system, and Terraform infrastructure-as-code pipelines are identical. <strong>Only the scale and security tier change — not the architecture.</strong></div>
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:rgba(248,113,113,.7);margin-bottom:8px;">What Plan B still does NOT include</div>
+
+      <div class="storybox" style="background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.15);margin-bottom:6px;">
+        <div class="storybox-icon">⚡</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--rose);">No DDoS Standard — quarterly drill only</div>
+          <div class="storybox-text">DDoS Standard is still not deployed continuously. Instead, it is activated for a 4-hour window each quarter to validate the configuration — then switched off to avoid the $2,944/month cost. <strong>This is a conscious decision, not an oversight.</strong> The regulator must mandate continuous DDoS Standard before it becomes a fixed cost.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.15);margin-bottom:6px;">
+        <div class="storybox-icon">🌍</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--rose);">No geographic disaster recovery</div>
+          <div class="storybox-text">If the entire Azure data centre region has an outage, Plan B has no automatic failover to a second region. <strong>For Sint Maarten's usage patterns, a regional Azure outage is extremely rare and brief.</strong> The Cosmos DB and SQL databases have local backups that allow recovery within hours — not days.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.15);">
+        <div class="storybox-icon">🏗️</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--rose);">No 3-zone spread</div>
+          <div class="storybox-text">Azure data centres are divided into availability zones (physically separate buildings with separate power and cooling). Plan B runs 2 servers but does not guarantee they are in separate zones. Plan C guarantees 3 separate zones — Plan B's 2 servers may share a zone.</div>
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--amber);margin-bottom:8px;margin-top:1rem;">When to upgrade from Plan B to Plan C</div>
+      <div class="utrigger"><div class="utrigger-icon">📊</div><div class="utrigger-text"><strong>Load data from Plan A shows</strong> sustained high CPU, database queries, or cache misses over 3+ months</div></div>
+      <div class="utrigger"><div class="utrigger-icon">⚖️</div><div class="utrigger-text"><strong>Formal RTO/RPO SLA commitment</strong> to the Government requires &lt;5 minute recovery time objective</div></div>
+      <div class="utrigger"><div class="utrigger-icon">🔐</div><div class="utrigger-text"><strong>PCI-DSS scope confirmed</strong> — triggers Key Vault Premium HSM + ADR-005 update + QSA sign-off</div></div>
+    </div>
+  </div>
+
+  <div class="pill-grid" style="margin-top:1rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.07);">
+    <span style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);align-self:center;margin-right:4px;">Plan B adds:</span>
+    <span class="pill pill-on-b">2 servers per tier (basic HA)</span>
+    <span class="pill pill-on-b">Front Door Premium + WAF</span>
+    <span class="pill pill-on-b">Firewall Premium + IDPS</span>
+    <span class="pill pill-on-b">Sentinel monitoring</span>
+    <span class="pill pill-on-b">Defender P2 all plans</span>
+    <span class="pill pill-on-b">VPN Gateway (on-prem link)</span>
+    <span class="pill pill-on-b">Bastion Standard</span>
+    <span class="pill pill-off">DDoS Standard (quarterly drill)</span>
+    <span class="pill pill-off">3-AZ zone spread</span>
+    <span class="pill pill-off">Geo-DR</span>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════ SLIDE 4 — PLAN C DEEP DIVE ══════════════ -->
+<section class="slide" id="spc" style="background:linear-gradient(150deg,rgba(155,135,245,.06) 0%,rgba(12,21,32,1) 50%,rgba(155,135,245,.03) 100%);">
+<div class="si">
+  <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:.4rem;">
+    <span style="font-family:var(--mono);font-size:3rem;font-weight:500;color:var(--plan-c);line-height:1;">C</span>
+    <div>
+      <div class="eyebrow" style="margin-bottom:2px;">Plan C · Full Cloud</div>
+      <h2 style="font-size:1.5rem;">The full enterprise stack — when the data says you need it.</h2>
+    </div>
+  </div>
+
+  <div class="analogy" style="margin-bottom:1.2rem;">
+    <div class="analogy-eyebrow">Non-technical analogy</div>
+    <div class="analogy-text">Plan C is like <em>opening three checkout lanes, each in a separate building, with a full security operations team, an armoured van, and a backup warehouse in another city.</em> It is what a national bank or a high-traffic e-commerce platform would deploy. Sint Maarten may need this — but only once the traffic data justifies it.</div>
+  </div>
+
+  <div style="background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.25);border-radius:8px;padding:10px 16px;margin-bottom:1.2rem;display:flex;gap:10px;align-items:flex-start;">
+    <span style="font-size:1.2rem;flex-shrink:0;">⚠️</span>
+    <div style="font-size:.8rem;color:rgba(232,228,220,.7);line-height:1.65;">
+      <strong style="color:var(--amber);">Important for decision-makers:</strong> Plan C requires two formal Architecture Decision Records (ADR-011 and ADR-005 update) and a QSA (security auditor) sign-off before the SQL and Key Vault changes can be committed. These are not optional — they are compliance obligations. Plan C is not a simple upgrade; it is a formal commitment.
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;">
+    <div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--plan-c);margin-bottom:8px;">What Plan C adds over Plan B</div>
+
+      <div class="storybox" style="background:rgba(155,135,245,.05);border-color:rgba(155,135,245,.2);">
+        <div class="storybox-icon">🏛️</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-c);">3-zone availability — three physically separate buildings</div>
+          <div class="storybox-title">7 servers across 3 Azure availability zones</div>
+          <div class="storybox-text">Plan C runs 3 frontend servers and 4 backend servers, each in a <strong>physically separate building</strong> within the same Azure region — separate power, separate cooling, separate network. If one entire building has a problem, the other two continue without any citizen noticing. This is the foundation of the 99.9%+ SLA commitment.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(155,135,245,.05);border-color:rgba(155,135,245,.2);">
+        <div class="storybox-icon">🛡️</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-c);">DDoS Standard — full network perimeter protection</div>
+          <div class="storybox-title">Always-on attack absorption for the entire network</div>
+          <div class="storybox-text"><strong>This is the most expensive single addition</strong> ($2,944/month). DDoS Standard protects the entire Azure VNet from volumetric attacks — not just the front door. A DDoS attack at scale could flood Sint Maarten's network perimeter, not just the website. Required once the platform is a high-value regulatory target.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(155,135,245,.05);border-color:rgba(155,135,245,.2);">
+        <div class="storybox-icon">🔑</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-c);">Hardware security module (HSM) for encryption keys</div>
+          <div class="storybox-title">Key Vault Premium — government-grade key protection</div>
+          <div class="storybox-text">Plan C uses a <strong>hardware security module</strong> (FIPS 140-2 Level 2) to protect encryption keys. This is a physical chip that generates and stores keys — they can never be exported, even by Microsoft engineers. Required if PCI-DSS scope is confirmed for Sint Maarten's payment flows. Needs QSA sign-off.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(155,135,245,.05);border-color:rgba(155,135,245,.2);">
+        <div class="storybox-icon">🌐</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-c);">Service Bus Premium — dedicated messaging lane</div>
+          <div class="storybox-title">Dedicated message queue — no shared infrastructure</div>
+          <div class="storybox-text">Plans A and B share messaging infrastructure with other Azure customers. Plan C gets a <strong>dedicated lane</strong> — guaranteed throughput, no noisy neighbours. Also enables geographic disaster recovery for the message queue: if the primary region fails, messages fail over to a backup queue automatically within minutes.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--amber);margin-bottom:8px;">Formal commitments Plan C requires</div>
+
+      <div class="storybox" style="background:rgba(245,166,35,.05);border-color:rgba(245,166,35,.2);margin-bottom:8px;">
+        <div class="storybox-icon">📋</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--amber);">ADR-011 — database architecture change</div>
+          <div class="storybox-title">SQL Managed Instance General Purpose · load test required</div>
+          <div class="storybox-text">The XLS baseline used SQL Database Business Critical. Plan C uses SQL Managed Instance General Purpose — a different product with <strong>significantly lower cost but different performance characteristics</strong>. It handles Sint Maarten's expected workload comfortably, but this must be validated with a load test before the Reserved Instance (annual cost commitment) is signed. ADR-011 documents this decision formally.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(245,166,35,.05);border-color:rgba(245,166,35,.2);margin-bottom:8px;">
+        <div class="storybox-icon">📋</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--amber);">ADR-005 update — key management change</div>
+          <div class="storybox-title">Managed HSM removed · Key Vault Premium replaces it · QSA review</div>
+          <div class="storybox-text">The XLS baseline included a dedicated Managed HSM ($3,320/month). Plan C replaces it with Key Vault Premium's HSM-backed keys — <strong>same security standard, far lower cost</strong>. This change requires a formal update to ADR-005 and a sign-off from the QSA (Qualified Security Assessor) if PCI-DSS compliance is in scope.</div>
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--rose);margin-bottom:8px;margin-top:.5rem;">Items locked in Plan C — cannot be removed</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div style="border-radius:6px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);padding:8px 10px;">
+          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 DDoS Standard</div>
+          <div style="font-size:.72rem;color:var(--ink2);">Regulatory requirement. Cannot be removed without regulator sign-off.</div>
+        </div>
+        <div style="border-radius:6px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);padding:8px 10px;">
+          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 Front Door Premium</div>
+          <div style="font-size:.72rem;color:var(--ink2);">Private backend connections required for citizen data SLA.</div>
+        </div>
+        <div style="border-radius:6px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);padding:8px 10px;">
+          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 ASE HA footprint</div>
+          <div style="font-size:.72rem;color:var(--ink2);">Once Reserved Instance committed, 3-instance minimum is contractual.</div>
+        </div>
+        <div style="border-radius:6px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);padding:8px 10px;">
+          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 Storage GZRS + WORM</div>
+          <div style="font-size:.72rem;color:var(--ink2);">7-year immutable storage. Legal compliance. Cannot downgrade.</div>
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--plan-c);margin-bottom:8px;margin-top:1rem;">Plan C delivers</div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>99.9%+ platform uptime SLA</div>
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>RTO &lt;5 minutes on server failure</div>
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>DDoS attack absorption at network level</div>
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>FIPS 140-2 L2 hardware key protection</div>
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>7-year WORM compliance storage</div>
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>Full Sentinel SOAR (P2 → P3 phasing)</div>
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>All NFR-01 through NFR-08 met</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pill-grid" style="margin-top:1rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.07);">
+    <span style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);align-self:center;margin-right:4px;">Plan C adds:</span>
+    <span class="pill pill-on-c">3-AZ zone-redundancy</span>
+    <span class="pill pill-on-c">DDoS Standard 🔒</span>
+    <span class="pill pill-on-c">7 ASE instances RI</span>
+    <span class="pill pill-on-c">SQL MI 16vCore + geo-replica</span>
+    <span class="pill pill-on-c">Cosmos 50k RU/s</span>
+    <span class="pill pill-on-c">Service Bus Premium</span>
+    <span class="pill pill-on-c">KV Premium HSM 🔒</span>
+    <span class="pill pill-on-c">GZRS + WORM 🔒</span>
+    <span class="pill pill-on-c">Sentinel 40 GB/day</span>
+    <span class="pill pill-on-c">Purview 8 CU</span>
+    <span class="pill pill-warn">ADR-011 required</span>
+    <span class="pill pill-warn">ADR-005 update</span>
+    <span class="pill pill-warn">QSA sign-off</span>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════ SLIDE — DEPENDENCY GRAPH ══════════════ -->
+<section class="slide" id="sgraph" style="padding:52px 0 0;height:100vh;max-height:100vh;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse 70% 60% at 50% 45%,rgba(15,25,45,1) 0%,rgba(12,21,32,1) 100%);">
+
+<style>
+#sgraph *{box-sizing:border-box;}
+#sgraph .gh{padding:10px 2.4rem 6px;flex-shrink:0;display:flex;align-items:center;gap:1.2rem;}
+#sgraph .gh h2{font-family:'DM Serif Display',serif;font-size:1.2rem;color:#e8e4dc;margin:0;}
+#sgraph .gh p{font-family:'DM Mono',monospace;font-size:.6rem;color:rgba(232,228,220,.3);margin:0;}
+
+/* plan filter tabs */
+#sgraph .gfilter{
+  display:flex;gap:4px;flex-shrink:0;
+  padding:0 2.4rem 6px;
+  align-items:center;
+}
+#sgraph .gftab{
+  font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;
+  padding:4px 12px;border-radius:20px;cursor:pointer;border:1.5px solid;
+  transition:all .2s;
+  background:none;
+}
+#sgraph .gftab.all{border-color:rgba(232,228,220,.2);color:rgba(232,228,220,.4);}
+#sgraph .gftab.all.on{border-color:rgba(232,228,220,.5);color:#e8e4dc;background:rgba(255,255,255,.07);}
+#sgraph .gftab.fa{border-color:rgba(34,199,146,.3);color:rgba(34,199,146,.5);}
+#sgraph .gftab.fa.on{border-color:#22c792;color:#22c792;background:rgba(34,199,146,.1);}
+#sgraph .gftab.fb{border-color:rgba(96,165,250,.3);color:rgba(96,165,250,.5);}
+#sgraph .gftab.fb.on{border-color:#60a5fa;color:#60a5fa;background:rgba(96,165,250,.1);}
+#sgraph .gftab.fc{border-color:rgba(155,135,245,.3);color:rgba(155,135,245,.5);}
+#sgraph .gftab.fc.on{border-color:#9b87f5;color:#9b87f5;background:rgba(155,135,245,.1);}
+#sgraph .gftab-sep{width:1px;height:16px;background:rgba(255,255,255,.1);margin:0 4px;}
+#sgraph .glegend{margin-left:auto;display:flex;gap:8px;align-items:center;}
+#sgraph .gleg{display:flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:.55rem;color:rgba(232,228,220,.3);}
+#sgraph .gleg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* canvas area */
+#sgraph .gcanvas{flex:1;min-height:0;position:relative;overflow:hidden;}
+#sgraph #gsvg{width:100%;height:100%;cursor:grab;}
+#sgraph #gsvg:active{cursor:grabbing;}
+
+/* tooltip */
+#sgraph .gtooltip{
+  position:absolute;pointer-events:none;
+  background:rgba(12,21,32,.96);border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;padding:10px 14px;
+  font-family:'DM Mono',monospace;font-size:.65rem;
+  max-width:260px;z-index:100;
+  opacity:0;transition:opacity .15s;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+}
+#sgraph .gtooltip.vis{opacity:1;}
+#sgraph .gtt-name{font-size:.8rem;font-weight:600;margin-bottom:4px;color:#e8e4dc;}
+#sgraph .gtt-cluster{font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+#sgraph .gtt-desc{font-size:.68rem;color:rgba(232,228,220,.6);line-height:1.55;margin-bottom:6px;}
+#sgraph .gtt-plans{display:flex;gap:4px;flex-wrap:wrap;}
+#sgraph .gtt-plan{font-size:.58rem;padding:1px 7px;border-radius:8px;border:1px solid;}
+
+/* ── node counter panel ── */
+#gcounter{
+  margin-left:auto;flex-shrink:0;
+  display:flex;align-items:stretch;gap:0;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;overflow:hidden;
+  font-family:'DM Mono',monospace;
+}
+.gctr-block{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:6px 14px;gap:1px;
+  border-right:1px solid rgba(255,255,255,.07);
+  position:relative;transition:background .25s;
+  min-width:68px;
+}
+.gctr-block:last-child{border-right:none;}
+.gctr-block.active{background:var(--gcb);}
+.gctr-num{
+  font-size:1.5rem;font-weight:500;line-height:1;
+  color:rgba(232,228,220,.2);
+  transition:color .4s,transform .3s;
+}
+.gctr-block.active .gctr-num{color:var(--gcc);}
+.gctr-num.bump{animation:numBump .35s cubic-bezier(.4,0,.2,1);}
+@keyframes numBump{0%{transform:scale(1);}40%{transform:scale(1.35);}100%{transform:scale(1);}}
+.gctr-label{
+  font-size:.5rem;text-transform:uppercase;letter-spacing:.12em;
+  color:rgba(232,228,220,.22);white-space:nowrap;
+}
+.gctr-block.active .gctr-label{color:var(--gcc);opacity:.7;}
+.gctr-bar{
+  position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--gcc);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .6s cubic-bezier(.4,0,.2,1);
+}
+.gctr-block.active .gctr-bar{transform:scaleX(1);}
+.gctr-total{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:6px 14px;gap:1px;min-width:68px;
+  background:rgba(255,255,255,.03);
+}
+.gctr-total .gctr-num{font-size:1.5rem;color:rgba(232,228,220,.55);}
+.gctr-total .gctr-label{color:rgba(232,228,220,.22);}
+#sgraph .gfire-icon{font-size:.75rem;margin-right:2px;display:inline-block;transition:transform .15s;}
+#sgraph .gftab:hover .gfire-icon{transform:scale(1.3) rotate(-10deg);}
+#sgraph .gftab.on .gfire-icon{animation:fireflicker .4s ease-in-out infinite alternate;}
+@keyframes fireflicker{from{transform:scale(1) rotate(-5deg);}to{transform:scale(1.2) rotate(5deg);}}
+#sgraph #gfire-status{transition:all .2s;}
+
+/* ── service legend panel ── */
+/* ── legend overlay ── */
+#glegend-panel{
+  position:absolute;
+  top:14px; right:14px;
+  z-index:50;
+  display:flex;flex-direction:column;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:12px;
+  background:rgba(8,15,26,.97);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  width:268px;
+  box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.05);
+  overflow:hidden;
+  transition:box-shadow .2s;
+}
+#glegend-panel:hover{box-shadow:0 12px 48px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.09);}
+/* height transitions on body only — header stays visible */
+#glegend-body{
+  overflow-y:auto;overflow-x:hidden;
+  max-height:0;
+  transition:max-height .32s cubic-bezier(.4,0,.2,1), opacity .22s;
+  opacity:0;
+  padding:0;
+}
+#glegend-panel.expanded #glegend-body{
+  max-height:calc(100vh - 220px);
+  opacity:1;
+}
+#glegend-body::-webkit-scrollbar{width:3px;}
+#glegend-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px;}
+/* drag handle / toggle header */
+#glegend-toggle{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;
+  cursor:grab;
+  background:rgba(255,255,255,.03);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  user-select:none;
+  flex-shrink:0;
+}
+#glegend-toggle:active{cursor:grabbing;}
+#glegend-toggle:hover{background:rgba(255,255,255,.06);}
+.glp-drag{font-size:.7rem;color:rgba(255,255,255,.18);flex-shrink:0;letter-spacing:1px;}
+.glp-title{
+  font-family:'DM Mono',monospace;font-size:.58rem;
+  text-transform:uppercase;letter-spacing:.12em;
+  color:rgba(232,228,220,.65);flex:1;
+}
+.glp-toggle-btn{
+  font-family:'DM Mono',monospace;font-size:.65rem;
+  color:rgba(232,228,220,.3);flex-shrink:0;
+  background:none;border:none;cursor:pointer;padding:0 2px;
+  transition:color .15s, transform .22s;
+  line-height:1;
+}
+#glegend-panel.expanded .glp-toggle-btn{transform:rotate(180deg);}
+.glp-toggle-btn:hover{color:rgba(232,228,220,.7);}
+/* plan group heading */
+.glp-plan-head{
+  font-family:'DM Mono',monospace;font-size:.55rem;
+  text-transform:uppercase;letter-spacing:.14em;
+  padding:8px 12px 4px;
+  display:flex;align-items:center;gap:6px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  position:sticky;top:0;z-index:2;
+  background:rgba(8,15,26,.98);
+}
+.glp-plan-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+/* service rows */
+.glp-row{
+  display:flex;align-items:flex-start;gap:8px;
+  padding:6px 12px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  transition:background .1s;
+}
+.glp-row:hover{background:rgba(255,255,255,.05);}
+.glp-row:last-child{border-bottom:none;}
+.glp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.glp-text{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0;}
+.glp-name{
+  font-family:'DM Mono',monospace;font-size:.66rem;
+  color:rgba(232,228,220,.88);line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.glp-why{font-size:.68rem;color:rgba(232,228,220,.42);line-height:1.5;}
+.glp-locked{font-family:'DM Mono',monospace;font-size:.52rem;color:rgba(248,113,113,.65);margin-top:1px;}
+</style>
+
+<div class="gh" style="align-items:flex-start;">
+  <div>
+    <span class="stag stag-violet" style="margin:0 0 3px;">Service Dependency Graph</span>
+    <h2>All Azure Services — Clusters, Dependencies &amp; Plan Coverage</h2>
+    <p style="margin-top:2px;">drag nodes · scroll to zoom · click to inspect · fire a plan to animate</p>
+  </div>
+
+  <!-- ── Node counter ── -->
+  <div id="gcounter">
+    <div class="gctr-block" id="gctr-a" style="--gcb:rgba(34,199,146,.08);--gcc:#22c792;">
+      <div class="gctr-num" id="gctr-num-a">0</div>
+      <div class="gctr-label">Plan A</div>
+      <div class="gctr-bar"></div>
+    </div>
+    <div class="gctr-block" id="gctr-b" style="--gcb:rgba(96,165,250,.08);--gcc:#60a5fa;">
+      <div class="gctr-num" id="gctr-num-b">0</div>
+      <div class="gctr-label">Plan B adds</div>
+      <div class="gctr-bar"></div>
+    </div>
+    <div class="gctr-block" id="gctr-c" style="--gcb:rgba(155,135,245,.08);--gcc:#9b87f5;">
+      <div class="gctr-num" id="gctr-num-c">0</div>
+      <div class="gctr-label">Plan C adds</div>
+      <div class="gctr-bar"></div>
+    </div>
+    <div class="gctr-total">
+      <div class="gctr-num" id="gctr-num-total">0</div>
+      <div class="gctr-label">In plan</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="gfilter">
+  <span style="font-family:'DM Mono',monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(232,228,220,.22);margin-right:4px;">View</span>
+  <button class="gftab all on" onclick="gFilter('all')">All</button>
+  <div class="gftab-sep"></div>
+  <span style="font-family:'DM Mono',monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(232,228,220,.22);margin-right:4px;margin-left:4px;">Animate plan</span>
+  <button class="gftab fa" onclick="gFirePlan('A')">
+    <span class="gfire-icon">🔥</span> Plan A
+  </button>
+  <button class="gftab fb" onclick="gFirePlan('B')">
+    <span class="gfire-icon">🔥</span> Plan B
+  </button>
+  <button class="gftab fc" onclick="gFirePlan('C')">
+    <span class="gfire-icon">🔥</span> Plan C
+  </button>
+  <div id="gfire-status" style="font-family:'DM Mono',monospace;font-size:.58rem;color:rgba(232,228,220,.3);margin-left:8px;min-width:160px;"></div>
+  <div class="glegend">
+    <div class="gleg"><div class="gleg-dot" style="background:#60a5fa;"></div>Consumer</div>
+    <div class="gleg"><div class="gleg-dot" style="background:#fca5a5;"></div>Gateway</div>
+    <div class="gleg"><div class="gleg-dot" style="background:#6ee7b7;"></div>Adapters</div>
+    <div class="gleg"><div class="gleg-dot" style="background:#c4b5fd;"></div>Orchestration</div>
+    <div class="gleg"><div class="gleg-dot" style="background:#fbbf24;"></div>Data</div>
+    <div class="gleg"><div class="gleg-dot" style="background:#f87171;"></div>Identity</div>
+    <div class="gleg"><div class="gleg-dot" style="background:#94a3b8;"></div>Platform</div>
+  </div>
+</div>
+
+<div class="gcanvas">
+  <svg id="gsvg"></svg>
+  <div class="gtooltip" id="gtooltip"></div>
+
+  <!-- ── Service legend overlay ── -->
+  <div id="glegend-panel" class="">
+    <div id="glegend-toggle">
+      <span class="glp-drag">⣿</span>
+      <span class="glp-title" id="glp-title">Plan services ▸ fire a plan</span>
+      <button class="glp-toggle-btn" onclick="gLegendToggle(event)" title="expand / collapse">▾</button>
+    </div>
+    <div id="glegend-body">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+(function(){
+// ── DATA ──────────────────────────────────────────────────────────────────────
+var CLUSTERS = {
+  consumer:    {label:'Consumer',   color:'#60a5fa', bg:'rgba(96,165,250,.06)',  stroke:'rgba(96,165,250,.2)'},
+  gateway:     {label:'API Gateway',color:'#fca5a5', bg:'rgba(232,83,58,.06)',   stroke:'rgba(232,83,58,.2)'},
+  adapters:    {label:'Adapters',   color:'#6ee7b7', bg:'rgba(34,199,146,.06)', stroke:'rgba(34,199,146,.2)'},
+  orch:        {label:'Orchestration',color:'#c4b5fd',bg:'rgba(155,135,245,.06)',stroke:'rgba(155,135,245,.2)'},
+  data:        {label:'Data Tier',  color:'#fbbf24', bg:'rgba(245,166,35,.06)',  stroke:'rgba(245,166,35,.2)'},
+  identity:    {label:'Identity & AI',color:'#f87171',bg:'rgba(248,113,113,.06)',stroke:'rgba(248,113,113,.2)'},
+  platform:    {label:'Platform',   color:'#94a3b8', bg:'rgba(100,116,139,.06)', stroke:'rgba(100,116,139,.2)'},
+};
+
+// azure:true = Azure native service shown in legend; azure:false = DGTP app code
+var NODES = [
+  // ── Consumer ─────────────────────────────────────────── azure:false = DGTP code
+  {id:'portal',   cluster:'consumer', label:'GoSXM Portal',        azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. Citizen-facing web app hosted on ASE v3. Authenticates via Entra External ID.'},
+  {id:'bff',      cluster:'consumer', label:'GoSXM BFF',            azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. Backend-For-Frontend proxy — holds APIM subscription key so browser never handles credentials.'},
+  // azure:true = Azure native services
+  {id:'afd-std',  cluster:'consumer', label:'Azure Front Door Standard',  azure:true, plans:['A'],     locked:false, desc:'CDN + basic WAF core rules. Routes and protects citizen traffic at the edge. No private link origins.'},
+  {id:'afd-prem', cluster:'consumer', label:'Azure Front Door Premium',   azure:true, plans:['B','C'], locked:true,  desc:'WAF Premium + private link origins. Citizen data never traverses public internet to backend servers.'},
+  {id:'appgw-std',cluster:'consumer', label:'Application Gateway Standard v2', azure:true, plans:['A'], locked:false, desc:'TLS termination and HTTP/S routing. Single instance, no WAF, no zone spread.'},
+  {id:'appgw-waf',cluster:'consumer', label:'Application Gateway WAF v2', azure:true, plans:['B','C'], locked:false, desc:'Enterprise WAF with full OWASP rule set. Plan B: ×1 medium. Plan C: ×3 zone-redundant.'},
+
+  // ── API Gateway ─────────────────────────────────────── all Azure native
+  {id:'apim-dev', cluster:'gateway',  label:'Azure API Management Developer',  azure:true, plans:['A'],     locked:false, desc:'Full 8-stage inbound pipeline — JWT validate, scope, rate limit, IP filter, request validate, correlation ID, MI auth, route. No SLA.'},
+  {id:'apim-std', cluster:'gateway',  label:'Azure API Management Standard v2',azure:true, plans:['B'],     locked:false, desc:'99.95% SLA. Auto-scales 1–5 units. VNet integration for private endpoint access to adapters.'},
+  {id:'apim-prem',cluster:'gateway',  label:'Azure API Management Premium v2', azure:true, plans:['C'],     locked:false, desc:'99.99% SLA. Multi-region capable. Zone-redundant. Auto-scale 1–10 units.'},
+
+  // ── Adapters cluster ─── DGTP application code + Azure ASE (azure native)
+  {id:'casbes',   cluster:'adapters', label:'CasbesAdapter (.NET 8)',  azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. SOAP/StUF-BG client to Civil Registry (Centric). Only SOAP call in the platform. Runs on ASE.'},
+  {id:'coci',     cluster:'adapters', label:'CociAdapter (.NET 8)',    azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. REST/JSON to Chamber of Commerce (Qualogy). Issues CRIB numbers. Runs on ASE.'},
+  {id:'siah',     cluster:'adapters', label:'SiahAdapter (.NET 8)',    azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. OData v4 to Tax CRM — §16.2 OIDC citizen token enforced before every query. Runs on ASE.'},
+  {id:'bliss',    cluster:'adapters', label:'BlissAdapter (.NET 8)',   azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. OData v4 to TEATT Dynamics 365 licensing tenant. Runs on ASE.'},
+  {id:'vromi',    cluster:'adapters', label:'VromiAdapter (.NET 8)',   azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. ArcGIS REST to VROMI permits. ArcGIS tokens auto-refreshed from Redis every 90 min. Runs on ASE.'},
+  {id:'kadaster', cluster:'adapters', label:'KadasterAdapter (.NET 8)',azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. ⚠ OI-08 BLOCKED. APIM mock policy returns stub data. Config swap on resolution — zero code change.'},
+  {id:'ase-a',    cluster:'adapters', label:'App Service Env v3  I1v2 ×2',  azure:true, plans:['A'],     locked:false, desc:'1 frontend + 1 backend I1v2 instance. Hosts all .NET 8 adapter Function Apps. No HA, no zone spread. Shutdown saves 65%.'},
+  {id:'ase-b',    cluster:'adapters', label:'App Service Env v3  I2v2 ×4',  azure:true, plans:['B'],     locked:false, desc:'2 frontend + 2 backend I2v2. Basic HA — automatic failover between instances. No 3-AZ zone spread.'},
+  {id:'ase-c',    cluster:'adapters', label:'App Service Env v3  I4v2 ×7',  azure:true, plans:['C'],     locked:true,  desc:'3 frontend + 4 backend I4v2 across 3 availability zones. 1-year Reserved Instance. LOCKED — cannot reduce after RI commit.'},
+
+  // ── Orchestration ─── mixed
+  {id:'outbox',   cluster:'orch',     label:'Outbox Relay (DGTP code)',azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. Timer-triggered Azure Function. Picks up PENDING rows from dbo.OutboxMessages and publishes to Service Bus.'},
+  {id:'sb-std',   cluster:'orch',     label:'Azure Service Bus Standard',   azure:true, plans:['A','B'], locked:false, desc:'Shared messaging infrastructure. Hosts dgtp.registry.events topic with 2 active subscriptions. 10M ops/mo included.'},
+  {id:'sb-prem',  cluster:'orch',     label:'Azure Service Bus Premium 1MU',azure:true, plans:['C'],     locked:false, desc:'Dedicated messaging unit. VNet-integrated, zone-redundant. Geo-DR via Standard backup namespace. Phase 2 workflow topic added.'},
+  {id:'eventgrid',cluster:'orch',     label:'Azure Event Grid',             azure:true, plans:['A','B','C'], locked:false, desc:'Consumption-based event fan-out and routing. Plan A: 10M events/mo. Plan B: 50M. Plan C: 200M.'},
+  {id:'logicapps-cons',cluster:'orch',label:'Azure Logic Apps Consumption',  azure:true, plans:['A'],     locked:false, desc:'Pay-per-execution workflow orchestration. No VNet integration. Suitable for low-volume dev flows.'},
+  {id:'logicapps-std', cluster:'orch',label:'Azure Logic Apps Standard WS1', azure:true, plans:['B','C'], locked:false, desc:'Always-on hosting plan. VNet integration required to reach private endpoints in staging and prod.'},
+
+  // ── Data ─── all Azure native
+  {id:'sql-a',    cluster:'data',     label:'Azure SQL MI  GP 4vCore',      azure:true, plans:['A'],     locked:false, desc:'Full SQL Server surface area. Hosts dbo.OutboxMessages, dbo.AuditLog (7yr LTR), dbo.ReferenceCode. Dev/Test + AHB ~58% saving.'},
+  {id:'sql-b',    cluster:'data',     label:'Azure SQL MI  GP 8vCore',      azure:true, plans:['B'],     locked:false, desc:'Double the vCores vs Plan A. Staging-grade IOPS. Same Dev/Test + AHB pricing model.'},
+  {id:'sql-c',    cluster:'data',     label:'Azure SQL MI  GP 16vCore RI',  azure:true, plans:['C'],     locked:false, desc:'Production grade. ZRS + geo-replica. 1-yr Reserved Instance + AHB. ADR-011 required. Load-test before committing RI.'},
+  {id:'cosmos-sv',cluster:'data',     label:'Azure Cosmos DB  Serverless',  azure:true, plans:['A'],     locked:false, desc:'CMF cache. citizen-profiles 15min TTL, business-records 5min, address-cache 24h. Bills per RU — optimal for Go-Live traffic.'},
+  {id:'cosmos-b', cluster:'data',     label:'Azure Cosmos DB  Autoscale 10k',azure:true, plans:['B'],   locked:false, desc:'Autoscale 1k→10k RU/s. Bills for max-burst hour only. Single region. Same TTL schema as Plan A.'},
+  {id:'cosmos-c', cluster:'data',     label:'Azure Cosmos DB  Autoscale 50k',azure:true, plans:['C'],   locked:false, desc:'Autoscale 10k→50k RU/s. Single-write + multi-region reads. 7-day continuous backup.'},
+  {id:'redis',    cluster:'data',     label:'Azure Cache for Redis  C1',    azure:true, plans:['A','B','C'], locked:false, desc:'ArcGIS tokens (2h TTL), refdata (1h TTL), APIM rate-limit counters. ⚠ NO citizen PII stored here — ever.'},
+  {id:'kv-std',   cluster:'data',     label:'Azure Key Vault  Standard',    azure:true, plans:['A','B'], locked:false, desc:'All adapter secrets and API keys via Managed Identity only. CASBES 90d rotation, ArcGIS tokens 2h auto-refresh.'},
+  {id:'kv-prem',  cluster:'data',     label:'Azure Key Vault  Premium HSM', azure:true, plans:['C'],     locked:false, desc:'FIPS 140-2 Level 2 HSM-backed keys. Replaces Managed HSM ($3,320/mo saved). ADR-005 update + QSA sign-off required.'},
+  {id:'storage-lrs',cluster:'data',   label:'Azure Storage  LRS',           azure:true, plans:['A','B'], locked:false, desc:'Locally-redundant storage. WORM policy validation for non-production environments.'},
+  {id:'storage-gzrs',cluster:'data',  label:'Azure Storage  GZRS + WORM',   azure:true, plans:['C'],     locked:true,  desc:'Geo-zone-redundant. 7-year WORM immutability. LOCKED — compliance obligation under EA Ordinance and GDPR.'},
+
+  // ── Identity & AI ─── all Azure native
+  {id:'entra-free',cluster:'identity',label:'Entra External ID  Free 50k MAU', azure:true, plans:['A','B'], locked:false, desc:'OIDC federation hub with national eID. Issues JWT with citizen scopes. §16.2 enforced at adapter level. 50k MAU fits free tier.'},
+  {id:'entra-paid',cluster:'identity',label:'Entra External ID  150k MAU',     azure:true, plans:['C'],     locked:false, desc:'Billed tier for 150k MAU headroom — covers population growth and staff/admin accounts.'},
+  {id:'openai',   cluster:'identity', label:'Azure OpenAI  gpt-4o + embedding',azure:true, plans:['A','B','C'], locked:false, desc:'Powers citizen chatbot. PAYG: Plan A 1M tokens, Plan B 5M, Plan C 50M. Re-evaluate PTU if >150M tokens/mo sustained.'},
+  {id:'aisearch-free',cluster:'identity',label:'Azure AI Search  Free tier',   azure:true, plans:['A'],     locked:false, desc:'RAG index for dev chatbot prototype. Limit: 10k docs, 50 MB, 3 indexes. Upgrade to S2 when production chatbot goes live.'},
+  {id:'aisearch-s2', cluster:'identity',label:'Azure AI Search  S2',           azure:true, plans:['B','C'], locked:false, desc:'Plan B: S2 ×1 replica. Plan C: S2 ×2 replicas (HA pair). Add 3rd replica if QPS sustained >2,000.'},
+
+  // ── Platform ─── all Azure native
+  {id:'fw-basic', cluster:'platform', label:'Azure Firewall  Basic',          azure:true, plans:['A'],     locked:false, desc:'Stateful L4 filtering + basic threat intelligence. No IDPS, no TLS inspection. Same UDR routing as B/C — topology parity.'},
+  {id:'fw-prem',  cluster:'platform', label:'Azure Firewall  Premium',        azure:true, plans:['B','C'], locked:true,  desc:'IDPS + TLS deep-packet inspection. Required to validate IDPS rules before production rollout. Cannot downgrade.'},
+  {id:'ddos',     cluster:'platform', label:'Azure DDoS Protection  Standard',azure:true, plans:['C'],     locked:true,  desc:'Always-on VNet perimeter DDoS absorption. LOCKED — regulatory requirement for public-facing production VNet.'},
+  {id:'bastion-b',cluster:'platform', label:'Azure Bastion  Basic',           azure:true, plans:['A'],     locked:false, desc:'Browser-based RDP/SSH to VMs and ASE hosts. No public IPs required on any compute resource.'},
+  {id:'bastion-std',cluster:'platform',label:'Azure Bastion  Standard',       azure:true, plans:['B','C'], locked:true,  desc:'Native client + file transfer for UAT admin support sessions. LOCKED — required admin access pattern.'},
+  {id:'vpn',      cluster:'platform', label:'Azure VPN Gateway',              azure:true, plans:['B','C'], locked:false, desc:'On-premises connectivity for registry integration testing and admin access. Plan B: VpnGw1 single. Plan C: ×2 active-active.'},
+  {id:'law',      cluster:'platform', label:'Azure Monitor  Log Analytics',   azure:true, plans:['A','B','C'], locked:false, desc:'Central log ingestion for all services. Plan A: 2 GB/day. Plan B: 10 GB/day. Plan C: 40 GB/day with DCR sampling.'},
+  {id:'appins',   cluster:'platform', label:'Azure Application Insights',     azure:true, plans:['A','B','C'], locked:false, desc:'APM telemetry across all 11 adapter Function Apps. No PII logged. Plan A: 1 GB/day. Plan C: 10 GB/day adaptive sampling.'},
+  {id:'defender', cluster:'platform', label:'Microsoft Defender for Cloud',   azure:true, plans:['A','B','C'], locked:true,  desc:'Security posture baseline per ADR-009. Plan A: Server P1. Plans B+C: Full P2 (Servers, App Service, Storage, SQL).'},
+  {id:'sentinel', cluster:'platform', label:'Microsoft Sentinel',             azure:true, plans:['B','C'],     locked:false, desc:'Threat detection and SIEM. Plan B: 10 GB/day advisory mode. Plan C: 40 GB/day. Phases: monitor → SOAR advisory → GoSXM handover.'},
+  {id:'purview',  cluster:'platform', label:'Microsoft Purview',              azure:true, plans:['A','B','C'], locked:false, desc:'Data classification and sensitivity labelling. Plan A: 1 CU. Plan B: 4 CU. Plan C: 8 CU.'},
+  {id:'dns',      cluster:'platform', label:'Azure Private DNS Zones  ×12',   azure:true, plans:['A','B','C'], locked:false, desc:'12 private DNS zones for all private endpoint name resolution. Required by every service. Unchanged across all plans.'},
+  {id:'terraform',cluster:'platform', label:'Azure DevOps  + Terraform IaC',  azure:true, plans:['A','B','C'], locked:false, desc:'CI/CD pipelines for app and infra. Terraform + Bicep. 2-person prod gate. Zero manual portal clicks in staging/prod (NFR-07).'},
+];
+
+var EDGES = [
+  {s:'portal',t:'bff',w:3},{s:'bff',t:'afd-std',w:2},{s:'bff',t:'afd-prem',w:2},
+  {s:'afd-std',t:'appgw-std',w:2},{s:'afd-prem',t:'appgw-waf',w:2},
+  {s:'appgw-std',t:'apim-dev',w:2},{s:'appgw-waf',t:'apim-std',w:2},{s:'appgw-waf',t:'apim-prem',w:2},
+  {s:'apim-dev',t:'casbes',w:2},{s:'apim-dev',t:'coci',w:2},{s:'apim-dev',t:'siah',w:2},
+  {s:'apim-dev',t:'bliss',w:2},{s:'apim-dev',t:'vromi',w:2},{s:'apim-dev',t:'kadaster',w:2},
+  {s:'apim-std',t:'casbes',w:2},{s:'apim-std',t:'coci',w:2},{s:'apim-std',t:'siah',w:2},
+  {s:'apim-std',t:'bliss',w:2},{s:'apim-std',t:'vromi',w:2},{s:'apim-std',t:'kadaster',w:2},
+  {s:'apim-prem',t:'casbes',w:2},{s:'apim-prem',t:'coci',w:2},{s:'apim-prem',t:'siah',w:2},
+  {s:'apim-prem',t:'bliss',w:2},{s:'apim-prem',t:'vromi',w:2},{s:'apim-prem',t:'kadaster',w:2},
+  {s:'ase-a',t:'casbes',w:1},{s:'ase-a',t:'coci',w:1},{s:'ase-a',t:'siah',w:1},
+  {s:'ase-a',t:'bliss',w:1},{s:'ase-a',t:'vromi',w:1},{s:'ase-a',t:'kadaster',w:1},
+  {s:'ase-b',t:'casbes',w:1},{s:'ase-b',t:'coci',w:1},{s:'ase-b',t:'siah',w:1},
+  {s:'ase-b',t:'bliss',w:1},{s:'ase-b',t:'vromi',w:1},{s:'ase-b',t:'kadaster',w:1},
+  {s:'ase-c',t:'casbes',w:1},{s:'ase-c',t:'coci',w:1},{s:'ase-c',t:'siah',w:1},
+  {s:'ase-c',t:'bliss',w:1},{s:'ase-c',t:'vromi',w:1},{s:'ase-c',t:'kadaster',w:1},
+  {s:'casbes',t:'outbox',w:2},{s:'coci',t:'outbox',w:2},{s:'siah',t:'outbox',w:2},
+  {s:'bliss',t:'outbox',w:2},{s:'vromi',t:'outbox',w:2},
+  {s:'outbox',t:'sb-std',w:3},{s:'outbox',t:'sb-prem',w:3},
+  {s:'sb-std',t:'sql-a',w:2},{s:'sb-std',t:'sql-b',w:2},{s:'sb-prem',t:'sql-c',w:2},
+  {s:'sb-std',t:'cosmos-sv',w:2},{s:'sb-std',t:'cosmos-b',w:2},{s:'sb-prem',t:'cosmos-c',w:2},
+  {s:'eventgrid',t:'sb-std',w:1},{s:'eventgrid',t:'sb-prem',w:1},
+  {s:'logicapps-cons',t:'eventgrid',w:1},{s:'logicapps-std',t:'eventgrid',w:1},
+  {s:'entra-free',t:'portal',w:3},{s:'entra-paid',t:'portal',w:3},
+  {s:'entra-free',t:'siah',w:2},{s:'entra-paid',t:'siah',w:2},
+  {s:'sql-a',t:'outbox',w:1},{s:'sql-b',t:'outbox',w:1},{s:'sql-c',t:'outbox',w:1},
+  {s:'redis',t:'vromi',w:2},{s:'redis',t:'apim-dev',w:1},{s:'redis',t:'apim-std',w:1},{s:'redis',t:'apim-prem',w:1},
+  {s:'kv-std',t:'casbes',w:1},{s:'kv-std',t:'coci',w:1},{s:'kv-prem',t:'casbes',w:1},{s:'kv-prem',t:'coci',w:1},
+  {s:'fw-basic',t:'apim-dev',w:1},{s:'fw-prem',t:'apim-std',w:1},{s:'fw-prem',t:'apim-prem',w:1},
+  {s:'law',t:'appins',w:1},{s:'law',t:'sentinel',w:1},
+  {s:'appins',t:'casbes',w:1},{s:'appins',t:'coci',w:1},{s:'appins',t:'siah',w:1},
+  {s:'defender',t:'law',w:1},
+  {s:'dns',t:'apim-dev',w:1},{s:'dns',t:'apim-std',w:1},{s:'dns',t:'apim-prem',w:1},
+  {s:'openai',t:'aisearch-free',w:1},{s:'openai',t:'aisearch-s2',w:1},
+  {s:'aisearch-s2',t:'portal',w:1},
+  {s:'terraform',t:'ase-a',w:1},{s:'terraform',t:'ase-b',w:1},{s:'terraform',t:'ase-c',w:1},
+];
+
+var PLAN_COLORS = {A:'#22c792', B:'#60a5fa', C:'#9b87f5'};
+
+// ── COUNT nodes per plan ─────────────────────────────────────────────────────
+// Plan A = nodes that have 'A' in plans (A-only)
+// Plan B adds = nodes that have 'B' but NOT 'A'
+// Plan C adds = nodes that have 'C' but NOT 'A' and NOT 'B'
+// Counter and legend only count Azure native services (azure:true)
+var azureNodes = NODES.filter(function(n){ return n.azure; });
+var countA     = azureNodes.filter(function(n){ return n.plans.includes('A'); }).length;
+var countBonly = azureNodes.filter(function(n){ return n.plans.includes('B') && !n.plans.includes('A'); }).length;
+var countConly = azureNodes.filter(function(n){ return n.plans.includes('C') && !n.plans.includes('B') && !n.plans.includes('A'); }).length;
+
+function animateNum(elId, target, duration){
+  var el = document.getElementById(elId);
+  if(!el) return;
+  var start = 0, startTime = null;
+  function step(ts){
+    if(!startTime) startTime = ts;
+    var p = Math.min((ts - startTime) / duration, 1);
+    var ease = 1 - Math.pow(1 - p, 3); // cubic ease-out
+    el.textContent = Math.round(ease * target);
+    if(p < 1) requestAnimationFrame(step);
+    else { el.textContent = target; el.classList.add('bump'); setTimeout(function(){ el.classList.remove('bump'); }, 400); }
+  }
+  requestAnimationFrame(step);
+}
+
+function setCounter(plan){
+  // Reset all blocks
+  ['a','b','c'].forEach(function(p){
+    document.getElementById('gctr-'+p).classList.remove('active');
+  });
+  var totalEl = document.getElementById('gctr-num-total');
+
+  if(plan === 'all'){
+    animateNum('gctr-num-a', countA, 600);
+    animateNum('gctr-num-b', countBonly, 700);
+    animateNum('gctr-num-c', countConly, 800);
+    totalEl.textContent = azureNodes.length;
+    return;
+  }
+  var planSets = {A:['A'], B:['A','B'], C:['A','B','C']};
+  var active = planSets[plan];
+  var total = NODES.filter(function(n){ return active.some(function(p){ return n.plans.includes(p); }); }).length;
+
+  // Which blocks to highlight
+  if(plan === 'A'){ document.getElementById('gctr-a').classList.add('active'); }
+  if(plan === 'B'){ document.getElementById('gctr-a').classList.add('active'); document.getElementById('gctr-b').classList.add('active'); }
+  if(plan === 'C'){ document.getElementById('gctr-a').classList.add('active'); document.getElementById('gctr-b').classList.add('active'); document.getElementById('gctr-c').classList.add('active'); }
+
+  animateNum('gctr-num-a', plan==='A'?countA:countA, 500);
+  animateNum('gctr-num-b', plan==='B'||plan==='C'?countBonly:countBonly, 600);
+  animateNum('gctr-num-c', plan==='C'?countConly:countConly, 700);
+  animateNum('gctr-num-total', total, 550);
+}
+var PLAN_STROKE = {A:'rgba(34,199,146,.35)', B:'rgba(96,165,250,.35)', C:'rgba(155,135,245,.35)'};
+
+function nodeMinPlan(plans){
+  if(plans.includes('A'))return 'A';
+  if(plans.includes('B'))return 'B';
+  return 'C';
+}
+
+// ── BUILD D3 GRAPH ─────────────────────────────────────────────────────────
+var currentFilter = 'all';
+
+var svg = d3.select('#gsvg');
+var container = document.querySelector('#sgraph .gcanvas');
+
+var W = container.clientWidth, H = container.clientHeight;
+svg.attr('viewBox',[0,0,W,H]);
+
+// defs
+var defs = svg.append('defs');
+// arrow markers per plan + grey
+['A','B','C','grey'].forEach(function(p){
+  var col = p==='grey' ? 'rgba(255,255,255,.12)' : PLAN_COLORS[p];
+  defs.append('marker')
+    .attr('id','arr-'+p)
+    .attr('viewBox','0 0 10 10').attr('refX',22).attr('refY',5)
+    .attr('markerWidth',4).attr('markerHeight',4).attr('orient','auto-start-reverse')
+    .append('path').attr('d','M0 0L10 5L0 10z')
+    .attr('fill', p==='grey'?'rgba(255,255,255,.15)':col)
+    .attr('opacity', p==='grey'?0.3:0.5);
+});
+
+// cluster hulls group
+var hullG = svg.append('g').attr('class','hulls');
+var linkG = svg.append('g').attr('class','links');
+var nodeG = svg.append('g').attr('class','nodes');
+
+// build simulation nodes/links
+var nodeMap = {};
+NODES.forEach(function(n){ nodeMap[n.id]=n; });
+
+// assign initial cluster positions
+var clusterCenters = {
+  consumer:  {x:W*0.15, y:H*0.2},
+  gateway:   {x:W*0.35, y:H*0.2},
+  adapters:  {x:W*0.6,  y:H*0.25},
+  orch:      {x:W*0.72, y:H*0.55},
+  data:      {x:W*0.45, y:H*0.7},
+  identity:  {x:W*0.18, y:H*0.68},
+  platform:  {x:W*0.15, y:H*0.45},
+};
+
+NODES.forEach(function(n){
+  var c = clusterCenters[n.cluster];
+  n.x = c.x + (Math.random()-0.5)*80;
+  n.y = c.y + (Math.random()-0.5)*80;
+});
+
+var links = EDGES.map(function(e){
+  return {source:nodeMap[e.s], target:nodeMap[e.t], w:e.w};
+}).filter(function(e){return e.source && e.target;});
+
+// simulation
+var sim = d3.forceSimulation(NODES)
+  .force('link', d3.forceLink(links).id(function(d){return d.id;}).distance(function(d){
+    return d.source.cluster === d.target.cluster ? 60 : 120;
+  }).strength(0.4))
+  .force('charge', d3.forceManyBody().strength(-180))
+  .force('cluster', function(alpha){
+    NODES.forEach(function(n){
+      var c = clusterCenters[n.cluster];
+      n.vx += (c.x - n.x) * alpha * 0.08;
+      n.vy += (c.y - n.y) * alpha * 0.08;
+    });
+  })
+  .force('collision', d3.forceCollide(28))
+  .force('center', d3.forceCenter(W/2, H/2).strength(0.03));
+
+// draw links
+var linkSel = linkG.selectAll('line').data(links).enter().append('line')
+  .attr('stroke', function(d){
+    var sp = nodeMinPlan(d.source.plans), tp = nodeMinPlan(d.target.plans);
+    var p = sp > tp ? sp : tp;
+    return sp === tp ? PLAN_COLORS[sp] : 'rgba(255,255,255,.1)';
+  })
+  .attr('stroke-opacity', 0.2)
+  .attr('stroke-width', function(d){return d.w*0.6;})
+  .attr('marker-end', function(d){
+    var sp = nodeMinPlan(d.source.plans);
+    return 'url(#arr-grey)';
+  });
+
+// draw nodes
+var nodeSel = nodeG.selectAll('g.node').data(NODES).enter().append('g')
+  .attr('class','node')
+  .style('cursor','pointer')
+  .call(d3.drag()
+    .on('start', function(event,d){
+      if(!event.active) sim.alphaTarget(0.3).restart();
+      d.fx=d.x; d.fy=d.y;
+    })
+    .on('drag', function(event,d){d.fx=event.x; d.fy=event.y;})
+    .on('end', function(event,d){
+      if(!event.active) sim.alphaTarget(0);
+      d.fx=null; d.fy=null;
+    })
+  )
+  .on('mouseenter', showTooltip)
+  .on('mousemove', moveTooltip)
+  .on('mouseleave', hideTooltip);
+
+// node circle
+nodeSel.append('circle')
+  .attr('r', function(d){ return d.locked ? 14 : 11; })
+  .attr('fill', function(d){
+    return d.azure ? CLUSTERS[d.cluster].color + '22' : 'rgba(255,255,255,.03)';
+  })
+  .attr('stroke', function(d){
+    return d.azure ? CLUSTERS[d.cluster].color : 'rgba(255,255,255,.2)';
+  })
+  .attr('stroke-width', function(d){ return d.locked ? 2.5 : 1.2; })
+  .attr('stroke-dasharray', function(d){
+    if(d.locked) return '3,2';
+    if(!d.azure) return '4,3'; // DGTP app code = dashed
+    return 'none';
+  });
+
+// DGTP label smaller + dimmer
+nodeSel.append('text')
+  .attr('text-anchor','middle').attr('dy','-14')
+  .attr('font-family','DM Mono,monospace').attr('font-size',6.5)
+  .attr('fill','rgba(255,255,255,.2)').attr('fill-opacity',0.8)
+  .text(function(d){ return d.azure ? '' : 'app'; });
+
+// plan badge (small dot, top-right of circle)
+nodeSel.append('circle')
+  .attr('r', 4)
+  .attr('cx', 9).attr('cy', -9)
+  .attr('fill', function(d){ return PLAN_COLORS[nodeMinPlan(d.plans)]; })
+  .attr('stroke', '#0c1520')
+  .attr('stroke-width', 1.5);
+
+// lock icon
+nodeSel.filter(function(d){return d.locked;})
+  .append('text')
+  .attr('text-anchor','middle').attr('dy','0.35em')
+  .attr('font-size',8).attr('fill','rgba(255,255,255,.4)')
+  .text('🔒');
+
+// node label
+nodeSel.append('text')
+  .attr('text-anchor','middle')
+  .attr('dy', function(d){ return d.locked ? 26 : 22; })
+  .attr('font-family','DM Mono,monospace')
+  .attr('font-size', 8.5)
+  .attr('fill', function(d){ return d.azure ? CLUSTERS[d.cluster].color : 'rgba(255,255,255,.35)'; })
+  .attr('fill-opacity', 0.85)
+  .text(function(d){return d.label;});
+
+// ── tick ───────────────────────────────────────────────────────────────────
+sim.on('tick', function(){
+  // constrain to canvas
+  NODES.forEach(function(n){
+    n.x = Math.max(40, Math.min(W-40, n.x));
+    n.y = Math.max(40, Math.min(H-40, n.y));
+  });
+
+  linkSel
+    .attr('x1',function(d){return d.source.x;})
+    .attr('y1',function(d){return d.source.y;})
+    .attr('x2',function(d){return d.target.x;})
+    .attr('y2',function(d){return d.target.y;});
+
+  nodeSel.attr('transform',function(d){return 'translate('+d.x+','+d.y+')';});
+
+  // cluster hulls
+  drawHulls();
+});
+
+function drawHulls(){
+  var clusterPoints = {};
+  Object.keys(CLUSTERS).forEach(function(k){ clusterPoints[k]=[]; });
+  NODES.forEach(function(n){
+    if(n.visible !== false) clusterPoints[n.cluster].push([n.x, n.y]);
+  });
+
+  var hullData = Object.keys(CLUSTERS).map(function(k){
+    var pts = clusterPoints[k];
+    if(pts.length < 3){
+      // pad to at least 3 points
+      while(pts.length < 3) pts.push([pts[0][0]+(Math.random()-0.5)*20, pts[0][1]+(Math.random()-0.5)*20]);
+    }
+    var hull = d3.polygonHull(pts);
+    return {id:k, hull:hull, cluster:CLUSTERS[k]};
+  }).filter(function(h){return h.hull;});
+
+  var hulls = hullG.selectAll('path.hull').data(hullData, function(d){return d.id;});
+  hulls.enter().append('path').attr('class','hull')
+    .merge(hulls)
+    .attr('d', function(d){
+      var pts = d.hull.map(function(p){return [p[0],p[1]];});
+      return 'M'+pts.map(function(p){return p[0]+','+p[1];}).join('L')+'Z';
+    })
+    .attr('fill', function(d){ return d.cluster.bg; })
+    .attr('stroke', function(d){ return d.cluster.stroke; })
+    .attr('stroke-width', 1)
+    .attr('stroke-dasharray','4,3')
+    .attr('opacity', 0.7);
+
+  hulls.exit().remove();
+}
+
+// ── ZOOM + PAN ──────────────────────────────────────────────────────────────
+var zoom = d3.zoom().scaleExtent([0.3, 3]).on('zoom', function(event){
+  hullG.attr('transform', event.transform);
+  linkG.attr('transform', event.transform);
+  nodeG.attr('transform', event.transform);
+});
+svg.call(zoom);
+
+// ── TOOLTIP ─────────────────────────────────────────────────────────────────
+var tooltip = document.getElementById('gtooltip');
+function showTooltip(event, d){
+  var plans = d.plans;
+  var planHTML = plans.map(function(p){
+    var col = PLAN_COLORS[p];
+    var stroke = PLAN_STROKE[p];
+    return '<span class="gtt-plan" style="color:'+col+';border-color:'+stroke+';background:'+col+'18;">Plan '+p+'</span>';
+  }).join('');
+
+  tooltip.innerHTML =
+    '<div class="gtt-name">'+(d.locked?'🔒 ':'')+d.label+'</div>'+
+    '<div class="gtt-cluster" style="color:'+CLUSTERS[d.cluster].color+'">'+CLUSTERS[d.cluster].label+'</div>'+
+    '<div class="gtt-desc">'+d.desc+'</div>'+
+    '<div class="gtt-plans">'+planHTML+'</div>';
+  tooltip.classList.add('vis');
+  moveTooltip(event);
+}
+function moveTooltip(event){
+  var rect = container.getBoundingClientRect();
+  var x = event.clientX - rect.left + 12;
+  var y = event.clientY - rect.top - 10;
+  if(x + 270 > container.clientWidth) x = event.clientX - rect.left - 280;
+  tooltip.style.left = x+'px';
+  tooltip.style.top  = y+'px';
+}
+function hideTooltip(){ tooltip.classList.remove('vis'); }
+
+// ── FILTER (show/hide) ───────────────────────────────────────────────────────
+window.gFilter = function(f){
+  stopFireAnimation();
+  currentFilter = f;
+  document.querySelectorAll('#sgraph .gftab').forEach(function(b){ b.classList.remove('on'); });
+  var map = {'all':'.all','A':'.fa','B':'.fb','C':'.fc'};
+  if(map[f]) document.querySelector('#sgraph .gftab'+map[f]).classList.add('on');
+
+  var planSets = {'all':['A','B','C'],'A':['A'],'B':['A','B'],'C':['A','B','C']};
+  var active = planSets[f] || ['A','B','C'];
+
+  // Reset all to base state
+  nodeSel.each(function(d){
+    var show = active.some(function(p){return d.plans.includes(p);});
+    d.visible = show;
+    d3.select(this).selectAll('circle').attr('filter',null);
+    d3.select(this).transition().duration(300).attr('opacity', show ? 1 : 0.07);
+  });
+  linkSel.each(function(d){
+    var show = active.some(function(p){return d.source.plans.includes(p);}) &&
+               active.some(function(p){return d.target.plans.includes(p);});
+    d3.select(this).attr('filter',null).transition().duration(300)
+      .attr('stroke-opacity', show ? 0.25 : 0.03)
+      .attr('stroke', show ? (f==='all' ? 'rgba(255,255,255,.15)' : PLAN_COLORS[f]) : 'rgba(255,255,255,.06)');
+  });
+  document.getElementById('gfire-status').textContent = '';
+  setCounter(f);
+  buildLegend(f);
+};
+
+// ── FIRE ANIMATION SYSTEM ────────────────────────────────────────────────────
+var fireTimer = null;
+var fireRAF   = null;
+var _fireRunning = false;
+
+function stopFireAnimation(){
+  _fireRunning = false;
+  if(fireTimer){ clearTimeout(fireTimer); fireTimer=null; }
+  if(fireRAF){ cancelAnimationFrame(fireRAF); fireRAF=null; }
+  // Remove all fire filters/glows
+  svg.selectAll('.fire-particle').remove();
+  svg.selectAll('.fire-ring').remove();
+  nodeSel.each(function(d){
+    d3.select(this).selectAll('circle.fire-glow').remove();
+    d3.select(this).selectAll('circle').attr('filter',null).attr('stroke-width', d.locked ? 2.5 : 1.5);
+  });
+  linkSel.attr('filter',null).attr('stroke-width', function(d){return d.w*0.6;});
+}
+
+// SVG filter for fire glow
+(function(){
+  if(defs.select('#fire-glow-A').empty()){
+    ['A','B','C'].forEach(function(p){
+      var col = p==='A'?'34,199,146': p==='B'?'96,165,250':'155,135,245';
+      var f = defs.append('filter').attr('id','fire-glow-'+p).attr('x','-80%').attr('y','-80%').attr('width','260%').attr('height','260%');
+      f.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation','4').attr('result','blur');
+      f.append('feColorMatrix').attr('in','blur').attr('type','matrix')
+        .attr('values','1 0 0 0 '+parseFloat(col.split(',')[0])/255+' 0 1 0 0 '+parseFloat(col.split(',')[1])/255+' 0 0 1 0 '+parseFloat(col.split(',')[2])/255+' 0 0 0 18 -7')
+        .attr('result','colored');
+      var merge = f.append('feMerge');
+      merge.append('feMergeNode').attr('in','colored');
+      merge.append('feMergeNode').attr('in','colored');
+      merge.append('feMergeNode').attr('in','SourceGraphic');
+    });
+  }
+  // Edge streak filter
+  if(defs.select('#streak-A').empty()){
+    ['A','B','C'].forEach(function(p){
+      var f2 = defs.append('filter').attr('id','streak-'+p).attr('x','-20%').attr('y','-200%').attr('width','140%').attr('height','500%');
+      f2.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation','2 1').attr('result','blur');
+      var col2 = p==='A'?'34,199,146': p==='B'?'96,165,250':'155,135,245';
+      f2.append('feColorMatrix').attr('in','blur').attr('type','matrix')
+        .attr('values','1 0 0 0 '+parseFloat(col2.split(',')[0])/255+' 0 1 0 0 '+parseFloat(col2.split(',')[1])/255+' 0 0 1 0 '+parseFloat(col2.split(',')[2])/255+' 0 0 0 12 -4');
+    });
+  }
+})();
+
+window.gFirePlan = function(plan){
+  stopFireAnimation();
+  _fireRunning = true;
+
+  setCounter(plan);
+  buildLegend(plan);
+  // Update tab UI
+  document.querySelectorAll('#sgraph .gftab').forEach(function(b){ b.classList.remove('on'); });
+  var tabMap = {'A':'.fa','B':'.fb','C':'.fc'};
+  document.querySelector('#sgraph .gftab'+tabMap[plan]).classList.add('on');
+
+  var planSets = {'A':['A'],'B':['A','B'],'C':['A','B','C']};
+  var active = planSets[plan];
+  var planColor = PLAN_COLORS[plan];
+
+  // Step 1: dim everything
+  nodeSel.transition().duration(250).attr('opacity', function(d){
+    return active.some(function(p){return d.plans.includes(p);}) ? 0.15 : 0.04;
+  });
+  linkSel.transition().duration(250)
+    .attr('stroke-opacity', function(d){
+      var show = active.some(function(p){return d.source.plans.includes(p);}) &&
+                 active.some(function(p){return d.target.plans.includes(p);});
+      return show ? 0.08 : 0.02;
+    })
+    .attr('stroke','rgba(255,255,255,.08)');
+
+  // Build ordered fire sequence: consumer → gateway → adapters → orch → data → identity → platform
+  var clusterOrder = ['consumer','gateway','adapters','orch','data','identity','platform'];
+  var fireNodes = [];
+  clusterOrder.forEach(function(cl){
+    NODES.forEach(function(n){
+      if(n.cluster === cl && active.some(function(p){return n.plans.includes(p);})){
+        fireNodes.push(n);
+      }
+    });
+  });
+
+  // Build fire edges ordered by source node order
+  var fireEdges = links.filter(function(l){
+    return active.some(function(p){return l.source.plans.includes(p);}) &&
+           active.some(function(p){return l.target.plans.includes(p);});
+  });
+
+  var statusEl = document.getElementById('gfire-status');
+  var nodeDelay = 160; // ms per node
+  var edgeDelay = 80;
+
+  function fireNode(node, idx){
+    if(!_fireRunning) return;
+    var el = nodeSel.filter(function(d){return d.id === node.id;});
+
+    statusEl.textContent = '▶ ' + node.label;
+
+    // Reveal with fire glow
+    el.transition().duration(120).attr('opacity', 1);
+
+    // Fire glow circle — expands outward and fades
+    var g = el.node();
+    var gsel = d3.select(g);
+
+    // Pulse ring 1
+    gsel.append('circle').attr('class','fire-ring')
+      .attr('r', node.locked ? 14 : 11)
+      .attr('fill','none')
+      .attr('stroke', planColor)
+      .attr('stroke-width', 4)
+      .attr('opacity', 0.9)
+      .attr('pointer-events','none')
+      .transition().duration(700).ease(d3.easeCubicOut)
+      .attr('r', (node.locked ? 14 : 11) + 28)
+      .attr('stroke-width', 0.5)
+      .attr('opacity', 0)
+      .remove();
+
+    // Pulse ring 2 (delayed)
+    setTimeout(function(){
+      if(!_fireRunning) return;
+      gsel.append('circle').attr('class','fire-ring')
+        .attr('r', node.locked ? 16 : 13)
+        .attr('fill', planColor).attr('fill-opacity', 0.18)
+        .attr('pointer-events','none')
+        .transition().duration(500).ease(d3.easeCubicOut)
+        .attr('r', (node.locked ? 16 : 13) + 18)
+        .attr('fill-opacity', 0)
+        .remove();
+    }, 80);
+
+    // Sustained glow on the main circle
+    el.select('circle').attr('filter','url(#fire-glow-'+plan+')');
+
+    // Keep glow for a while then reduce
+    setTimeout(function(){
+      if(!_fireRunning) return;
+      el.select('circle').transition().duration(1200)
+        .attr('filter', null);
+    }, nodeDelay * (fireNodes.length - idx) + 800);
+  }
+
+  function fireEdge(edge, idx){
+    if(!_fireRunning) return;
+    var lsel = linkSel.filter(function(d){ return d===edge; });
+
+    lsel.transition().duration(200)
+      .attr('stroke', planColor)
+      .attr('stroke-opacity', 0.7)
+      .attr('stroke-width', (edge.w||1)*2.5)
+      .attr('filter','url(#streak-'+plan+')');
+
+    setTimeout(function(){
+      if(!_fireRunning) return;
+      lsel.transition().duration(800)
+        .attr('stroke-opacity', 0.35)
+        .attr('stroke-width', (edge.w||1)*1.5)
+        .attr('filter', null);
+    }, 400);
+  }
+
+  // Sequence: fire nodes first, then edges
+  fireNodes.forEach(function(n, i){
+    fireTimer = setTimeout(function(){ fireNode(n, i); }, 300 + i * nodeDelay);
+  });
+
+  var totalNodeTime = 300 + fireNodes.length * nodeDelay;
+
+  // Then fire edges (grouped by source cluster)
+  fireEdges.forEach(function(e, i){
+    fireTimer = setTimeout(function(){ fireEdge(e, i); }, totalNodeTime + i * edgeDelay);
+  });
+
+  // Final: all nodes bright, status done
+  var totalTime = totalNodeTime + fireEdges.length * edgeDelay + 800;
+  fireTimer = setTimeout(function(){
+    if(!_fireRunning) return;
+    statusEl.textContent = '✓ Plan ' + plan + ' — ' + fireNodes.length + ' services active';
+    nodeSel.filter(function(d){
+      return active.some(function(p){return d.plans.includes(p);});
+    }).transition().duration(400).attr('opacity',1);
+    linkSel.filter(function(d){
+      return active.some(function(p){return d.source.plans.includes(p);}) &&
+             active.some(function(p){return d.target.plans.includes(p);});
+    }).transition().duration(400)
+      .attr('stroke', planColor)
+      .attr('stroke-opacity', 0.3)
+      .attr('stroke-width', function(d){return (d.w||1)*1.2;});
+  }, totalTime);
+};
+
+// ── LEGEND PANEL ────────────────────────────────────────────────────────────
+var _legendOpen = false;
+
+window.gLegendToggle = function(e){
+  if(e) e.stopPropagation();
+  _legendOpen = !_legendOpen;
+  document.getElementById('glegend-panel').classList.toggle('expanded', _legendOpen);
+};
+
+// ── drag the legend overlay ──────────────────────────────────────────────────
+(function(){
+  var panel, isDragging=false, ox=0, oy=0, startX=0, startY=0;
+  document.addEventListener('DOMContentLoaded', function(){
+    panel = document.getElementById('glegend-panel');
+    var handle = document.getElementById('glegend-toggle');
+    if(!handle) return;
+    handle.addEventListener('mousedown', function(e){
+      if(e.target.classList.contains('glp-toggle-btn')) return;
+      isDragging = true;
+      var rect = panel.getBoundingClientRect();
+      var cRect = panel.parentElement.getBoundingClientRect();
+      ox = rect.left - cRect.left;
+      oy = rect.top  - cRect.top;
+      startX = e.clientX; startY = e.clientY;
+      panel.style.right = 'auto';
+      panel.style.left  = ox+'px';
+      panel.style.top   = oy+'px';
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e){
+      if(!isDragging) return;
+      var dx = e.clientX - startX, dy = e.clientY - startY;
+      var cRect = panel.parentElement.getBoundingClientRect();
+      var nx = Math.max(0, Math.min(cRect.width  - panel.offsetWidth,  ox+dx));
+      var ny = Math.max(0, Math.min(cRect.height - panel.offsetHeight, oy+dy));
+      panel.style.left = nx+'px';
+      panel.style.top  = ny+'px';
+    });
+    document.addEventListener('mouseup', function(){ isDragging=false; });
+  });
+})();
+
+function buildLegend(plan){
+  var body = document.getElementById('glegend-body');
+  var titleEl = document.getElementById('glp-title');
+  var planSets = {'all':['A','B','C'],'A':['A'],'B':['A','B'],'C':['A','B','C']};
+  var active = planSets[plan] || ['A','B','C'];
+
+  // Update title
+  if(plan === 'all'){
+    titleEl.textContent = 'All ' + azureNodes.length + ' Azure services';
+  } else {
+    var total = azureNodes.filter(function(n){ return active.some(function(p){ return n.plans.includes(p); }); }).length;
+    titleEl.textContent = 'Plan ' + plan + ' — ' + total + ' services';
+  }
+
+  // Group nodes by their min plan within active
+  var planGroups = {};
+  if(plan === 'all'){
+    planGroups = {A:[], B:[], C:[]};
+    NODES.forEach(function(n){
+      if(!n.azure) return; // skip DGTP application code
+      var mp = nodeMinPlan(n.plans);
+      planGroups[mp].push(n);
+    });
+  } else {
+    // Show nodes grouped by which plan first introduces them
+    active.forEach(function(p){ planGroups[p] = []; });
+    NODES.forEach(function(n){
+      if(!active.some(function(p){ return n.plans.includes(p); })) return;
+      var mp = nodeMinPlan(n.plans);
+      // Clamp to the lowest active plan
+      if(!planGroups[mp]) mp = active[0];
+      planGroups[mp].push(n);
+    });
+  }
+
+  var planLabels = {A:'Plan A — Minimal', B:'Plan B — Standard adds', C:'Plan C — Full Cloud adds'};
+  var planColors2 = {A:'#22c792', B:'#60a5fa', C:'#9b87f5'};
+
+  var html2 = '';
+  ['A','B','C'].forEach(function(p){
+    var group = planGroups[p];
+    if(!group || !group.length) return;
+    html2 += '<div class="glp-plan-head" style="color:' + planColors2[p] + ';">'
+           + '<div class="glp-plan-dot" style="background:' + planColors2[p] + ';"></div>'
+           + planLabels[p] + ' (' + group.length + ')'
+           + '</div>';
+    group.forEach(function(n){
+      var clColor = CLUSTERS[n.cluster].color;
+      var why = n.desc || '';
+      var isLocked = n.locked ? '<div class="glp-locked">🔒 locked in Plan C</div>' : '';
+      html2 += '<div class="glp-row">'
+             + '<div class="glp-dot" style="background:' + clColor + ';"></div>'
+             + '<div class="glp-text">'
+             + '<div class="glp-name">' + n.label + '</div>'
+             + (why ? '<div class="glp-why">' + why + '</div>' : '')
+             + isLocked
+             + '</div></div>';
+    });
+  });
+
+  body.innerHTML = html2;
+
+  // Auto-expand when a plan is fired
+  if(plan !== 'all' && !_legendOpen){
+    _legendOpen = true;
+    document.getElementById('glegend-panel').classList.add('expanded');
+  }
+}
+
+// initial view
+gFilter('all');
+buildLegend('all');
+// init counter with totals
+setTimeout(function(){ animateNum('gctr-num-a',countA,700); animateNum('gctr-num-b',countBonly,850); animateNum('gctr-num-c',countConly,1000); document.getElementById('gctr-num-total').textContent=NODES.length; }, 600);
+
+// handle resize
+window.addEventListener('resize', function(){
+  W = container.clientWidth; H = container.clientHeight;
+  svg.attr('viewBox',[0,0,W,H]);
+  clusterCenters = {
+    consumer:  {x:W*0.15, y:H*0.2},
+    gateway:   {x:W*0.35, y:H*0.2},
+    adapters:  {x:W*0.6,  y:H*0.25},
+    orch:      {x:W*0.72, y:H*0.55},
+    data:      {x:W*0.45, y:H*0.7},
+    identity:  {x:W*0.18, y:H*0.68},
+    platform:  {x:W*0.15, y:H*0.45},
+  };
+  sim.force('center', d3.forceCenter(W/2, H/2).strength(0.03));
+  sim.alpha(0.3).restart();
+});
+
+})();
+</script>
+
+</section>
+
+
+
+<!-- ══════════════ SLIDE 2 — LAYER STACK ══════════════ -->
+<section class="slide" id="s2">
+<div class="si">
+  <span class="stag stag-violet">Layer Stack</span>
+  <div class="rule" style="background:var(--violet);"></div>
+  <h2>7-Layer Architecture — All Three Plans</h2>
+  <p class="lead">Click any layer to see what each plan deploys, the rationale, and trade-offs.</p>
+
+  <div class="lstack" id="lstack" style="margin-top:1rem;">
+
+    <!-- L0 Consumer -->
+    <div class="layer" id="l0" style="--lc:#60a5fa;--lbg:rgba(96,165,250,.04);">
+      <div class="layer-head" onclick="toggleLayer('l0')">
+        <div class="layer-num">L0</div>
+        <div class="layer-title">Consumer &amp; Edge — Portal · CDN · WAF · Front Door</div>
+        <div class="layer-arr">▶</div>
+      </div>
+      <div class="layer-body">
+        <div class="layer-inner">
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
+            <div class="lc-component">Azure Front Door Standard</div>
+            <div class="lc-note">Core CDN + basic WAF core rules. Dev traffic pattern. No WAF Premium, no private link origins. Adequate for 50k citizens at Go-Live.</div>
+            <div class="lc-component" style="margin-top:6px;">App Gateway Standard v2 ×1</div>
+            <div class="lc-note">No WAF, TLS termination + routing. Single instance, no zone spread.</div>
+            <div class="lc-tradeoff">△ Basic WAF only · No private origin · No zone-redundancy</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
+            <div class="lc-component">Azure Front Door Premium</div>
+            <div class="lc-note">WAF Premium + private link origins. Full OWASP rule set. 500 GB/mo transfer. Required to validate prod WAF policies.</div>
+            <div class="lc-component" style="margin-top:6px;">App Gateway WAF v2 ×1 medium</div>
+            <div class="lc-note">WAF enabled, single medium instance. No 3-AZ spread.</div>
+            <div class="lc-tradeoff">△ No zone-redundant AppGw · 1 instance</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
+            <div class="lc-component">Azure Front Door Premium <span class="badge-locked">LOCKED</span></div>
+            <div class="lc-note">5 TB transfer. WAF Premium + private link origins. Cannot reduce further — prod SLA requires Premium.</div>
+            <div class="lc-component" style="margin-top:6px;">App Gateway WAF v2 ×3 medium (zone-redundant)</div>
+            <div class="lc-note">3 instances across 3 AZs. Full zone-redundancy. Load-test validated.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- L1 APIM -->
+    <div class="layer" id="l1" style="--lc:#fca5a5;--lbg:rgba(232,83,58,.04);">
+      <div class="layer-head" onclick="toggleLayer('l1')">
+        <div class="layer-num">L1</div>
+        <div class="layer-title">API Gateway — Azure APIM · 8-Stage Pipeline · OpenAPI 3.0</div>
+        <div class="layer-arr">▶</div>
+      </div>
+      <div class="layer-body">
+        <div class="layer-inner">
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
+            <div class="lc-component">Azure APIM Developer tier</div>
+            <div class="lc-note">Full 8-stage policy pipeline. All 6 adapter routes. JWT validate · Scope · Rate limit · IP · Request validate · CorrelID · MI auth · Route. No SLA, single unit. Sufficient for 50k citizens at Go-Live.</div>
+            <div class="lc-tradeoff">△ No SLA · Single gateway unit · No zone-redundancy</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
+            <div class="lc-component">Azure APIM Standard v2</div>
+            <div class="lc-note">99.95% SLA. Auto-scale 1–5 units. VNet integration for private endpoint access. Same 8-stage pipeline. Handles UAT load + staging traffic patterns.</div>
+            <div class="lc-tradeoff">△ No zone-redundancy across AZs</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
+            <div class="lc-component">Azure APIM Premium v2</div>
+            <div class="lc-note">Multi-region deployment possible. Zone-redundant. Auto-scale 1–10 units. Full VNet integration + private DNS. 99.99% SLA. All policies identical to lower plans.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- L2 Adapters -->
+    <div class="layer" id="l2" style="--lc:#6ee7b7;--lbg:rgba(34,199,146,.04);">
+      <div class="layer-head" onclick="toggleLayer('l2')">
+        <div class="layer-num">L2</div>
+        <div class="layer-title">Registry Adapters — .NET 8 Azure Functions · ASE v3 · 6 Adapters</div>
+        <div class="layer-arr">▶</div>
+      </div>
+      <div class="layer-body">
+        <div class="layer-inner">
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
+            <div class="lc-component">ASE v3 I1v2 ×1 frontend + ×1 backend</div>
+            <div class="lc-note">2 total ASE instances (1 vCore, 3.5 GB RAM each). ILB mode. No HA, no zone spread. All 6 adapter Function Apps deploy here: CASBES · COCI · SIAH · BLISS · VROMI · KadasterMock. Scheduled shutdown 65% saving eligible.</div>
+            <div class="lc-tradeoff">△ No HA · Single AZ · No failover · Dev/Test pricing</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
+            <div class="lc-component">ASE v3 I2v2 ×2 frontend + ×2 backend</div>
+            <div class="lc-note">4 total instances (2 vCore, 8 GB each). Basic HA — 2 instances per tier validates failover. ILB topology unchanged. No 3-AZ spread but basic availability preserved.</div>
+            <div class="lc-tradeoff">△ 2-instance HA only · No 3-AZ zone spread</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
+            <div class="lc-component">ASE v3 I4v2 ×3 frontend + ×4 backend <span class="badge-locked">LOCKED</span></div>
+            <div class="lc-note">7 total instances across 3 AZs. 1-year Reserved Instance applied (~35% saving). Full zone-redundancy. 4 vCore, 16 GB RAM per instance. Cannot reduce further — HA SLA requires 3-instance minimum.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- L3 Orchestration -->
+    <div class="layer" id="l3" style="--lc:#c4b5fd;--lbg:rgba(155,135,245,.04);">
+      <div class="layer-head" onclick="toggleLayer('l3')">
+        <div class="layer-num">L3</div>
+        <div class="layer-title">Orchestration — CMF · Service Bus · Outbox Pattern · Event Grid</div>
+        <div class="layer-arr">▶</div>
+      </div>
+      <div class="layer-body">
+        <div class="layer-inner">
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
+            <div class="lc-component">Service Bus Standard</div>
+            <div class="lc-note">Shared infrastructure. 10M operations/mo included. No dedicated MU. Outbox Pattern fully operational: dgtp.registry.events · audit-log-sub · cmf-cache-invalidation-sub. No Premium features (geo-DR, sessions, transactions).</div>
+            <div class="lc-component" style="margin-top:5px;">Event Grid · Logic Apps Consumption</div>
+            <div class="lc-note">Pay-per-execution. No VNet integration.</div>
+            <div class="lc-tradeoff">△ No geo-DR · No sessions/transactions · Shared infra</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
+            <div class="lc-component">Service Bus Standard (+ quarterly Premium drill)</div>
+            <div class="lc-note">Standard tier day-to-day. One-week Premium namespace per major release cycle to validate geo-DR pairing, sessions, and transactions. Same Outbox topology. Logic Apps Standard WS1 for VNet integration.</div>
+            <div class="lc-component" style="margin-top:5px;">Event Grid 50M events + Logic Apps Standard WS1</div>
+            <div class="lc-tradeoff">△ Premium features not continuously active</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
+            <div class="lc-component">Service Bus Premium 1MU</div>
+            <div class="lc-note">Dedicated messaging unit. VNet-integrated. Zone-redundant in prod. Geo-DR via Standard backup namespace (manual failover ~30 min). dgtp.service-requests topic added for Phase 2 workflow engine.</div>
+            <div class="lc-component" style="margin-top:5px;">Event Grid 200M events + Logic Apps Standard WS1</div>
+            <div class="lc-tradeoff">△ ADR required: SB 2MU→1MU active geo-DR change</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- L4 Data -->
+    <div class="layer" id="l4" style="--lc:#fbbf24;--lbg:rgba(245,166,35,.04);">
+      <div class="layer-head" onclick="toggleLayer('l4')">
+        <div class="layer-num">L4</div>
+        <div class="layer-title">Data Tier — Azure SQL MI · Cosmos DB · Redis · Storage · Key Vault</div>
+        <div class="layer-arr">▶</div>
+      </div>
+      <div class="layer-body">
+        <div class="layer-inner">
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
+            <div class="lc-component">SQL MI GP 4 vCore Dev/Test + AHB</div>
+            <div class="lc-note">Full SQL Server surface area (Outbox, AuditLog 7yr LTR, ReferenceCode). Dev/Test pricing + Azure Hybrid Benefit ~58% cheaper. No ZRS, no geo-replica.</div>
+            <div class="lc-component" style="margin-top:5px;">Cosmos DB Serverless · Redis Standard C1 · Key Vault Standard · Storage LRS</div>
+            <div class="lc-note">Serverless Cosmos optimal for low-traffic dev patterns. KV Standard (no HSM). LRS storage.</div>
+            <div class="lc-tradeoff">△ Dev/Test pricing (prod commit: upgrade to GP RI) · No geo-DR · No HSM</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
+            <div class="lc-component">SQL MI GP 8 vCore Dev/Test + AHB</div>
+            <div class="lc-note">Double the vCores vs Plan A. Same surface area. Staging-grade IOPS.</div>
+            <div class="lc-component" style="margin-top:5px;">Cosmos DB Autoscale 1k→10k RU/s · Redis C1 · Key Vault Standard · Storage LRS</div>
+            <div class="lc-note">Autoscale Cosmos bills only for max-burst hour. Multi-region reads disabled.</div>
+            <div class="lc-tradeoff">△ No HSM-backed keys · LRS storage · No geo-replica</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
+            <div class="lc-component">SQL MI GP 16 vCore + ZRS + geo-replica + 1yr RI + AHB</div>
+            <div class="lc-note">Production-grade. Zone-redundant storage. Geo-replica for DR. 1-yr RI saves ~35%. Requires ADR-011.</div>
+            <div class="lc-component" style="margin-top:5px;">Cosmos DB Autoscale 10k→50k RU/s single-write · Redis C1 · Key Vault Premium (FIPS 140-2 L2) · Storage GZRS + WORM</div>
+            <div class="lc-locked">🔒 GZRS Storage + WORM 7yr — compliance locked</div>
+            <div class="lc-tradeoff">△ ADR-005 update: MHSM→KV Premium · QSA sign-off needed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- L5 Identity -->
+    <div class="layer" id="l5" style="--lc:#f87171;--lbg:rgba(248,113,113,.04);">
+      <div class="layer-head" onclick="toggleLayer('l5')">
+        <div class="layer-num">L5</div>
+        <div class="layer-title">Identity &amp; AI — Entra External ID · OpenAI · AI Search · §16.2</div>
+        <div class="layer-arr">▶</div>
+      </div>
+      <div class="layer-body">
+        <div class="layer-inner">
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
+            <div class="lc-component">Entra External ID — free tier (50k MAU)</div>
+            <div class="lc-note">Free tier covers 50k MAU. OIDC federation with national eID. §16.2 SIAH constraint enforced in adapter. JWT scopes via OI-04.</div>
+            <div class="lc-component" style="margin-top:5px;">AI Search — Free tier (10k docs, 50 MB)</div>
+            <div class="lc-note">Dev RAG prototype only. Azure OpenAI gpt-4o 1M tokens + text-embedding 1M tokens PAYG.</div>
+            <div class="lc-tradeoff">△ AI Search free = 10k doc limit · No chatbot at scale</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
+            <div class="lc-component">Entra External ID — free tier (50k MAU)</div>
+            <div class="lc-note">Same free tier — 50k population fits within free MAU threshold.</div>
+            <div class="lc-component" style="margin-top:5px;">AI Search S2 ×1 replica</div>
+            <div class="lc-note">S2 tier for prod-like storage + throughput. Single replica — HA pattern validated but not fully redundant.</div>
+            <div class="lc-note" style="margin-top:4px;">Azure OpenAI gpt-4o 5M tokens + text-embedding PAYG.</div>
+            <div class="lc-tradeoff">△ Single AI Search replica (N+1 HA only)</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
+            <div class="lc-component">Entra External ID — 150k MAU billed</div>
+            <div class="lc-note">Billed tier for 150k MAU headroom. Provider-agnostic OIDC federation. §16.2 enforced.</div>
+            <div class="lc-component" style="margin-top:5px;">AI Search S2 ×2 replicas (HA pair)</div>
+            <div class="lc-note">N+1 HA. Add 3rd replica if QPS sustained &gt;2,000. 1 replica removed from XLS baseline (S2×3→S2×2).</div>
+            <div class="lc-note" style="margin-top:4px;">Azure OpenAI gpt-4o 50M tokens + text-embedding. Re-evaluate PTU at 6 months.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- L6 Platform Foundation -->
+    <div class="layer" id="l6" style="--lc:#94a3b8;--lbg:rgba(100,116,139,.05);">
+      <div class="layer-head" onclick="toggleLayer('l6')">
+        <div class="layer-num">L6</div>
+        <div class="layer-title">Platform Foundation — Network · Security · Observability · IaC</div>
+        <div class="layer-arr">▶</div>
+      </div>
+      <div class="layer-body">
+        <div class="layer-inner">
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
+            <div class="lc-component">Azure Firewall Basic</div>
+            <div class="lc-note">Stateful L4 filtering + basic threat intelligence. No IDPS, no TLS deep inspection. Same UDR routing — topology parity maintained. Upgrades to Premium without topology change.</div>
+            <div class="lc-component" style="margin-top:5px;">Bastion Basic · No VPN · LAW 2 GB/day · App Insights 1 GB/day · Defender Server P1 · Purview 1 CU · No Sentinel · No DDoS Standard</div>
+            <div class="lc-note">Security investigations via LAW saved queries + Defender alerts. Sentinel connectors validated when upgrading to Plan B.</div>
+            <div class="lc-tradeoff">△ No IDPS · No DDoS VNet protection · No Sentinel · No on-prem VPN</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
+            <div class="lc-component">Azure Firewall Premium</div>
+            <div class="lc-note">IDPS + TLS deep-packet inspection. Required to validate IDPS rules before prod. LAW 10 GB/day + Sentinel 10 GB/day (reduced detection coverage maintained). App Insights 4 GB/day. Purview 4 CU. Defender P2. VPN GW VpnGw1 single tunnel. No DDoS Standard — Front Door Premium edge DDoS only.</div>
+            <div class="lc-locked" style="margin-top:6px;">🔒 Firewall Premium</div>
+            <div class="lc-tradeoff">△ No DDoS Standard (quarterly drill window only)</div>
+          </div>
+          <div class="lc-cell">
+            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
+            <div class="lc-component">Azure Firewall Premium <span class="badge-locked">LOCKED</span></div>
+            <div class="lc-component" style="margin-top:5px;">DDoS Protection Standard <span class="badge-locked">LOCKED</span></div>
+            <div class="lc-component" style="margin-top:5px;">Bastion Standard <span class="badge-locked">LOCKED</span></div>
+            <div class="lc-note" style="margin-top:4px;">LAW 40 GB/day + Sentinel 40 GB/day (100 GB/day commitment tier). App Insights 10 GB/day (11 apps). Purview 8 CU. Defender P2 all plans. VPN VpnGw1 ×2 active-active. Private DNS 12 zones. Terraform + Bicep IaC all environments.</div>
+            <div class="lc-locked">🔒 DDoS Standard · Firewall Premium · Bastion Standard · Defender P2 · Storage GZRS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="sfooter" style="margin-top:1rem;">Scroll → LLD Component Mapping</div>
+</div>
+</section>
+
+<!-- ══════════════ SLIDE 3 — LLD → AZURE MAPPING ══════════════ -->
+<section class="slide" id="s3">
+<div class="si">
+  <span class="stag stag-teal">LLD → Azure</span>
+  <div class="rule" style="background:var(--teal);"></div>
+  <h2>LLD Component → Azure Service Mapping</h2>
+  <p class="lead">Every LLD-001 component mapped to its Azure service equivalent across all three plans. The LLD design is plan-agnostic — only the Azure service tier changes.</p>
+
+  <div class="lld-map" style="margin-top:1.2rem;font-size:.72rem;">
+    <div class="lm-head">LLD Component</div>
+    <div class="lm-head ha">Plan A · Minimal</div>
+    <div class="lm-head hb">Plan B · Standard</div>
+    <div class="lm-head hc">Plan C · Full Cloud</div>
+
+    <div class="lm-grp">CONSUMER + GATEWAY (L0 + L1)</div>
+    <div class="lm-component">GoSXM BFF + Portal</div>
+    <div class="lm-cell a">ASE v3 I1v2 ×1 · Static Web App (Portal)</div>
+    <div class="lm-cell b">ASE v3 I2v2 ×2 · Static Web App Premium</div>
+    <div class="lm-cell c">ASE v3 I4v2 ×3 zone-redundant · Static Web App Standard</div>
+
+    <div class="lm-component">APIM 8-Stage Pipeline</div>
+    <div class="lm-cell a">APIM Developer (no SLA)</div>
+    <div class="lm-cell b">APIM Standard v2 (99.95% SLA)</div>
+    <div class="lm-cell c">APIM Premium v2 (99.99% SLA)</div>
+
+    <div class="lm-component">WAF + CDN</div>
+    <div class="lm-cell a">Front Door Standard + AppGw Standard v2 ×1</div>
+    <div class="lm-cell b">Front Door Premium + AppGw WAF v2 ×1</div>
+    <div class="lm-cell c">Front Door Premium 🔒 + AppGw WAF v2 ×3 AZ</div>
+
+    <div class="lm-grp">REGISTRY ADAPTERS (L2) — .NET 8 Azure Functions</div>
+    <div class="lm-component">CasbesAdapter · SOAP/StUF-BG</div>
+    <div class="lm-cell a">Function App on ASE I1v2 · Key Vault Standard · 10 req/s enforced client-side</div>
+    <div class="lm-cell b">Function App on ASE I2v2 · KV Standard · retry policy active</div>
+    <div class="lm-cell c">Function App on ASE I4v2 AZ · KV Premium (FIPS L2) · 1yr RI</div>
+
+    <div class="lm-component">CociAdapter · REST/JSON</div>
+    <div class="lm-cell a">Function App · KV Standard · Managed Identity auth</div>
+    <div class="lm-cell b">Function App · KV Standard · circuit breaker active</div>
+    <div class="lm-cell c">Function App AZ · KV Premium · geo-redundant config</div>
+
+    <div class="lm-component">SiahAdapter · OData v4 CRM · §16.2</div>
+    <div class="lm-cell a">Function App · OIDC check enforced · KV Standard SP credentials</div>
+    <div class="lm-cell b">Function App · §16.2 enforced · SIAH Managed Identity</div>
+    <div class="lm-cell c">Function App AZ · §16.2 enforced · Managed Identity · full audit</div>
+
+    <div class="lm-component">BlissAdapter · OData v4 TEATT</div>
+    <div class="lm-cell a">Function App · separate TEATT SP in KV Standard</div>
+    <div class="lm-cell b">Function App · separate TEATT SP · Managed Identity</div>
+    <div class="lm-cell c">Function App AZ · TEATT tenant isolated · KV Premium</div>
+
+    <div class="lm-component">VromiAdapter · ArcGIS REST</div>
+    <div class="lm-cell a">Function App · Redis arcgis:token · 90min refresh timer</div>
+    <div class="lm-cell b">Function App · Redis C1 · token refresh · alert on 2× fail</div>
+    <div class="lm-cell c">Function App AZ · Redis C1 · S1 alert on token fail</div>
+
+    <div class="lm-component">KadasterAdapter · ArcGIS ⚠ OI-08</div>
+    <div class="lm-cell a">APIM mock policy · KadasterAdapter stub in code · not called at runtime</div>
+    <div class="lm-cell b">APIM mock policy · config swap ready when OI-08 resolved</div>
+    <div class="lm-cell c">APIM mock → live swap on OI-08 resolution · same ArcGIS pattern as VROMI</div>
+
+    <div class="lm-grp">ORCHESTRATION + DATA (L3 + L4)</div>
+    <div class="lm-component">CMF Outbox Pattern</div>
+    <div class="lm-cell a">dbo.OutboxMessages in SQL MI GP · timer relay Function · Service Bus Standard</div>
+    <div class="lm-cell b">dbo.OutboxMessages · relay Function · Service Bus Standard + quarterly Premium drill</div>
+    <div class="lm-cell c">dbo.OutboxMessages · relay Function · Service Bus Premium 1MU VNet-integrated</div>
+
+    <div class="lm-component">dgtp.registry.events topic</div>
+    <div class="lm-cell a">Service Bus Standard · 3 subscriptions · DLQ monitor</div>
+    <div class="lm-cell b">Service Bus Standard · same topology · DLQ monitor 15min</div>
+    <div class="lm-cell c">Service Bus Premium · dgtp.service-requests added (Phase 2) · geo-DR backup ns</div>
+
+    <div class="lm-component">Cosmos DB — CMF cache</div>
+    <div class="lm-cell a">Serverless · citizen-profiles 15min · business-records 5min · address-cache 24h</div>
+    <div class="lm-cell b">Autoscale 1k→10k RU/s · same TTLs · single region</div>
+    <div class="lm-cell c">Autoscale 10k→50k RU/s · single-write multi-region reads · continuous backup</div>
+
+    <div class="lm-component">Azure SQL MI — dbo.AuditLog</div>
+    <div class="lm-cell a">SQL MI GP 4vCore · 7yr LTR · append-only · SHA-256 CitizenSubjectId</div>
+    <div class="lm-cell b">SQL MI GP 8vCore · 7yr LTR · same compliance model</div>
+    <div class="lm-cell c">SQL MI GP 16vCore + ZRS + geo-replica · 7yr LTR · 1yr RI + AHB 🔒</div>
+
+    <div class="lm-component">Redis C1 — token + refdata cache</div>
+    <div class="lm-cell a">Standard C1 · ArcGIS tokens 2h · refdata 1h · rate-limit counters · NO PII</div>
+    <div class="lm-cell b">Standard C1 · same · no change</div>
+    <div class="lm-cell c">Standard C1 · same · no change · private endpoint</div>
+
+    <div class="lm-grp">IDENTITY + SECURITY + OBSERVABILITY (L5 + L6)</div>
+    <div class="lm-component">Entra External ID · eID OIDC</div>
+    <div class="lm-cell a">Free tier (50k MAU included) · OIDC federation · JWT scopes · §16.2</div>
+    <div class="lm-cell b">Free tier (50k MAU) · same · OI-04 scope strings Sprint 1</div>
+    <div class="lm-cell c">Billed tier 150k MAU headroom · same OIDC federation</div>
+
+    <div class="lm-component">Key Vault — secrets + keys</div>
+    <div class="lm-cell a">KV Standard · Managed Identity only · no HSM · CASBES 90d · COCI API key 90d · ArcGIS 2h auto</div>
+    <div class="lm-cell b">KV Standard · same rotation schedule · private endpoint</div>
+    <div class="lm-cell c">KV Premium FIPS 140-2 L2 HSM-backed · all PCI keys · ADR-005 update required</div>
+
+    <div class="lm-component">Sentinel + Defender</div>
+    <div class="lm-cell a">No Sentinel · Defender Server P1 · LAW 2 GB/day · investigations via LAW queries</div>
+    <div class="lm-cell b">Sentinel 10 GB/day + Defender P2 · LAW 10 GB/day · advisory mode</div>
+    <div class="lm-cell c">Sentinel 40 GB/day + Defender P2 all plans · Purview 8 CU · 100 GB/day commitment</div>
+
+    <div class="lm-component">CI/CD · IaC</div>
+    <div class="lm-cell a">Azure DevOps · Terraform + Bicep · same pipeline (5-stage app + 4-stage infra) · 2-person prod gate</div>
+    <div class="lm-cell b">Same · Staging validates all prod patterns · NRD review gate</div>
+    <div class="lm-cell c">Same pipeline · 22 subscriptions full topology · Bicep what-if + TF plan artifacts</div>
+  </div>
+  <div class="sfooter" style="margin-top:1rem;">Scroll → Decision Matrix</div>
+</div>
+</section>
+
+<!-- ══════════════ SLIDE 4 — DECISION MATRIX ══════════════ -->
+<section class="slide" id="s4">
+<div class="si">
+  <span class="stag stag-blue">Decision Matrix</span>
+  <div class="rule" style="background:var(--blue);"></div>
+  <h2>Per-Component Plan Selection Guide</h2>
+  <p class="lead">Which plan fits which component — and what triggers an upgrade. Start with Plan A, monitor these signals, upgrade components individually.</p>
+
+  <div class="dmatrix" style="margin-top:1.2rem;">
+    <div class="dm-h">Component</div>
+    <div class="dm-h ha"><span class="dot-a"></span>Plan A · Minimal</div>
+    <div class="dm-h hb"><span class="dot-b"></span>Plan B · Standard</div>
+    <div class="dm-h hc"><span class="dot-c"></span>Plan C · Full Cloud</div>
+
+    <div class="dm-row">
+      <div class="dm-cat">Front Door</div>
+      <div class="dm-cell a">Standard · basic WAF core rules<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: WAF Premium policy validation needed</span></div>
+      <div class="dm-cell b">Premium · full WAF + private origins<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: multi-region failover required</span></div>
+      <div class="dm-cell c">Premium 🔒 · cannot reduce<br/>Regulatory/SLA requirement</div>
+    </div>
+    <div class="dm-row">
+      <div class="dm-cat">ASE v3</div>
+      <div class="dm-cell a">1×I1v2 per tier · no HA<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: P95 latency &gt;2s or error rate &gt;5%</span></div>
+      <div class="dm-cell b">2×I2v2 per tier · basic HA<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: require 3-AZ zone-redundancy</span></div>
+      <div class="dm-cell c">3F+4B I4v2 · 3-AZ HA 🔒<br/>Cannot reduce once RI committed</div>
+    </div>
+    <div class="dm-row">
+      <div class="dm-cat">APIM</div>
+      <div class="dm-cell a">Developer · no SLA<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: SLA required or &gt;100k API calls/day</span></div>
+      <div class="dm-cell b">Standard v2 · 99.95% SLA<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: multi-region or 99.99% SLA needed</span></div>
+      <div class="dm-cell c">Premium v2 · 99.99% SLA</div>
+    </div>
+    <div class="dm-row">
+      <div class="dm-cat">SQL MI</div>
+      <div class="dm-cell a">GP 4vCore · Dev/Test + AHB<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: sustained CPU &gt;70% or IOPS limit hit</span></div>
+      <div class="dm-cell b">GP 8vCore · Dev/Test + AHB<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: prod commit + geo-replica needed</span></div>
+      <div class="dm-cell c">GP 16vCore + ZRS + geo-replica + RI<br/>ADR-011 required</div>
+    </div>
+    <div class="dm-row">
+      <div class="dm-cat">Cosmos DB</div>
+      <div class="dm-cell a">Serverless · pay per RU<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: sustained &gt;400 RU/s average or &gt;$50/mo Cosmos bill</span></div>
+      <div class="dm-cell b">Autoscale 1k→10k RU/s<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: sustained peak &gt;10k RU/s</span></div>
+      <div class="dm-cell c">Autoscale 10k→50k RU/s · single-write multi-region reads</div>
+    </div>
+    <div class="dm-row">
+      <div class="dm-cat">Service Bus</div>
+      <div class="dm-cell a">Standard · shared infra<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: sessions/transactions needed or &gt;10M msgs/mo</span></div>
+      <div class="dm-cell b">Standard + quarterly Premium drill<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: active geo-DR RTO &lt;5min required</span></div>
+      <div class="dm-cell c">Premium 1MU · geo-DR backup namespace</div>
+    </div>
+    <div class="dm-row">
+      <div class="dm-cat">Firewall</div>
+      <div class="dm-cell a">Basic · L4 stateful only<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: IDPS required or TLS inspection needed</span></div>
+      <div class="dm-cell b">Premium 🔒 · IDPS + TLS inspection<br/>Cannot downgrade — ADR requirement</div>
+      <div class="dm-cell c">Premium 🔒 · same · locked</div>
+    </div>
+    <div class="dm-row">
+      <div class="dm-cat">DDoS Standard</div>
+      <div class="dm-cell a">Not deployed · Front Door DDoS only<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: regulatory sign-off or public-facing VNet required</span></div>
+      <div class="dm-cell b">Not deployed · quarterly drill only<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: regulator requires continuous VNet DDoS protection</span></div>
+      <div class="dm-cell c">DDoS Standard 🔒 · locked · regulatory requirement</div>
+    </div>
+    <div class="dm-row">
+      <div class="dm-cat">Sentinel</div>
+      <div class="dm-cell a">Not deployed · LAW + Defender<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: SOC established or SOAR automation needed</span></div>
+      <div class="dm-cell b">Sentinel 10 GB/day · advisory mode<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: alert quality validated, SOAR automation ready</span></div>
+      <div class="dm-cell c">Sentinel 40 GB/day · Purview 8 CU · SOAR P2→P3 phasing</div>
+    </div>
+    <div class="dm-row">
+      <div class="dm-cat">AI Search</div>
+      <div class="dm-cell a">Free tier · 10k docs<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: document set &gt;10k or production chatbot goes live</span></div>
+      <div class="dm-cell b">S2 ×1 replica<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: QPS &gt;2,000 sustained or P95 latency degrades</span></div>
+      <div class="dm-cell c">S2 ×2 replicas HA pair · add 3rd at QPS &gt;2,000</div>
+    </div>
+    <div class="dm-row">
+      <div class="dm-cat">Key Vault</div>
+      <div class="dm-cell a">Standard · no HSM<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: PCI-DSS scope requires HSM-backed keys</span></div>
+      <div class="dm-cell b">Standard · same<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: QSA confirms KV Premium FIPS L2 acceptable</span></div>
+      <div class="dm-cell c">Premium FIPS 140-2 L2 · ADR-005 + QSA sign-off</div>
+    </div>
+  </div>
+  <div class="sfooter" style="margin-top:1rem;">Scroll → Locked Items</div>
+</div>
+</section>
+
+<!-- ══════════════ SLIDE 5 — LOCKED ITEMS ══════════════ -->
+<section class="slide" id="s5">
+<div class="si">
+  <span class="stag stag-violet">Locked Items</span>
+  <div class="rule" style="background:var(--rose);"></div>
+  <h2>Components That Cannot Be Reduced Further</h2>
+  <p class="lead">Seven components are locked in Plan C — and must remain locked regardless of optimisation pressure. Any attempt to remove or downgrade these requires a formal ADR and in most cases regulatory sign-off.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:1.4rem;">
+
+    <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 DDoS Protection Standard</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Regulatory requirement for production public-facing VNet. Front Door edge DDoS protection only is insufficient when the VNet itself is the regulatory boundary. Cannot be removed without regulator sign-off.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Available in: Plan C only · Not in Plan A or B (quarterly drill only)</div>
+    </div>
+
+    <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Azure Firewall Premium</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">IDPS (Intrusion Detection and Prevention System) + TLS deep-packet inspection are Premium-only. Required to validate IDPS rules before prod rollout (Plan B+) and locked in Plan C. Plan A uses Basic for topology parity without IDPS.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Available in: Plan B and C · Plan A uses Firewall Basic</div>
+    </div>
+
+    <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Azure Front Door Premium</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">WAF Premium (OWASP + custom rules) + private link origins for backend pools. Standard tier cannot connect to private endpoints — citizen data flows through public origin. Required for prod SLA. Plan A uses Standard.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Available in: Plan B and C · Plan A uses Front Door Standard</div>
+    </div>
+
+    <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Storage GZRS + WORM 7-year</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Geo-zone-redundant storage required for citizen data geo-redundancy SLA. 7-year WORM immutability required for audit log compliance (EA Ordinance). Downgrading to LRS/ZRS or removing WORM is a compliance violation.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Available in: Plan C only · Plans A/B use LRS (non-compliance environments)</div>
+    </div>
+
+    <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 ASE v3 HA Footprint (Plan C)</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">3 frontend + 4 backend I4v2 instances across 3 AZs is the minimum for the 99.9% HA SLA under the 1-year Reserved Instance commitment. Once the RI is committed, reducing instances below 3 per tier breaks the HA contract. Reserved Instances apply savings.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Cannot reduce after RI commitment · Plans A/B have no RI commitment</div>
+    </div>
+
+    <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Bastion Standard</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Native client support + file transfer required for admin operations (RDP/SSH without public IP). Standard SKU is the admin access pattern — no public IPs on any DGTP compute. Plan A uses Bastion Basic (browser only).</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Available in: Plan B and C · Plan A uses Bastion Basic</div>
+    </div>
+
+    <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Defender for Cloud P2</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Security baseline per ADR-009. All P2 plans required: Defender for Servers P2 (JIT VM access), Defender for App Service, Defender for Storage, Defender for SQL. Cannot be downgraded without ADR-009 revision and security team sign-off.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Plan A uses Server P1 only · Plans B and C require full P2</div>
+    </div>
+
+    <div style="border:1.5px solid rgba(245,166,35,.25);border-radius:10px;background:rgba(245,166,35,.04);padding:16px;">
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);margin-bottom:12px;">⚠ ADR Changes Required for Plan C</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;"><strong style="color:var(--ink);">ADR-011 (new):</strong> SQL DB Business Critical → SQL MI General Purpose. GP delivers 8,000 IOPS @ 16 vCore. Validate with load test before RI commit.<br/><br/><strong style="color:var(--ink);">ADR-005 (update):</strong> Managed HSM → Key Vault Premium FIPS 140-2 L2. Multi-tenant HSM vs sole-tenant. QSA sign-off required for PCI-DSS attestation.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.65);">Also: SB geo-DR RTO change (~30min vs &lt;5min) · Cosmos single-write write RTO · VPN GW zone-redundancy removed</div>
+    </div>
+
+  </div>
+  <div class="sfooter" style="margin-top:1rem;">Scroll → Recommendation</div>
+</div>
+</section>
+
+<!-- ══════════════ SLIDE 6 — RECOMMENDATION ══════════════ -->
+<section class="slide" id="s6">
+<canvas class="bgc" id="bgc6"></canvas>
+<div class="si">
+  <span class="stag stag-teal">Recommendation</span>
+  <div class="rule" style="background:var(--teal);"></div>
+  <h2>Start with Plan A.<br/><em style="font-style:italic;color:var(--teal);">Upgrade on signal — not on schedule.</em></h2>
+
+  <div class="g2" style="margin-top:1.4rem;gap:1.6rem;">
+    <div>
+      <p class="lead" style="margin-bottom:1.2rem;">Sint Maarten has 50,000 citizens. The XLS PROD v2 baseline was designed for scale that hasn't been proven yet. Plan A gives you a live, auditable, secure platform at a fraction of the cost. Every Plan A component has a direct upgrade path to Plan B and Plan C — independently, without topology changes.</p>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="border-radius:8px;background:rgba(34,199,146,.06);border:1px solid rgba(34,199,146,.2);padding:12px 14px;">
+          <div style="font-family:var(--mono);font-size:.62rem;color:var(--plan-a);margin-bottom:5px;text-transform:uppercase;letter-spacing:.1em;">Phase 1 Go-Live · Plan A</div>
+          <p style="font-size:.8rem;color:var(--ink2);line-height:1.6;">Deploy Plan A. All 6 adapters live. Outbox + Service Bus Standard. SQL MI GP 4vCore. Cosmos Serverless. Firewall Basic. No Sentinel, no DDoS. Collect 3 months of production data — CPU, IOPS, request rates, Cosmos RU/s.</p>
+        </div>
+        <div style="border-radius:8px;background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);padding:12px 14px;">
+          <div style="font-family:var(--mono);font-size:.62rem;color:var(--plan-b);margin-bottom:5px;text-transform:uppercase;letter-spacing:.1em;">Post-UAT · Upgrade to Plan B</div>
+          <p style="font-size:.8rem;color:var(--ink2);line-height:1.6;">When UAT passes and citizen volume is confirmed: swap Front Door Standard → Premium, add 2nd ASE instance per tier, activate Sentinel, upgrade Firewall Basic → Premium, activate VPN Gateway. Each upgrade is a Terraform change — no architecture redesign.</p>
+        </div>
+        <div style="border-radius:8px;background:rgba(155,135,245,.06);border:1px solid rgba(155,135,245,.2);padding:12px 14px;">
+          <div style="font-family:var(--mono);font-size:.62rem;color:var(--plan-c);margin-bottom:5px;text-transform:uppercase;letter-spacing:.1em;">Months 18+ · Plan C on Evidence</div>
+          <p style="font-size:.8rem;color:var(--ink2);line-height:1.6;">Commit to Plan C only when load data justifies it: sustained P95 &gt;2s on Plan B, Cosmos RU/s sustained &gt;10k, citizen volume validated &gt;30k active users. Draft ADR-011 + ADR-005, get QSA sign-off, then commit SQL MI RI + DDoS Standard + zone-redundant ASE.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:16px;">
+        <div style="font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);margin-bottom:10px;">Upgrade Triggers — Monitor These</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">ASE CPU sustained &gt;70% for 7 days → add instance</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">Cosmos RU/s sustained &gt;400/s average → upgrade to autoscale</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">SQL MI CPU &gt;70% or IOPS limit hit → upgrade vCores</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">APIM P95 &gt;2s consistently → investigate + upgrade tier</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">Service Bus DLQ &gt;10 msgs/day → validate consumer health</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--rose);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">⚠</span><span style="font-size:.78rem;color:var(--ink2);">Regulator mandates DDoS Standard → Plan C only, cannot defer</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--rose);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">⚠</span><span style="font-size:.78rem;color:var(--ink2);">PCI-DSS scope confirmed → KV Premium + ADR-005 + QSA</span></div>
+        </div>
+      </div>
+
+      <div style="border-radius:10px;background:rgba(34,199,146,.05);border:1px solid rgba(34,199,146,.2);padding:16px;">
+        <div style="font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--teal);margin-bottom:8px;">Components identical across all three plans</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">CASBES WCF adapter</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">CMF Outbox pattern</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">§16.2 SIAH constraint</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">SHA-256 AuditLog</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">7yr LTR retention</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">Redis NO-PII rule</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">Entra OIDC federation</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">Terraform IaC pipelines</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">2-person prod gate</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">Private DNS 12 zones</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">NFR-03 &lt;15min CMF</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">DLQ 15min monitor</span>
+        </div>
+      </div>
+
+      <div class="mrow" style="margin-top:0;">
+        <div class="met"><span class="mv mv-teal">A</span><div class="ml">Start here · Go-Live</div></div>
+        <div class="met"><span class="mv mv-blue">B</span><div class="ml">Post-UAT · HA</div></div>
+        <div class="met"><span class="mv mv-violet">C</span><div class="ml">Evidence-based</div></div>
+        <div class="met"><span class="mv mv-rose">7</span><div class="ml">Locked items</div></div>
+        <div class="met"><span class="mv mv-amber">2</span><div class="ml">ADRs for Plan C</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sfooter" style="margin-top:1.4rem;">DGTP-LLD-001 v1.0 · Part 2 Cloud Architecture · Government of Sint Maarten · Orangebd · May 2026</div>
+</div>
+</section>
+
+<script>
+// ── nav + scroll dots ──
+var slides=document.querySelectorAll('.slide');
+var navBtns=document.querySelectorAll('nav .navbtn');
+var dots=document.querySelectorAll('.sdot');
+function goSlide(n){slides[n].scrollIntoView({behavior:'smooth'});}
+var planColors=['','','#22c792','#60a5fa','#9b87f5','#9b87f5','','','','',''];
+var obs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting&&e.intersectionRatio>0.4){
+      var i=Array.from(slides).indexOf(e.target);
+      navBtns.forEach(function(b,j){b.classList.toggle('on',j===i);});
+      dots.forEach(function(d,j){
+        d.classList.toggle('on',j===i);
+        if(j===i&&planColors[i])d.style.background=planColors[i];
+        else if(j!==i)d.style.background='';
+      });
+    }
+  });
+},{threshold:0.4});
+slides.forEach(function(s){obs.observe(s);});
+
+// ── layer toggles ──
+function toggleLayer(id){
+  var el=document.getElementById(id);
+  var was=el.classList.contains('open');
+  document.querySelectorAll('.layer').forEach(function(l){l.classList.remove('open');});
+  if(!was)el.classList.add('open');
+}
+
+// ── canvas backgrounds ──
+function initCanvas(id,colors){
+  var canvas=document.getElementById(id);if(!canvas)return;
+  var ctx=canvas.getContext('2d');
+  var W,H,pts=[];
+  function resize(){W=canvas.width=canvas.offsetWidth;H=canvas.height=canvas.offsetHeight||window.innerHeight;}
+  function mkPt(){var c=colors[Math.floor(Math.random()*colors.length)];
+    return{x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.2,
+      r:Math.random()*14+5,alpha:Math.random()*.07+.02,phase:Math.random()*Math.PI*2,sp:Math.random()*.005+.002,c:c};}
+  function hex2r(h,a){var r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return'rgba('+r+','+g+','+b+','+a+')';}
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;p.phase+=p.sp;
+      if(p.x<-20)p.x=W+20;if(p.x>W+20)p.x=-20;
+      if(p.y<-20)p.y=H+20;if(p.y>H+20)p.y=-20;
+      ctx.save();ctx.globalAlpha=p.alpha+Math.sin(p.phase)*.015;
+      ctx.strokeStyle=hex2r(p.c,p.alpha*4);ctx.lineWidth=1;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.stroke();
+      ctx.restore();
+    });
+    requestAnimationFrame(tick);
+  }
+  resize();window.addEventListener('resize',resize);
+  for(var i=0;i<20;i++)pts.push(mkPt());
+  tick();
+}
+window.addEventListener('load',function(){
+  initCanvas('bgc0',['#1d9e75','#6b48c8','#185fa5']);
+  initCanvas('bgc6',['#1d9e75','#185fa5']);
+});
+</script>
+</body>
+</html>
