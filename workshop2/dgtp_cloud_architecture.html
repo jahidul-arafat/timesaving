@@ -6,6 +6,7 @@
 <title>DGTP Sint Maarten — Azure Cloud Architecture · Part 2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <style>
 :root{
   --ink:#e8e4dc;--ink2:rgba(232,228,220,.6);--ink3:rgba(232,228,220,.3);--ink4:rgba(232,228,220,.14);
@@ -186,6 +187,36 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
 .lm-cell.b{border-left:2px solid rgba(96,165,250,.15);}
 .lm-cell.c{border-left:2px solid rgba(155,135,245,.15);}
 .lm-grp{font-family:var(--mono);font-size:.56rem;text-transform:uppercase;letter-spacing:.1em;padding:5px 12px;background:rgba(255,255,255,.03);color:var(--ink3);grid-column:1/-1;}
+
+/* ── cost cards ── */
+.cost-card{border-radius:12px;border:1.5px solid;overflow:hidden;display:flex;flex-direction:column;}
+.cost-card-a{border-color:rgba(34,199,146,.3);background:rgba(34,199,146,.025);}
+.cost-card-b{border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.025);}
+.cost-card-c{border-color:rgba(155,135,245,.3);background:rgba(155,135,245,.025);}
+.cost-card-head{padding:16px 18px 12px;border-bottom:1px solid rgba(255,255,255,.07);}
+.cost-card-body{padding:14px 18px;flex:1;}
+.cbar-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.cbar-lbl{font-family:var(--mono);font-size:.57rem;color:var(--ink2);width:138px;flex-shrink:0;}
+.cbar-track{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.cbar{height:100%;border-radius:3px;}
+.cbar-val{font-family:var(--mono);font-size:.57rem;color:var(--ink2);width:46px;text-align:right;flex-shrink:0;}
+/* ── env diagram tabs ── */
+.env-tabs{display:flex;gap:6px;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;}
+.env-tab{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;padding:6px 16px;border-radius:20px;cursor:pointer;border:1.5px solid;background:none;transition:all .2s;}
+.env-tab.ta{border-color:rgba(34,199,146,.3);color:rgba(34,199,146,.5);}
+.env-tab.ta.on{border-color:#22c792;color:#22c792;background:rgba(34,199,146,.1);}
+.env-tab.tb{border-color:rgba(96,165,250,.3);color:rgba(96,165,250,.5);}
+.env-tab.tb.on{border-color:#60a5fa;color:#60a5fa;background:rgba(96,165,250,.1);}
+.env-tab.tc{border-color:rgba(155,135,245,.3);color:rgba(155,135,245,.5);}
+.env-tab.tc.on{border-color:#9b87f5;color:#9b87f5;background:rgba(155,135,245,.1);}
+.env-pane{display:none;}
+.env-pane.on{display:grid;grid-template-columns:1fr 310px;gap:1.4rem;align-items:start;}
+.mwrap{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;min-height:380px;display:flex;align-items:center;justify-content:center;overflow:auto;}
+.mwrap svg{width:100%;height:auto;max-height:440px;}
+.diag-spec-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.diag-spec-key{font-family:var(--mono);font-size:.56rem;color:var(--ink3);flex-shrink:0;}
+.diag-spec-val{font-family:var(--mono);font-size:.6rem;text-align:right;line-height:1.4;}
+.diag-analogy{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px 13px;font-family:var(--serif);font-size:.88rem;color:var(--ink2);line-height:1.55;font-style:italic;margin-top:8px;}
 </style>
 </head>
 <body>
@@ -214,6 +245,10 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
   <button class="navbtn" onclick="goSlide(9)">Locked Items</button>
   <div class="navsep"></div>
   <button class="navbtn" onclick="goSlide(10)">Recommendation</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(11)" style="color:var(--amber);">Cost Model</button>
+  <div class="navsep"></div>
+  <button class="navbtn" onclick="goSlide(12)">Architecture</button>
 </nav>
 
 <!-- SCROLL DOTS -->
@@ -232,6 +267,8 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
   <button class="sdot" onclick="goSlide(8)"></button>
   <button class="sdot" onclick="goSlide(9)"></button>
   <button class="sdot" onclick="goSlide(10)"></button>
+  <button class="sdot" style="background:rgba(245,166,35,.35);" onclick="goSlide(11)"></button>
+  <button class="sdot" onclick="goSlide(12)"></button>
 </div>
 
 <!-- ══════════════ SLIDE 0 — COVER ══════════════ -->
@@ -240,28 +277,28 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
 <div class="si">
   <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:2rem;max-width:900px;">
     <div>
-      <div class="eyebrow" style="margin-bottom:.8rem;">Technical Workshop · Part 2 · May 2026</div>
-      <h1>Azure Cloud<br/>Architecture<br/><em style="color:var(--teal);font-style:italic;">Three Adaptable Plans</em></h1>
-      <p class="lead" style="margin-top:1.2rem;">Mapping every DGTP LLD component to an Azure service — then offering three cost tiers designed for Sint Maarten's 50,000-person population. Plan A gets you live. Plan B gets you production-ready. Plan C is the full enterprise stack.</p>
+      <div class="eyebrow" style="margin-bottom:.8rem;">Technical Workshop · Part 2 · June 2026 · cost-refreshed 2026-06-01</div>
+      <h1>Azure Cloud<br/>Architecture<br/><em style="color:var(--teal);font-style:italic;">Three Environments</em></h1>
+      <p class="lead" style="margin-top:1.2rem;">Mapping every DGTP LLD component to an Azure service across the three environments for Sint Maarten's 50,000 citizens. Plan A is the Dev sandbox (<strong>$273/mo</strong>). Plan B is the Staging / UAT gate (<strong>$679/mo</strong>). Plan C is Production — deployed Minimal, Standard, or Full (<strong>$2,433–4,955/mo</strong>).</p>
     </div>
     <div style="display:flex;gap:16px;flex-wrap:wrap;">
       <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:1px solid rgba(34,199,146,.25);background:rgba(34,199,146,.05);">
         <span style="font-family:var(--mono);font-size:1.2rem;color:var(--plan-a);">A</span>
-        <div><div style="font-family:var(--mono);font-size:.65rem;color:var(--plan-a);">MINIMAL</div><div style="font-size:.75rem;color:var(--ink2);">Core platform · lean stack</div></div>
+        <div><div style="font-family:var(--mono);font-size:.65rem;color:var(--plan-a);">DEV · $273/mo</div><div style="font-size:.75rem;color:var(--ink2);">Sandbox · lean · App Service</div></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:1px solid rgba(96,165,250,.25);background:rgba(96,165,250,.05);">
         <span style="font-family:var(--mono);font-size:1.2rem;color:var(--plan-b);">B</span>
-        <div><div style="font-family:var(--mono);font-size:.65rem;color:var(--plan-b);">STANDARD</div><div style="font-size:.75rem;color:var(--ink2);">Balanced · DEV/STG pattern</div></div>
+        <div><div style="font-family:var(--mono);font-size:.65rem;color:var(--plan-b);">STAGING · $679/mo</div><div style="font-size:.75rem;color:var(--ink2);">UAT gate · warm SQL · autoscale</div></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:1px solid rgba(155,135,245,.25);background:rgba(155,135,245,.05);">
         <span style="font-family:var(--mono);font-size:1.2rem;color:var(--plan-c);">C</span>
-        <div><div style="font-family:var(--mono);font-size:.65rem;color:var(--plan-c);">FULL CLOUD</div><div style="font-size:.75rem;color:var(--ink2);">PROD v2 aggressive · enterprise</div></div>
+        <div><div style="font-family:var(--mono);font-size:.65rem;color:var(--plan-c);">PROD · $2,433–4,955/mo</div><div style="font-size:.75rem;color:var(--ink2);">Dual ASE v3 · Minimal→Full</div></div>
       </div>
     </div>
     <div class="mrow">
       <div class="met"><span class="mv mv-teal">7</span><div class="ml">Architecture layers</div></div>
       <div class="met"><span class="mv mv-blue">6</span><div class="ml">Registry adapters</div></div>
-      <div class="met"><span class="mv mv-violet">22</span><div class="ml">Azure subscriptions</div></div>
+      <div class="met"><span class="mv mv-violet">4</span><div class="ml">Azure subscriptions</div></div>
       <div class="met"><span class="mv mv-amber">50k</span><div class="ml">Population served</div></div>
       <div class="met"><span class="mv mv-rose">7</span><div class="ml">Locked components</div></div>
     </div>
@@ -275,8 +312,8 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
 <div class="si">
   <span class="stag stag-teal">Cloud Strategy</span>
   <div class="rule" style="background:var(--teal);"></div>
-  <h2>Three Adaptable Plans</h2>
-  <p class="lead">The XLS PROD v2 aggressive stack is over-engineered for 50,000 citizens at launch. These three plans let DGTP start lean, validate demand, and scale only what the data justifies.</p>
+  <h2>Three Environments, One Architecture</h2>
+  <p class="lead">The same LLD design runs across <strong>Dev</strong>, <strong>Staging</strong>, and <strong>Production</strong> — only the service tier and scale change. Production itself ships in three sizings (Minimal / Standard / Full) so DGTP can launch lean and scale on evidence. All edge + network is a shared service hosted once in the Production subscription, so Dev and Staging carry $0 edge.</p>
 
   <div class="plans" style="margin-top:1.4rem;">
 
@@ -284,21 +321,21 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
     <div class="plan plan-a">
       <div class="plan-head">
         <div class="plan-letter">A</div>
-        <div class="plan-name">Minimal Cloud</div>
-        <div class="plan-sub">Core platform · lean stack · go-live ready</div>
+        <div class="plan-name">Dev Sandbox</div>
+        <div class="plan-sub">$273/mo · App Service · synthetic data</div>
       </div>
       <div class="plan-body">
-        <p class="plan-desc">Everything needed to run DGTP end-to-end for 50,000 citizens — and nothing more. Mirrors the optimised DEV environment pattern scaled for production use. Single instances, no geo-redundancy, Standard service tiers, Basic firewall. Sentinel excluded. AI Search on free tier.</p>
+        <p class="plan-desc">A functional-correctness and integration environment — architecturally representative of Prod so Bicep modules and app wiring are validated, at the lowest credible cost. Multi-tenant App Service (no ASE stamp), serverless data, single region. No HA, no Sentinel, no DR. Carries no citizen PII — synthetic / seeded data only.</p>
         <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px;">
           <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-a);flex-shrink:0;">✓</span>All 6 registry adapters live</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-a);flex-shrink:0;">✓</span>APIM + Entra + Service Bus Standard</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-a);flex-shrink:0;">✓</span>SQL MI GP 4 vCore + Cosmos Serverless</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-a);flex-shrink:0;">✓</span>Front Door Standard + Firewall Basic</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.6);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">✗</span>No DDoS Standard · No Sentinel · No HA</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.6);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">✗</span>No zone-redundancy · No geo-DR</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-a);flex-shrink:0;">✓</span>App Service P0v3 ×2 (frontend + backend)</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-a);flex-shrink:0;">✓</span>Azure SQL DB serverless + Cosmos serverless</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-a);flex-shrink:0;">✓</span>Service Bus + Event Grid · edge shared from Prod</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.6);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">✗</span>No HA · No Sentinel · No DR</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.6);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">✗</span>No zone-redundancy · LRS storage · no PII</div>
         </div>
-        <div class="plan-verdict">Best for: Phase 1 Go-Live · Validate demand · First 6–12 months</div>
-        <p style="font-size:.7rem;color:var(--ink3);font-family:var(--mono);margin-top:6px;">Upgrade path: each component swappable independently — add DDoS Standard first, then HA ASE, then Sentinel SOAR</p>
+        <div class="plan-verdict">Best for: functional + integration testing · synthetic data only</div>
+        <p style="font-size:.7rem;color:var(--ink3);font-family:var(--mono);margin-top:6px;">Path: promote validated builds to Staging — identical Bicep modules, only the SKUs change</p>
       </div>
     </div>
 
@@ -306,21 +343,21 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
     <div class="plan plan-b">
       <div class="plan-head">
         <div class="plan-letter">B</div>
-        <div class="plan-name">Standard Cloud</div>
-        <div class="plan-sub">Balanced · prod-pattern fidelity · right-sized</div>
+        <div class="plan-name">Staging / UAT</div>
+        <div class="plan-sub">$679/mo · warm SQL · autoscale 1→2</div>
       </div>
       <div class="plan-body">
-        <p class="plan-desc">Matches the XLS optimised STG configuration scaled for production. Basic HA (2-instance ASE), Front Door Premium for WAF, Sentinel active, Service Bus Standard with quarterly Premium validation windows. SQL MI GP 8 vCore. Cosmos autoscale. Firewall Premium for IDPS.</p>
+        <p class="plan-desc">The last gate before Production — UAT, integration sign-off, and light HA / performance testing. Higher-end compute and data than Dev (P1v3 autoscale, warm provisioned SQL, Cosmos autoscale, Key Vault Premium) on masked / synthetic datasets. Edge is still shared from the Prod subscription, so the whole budget goes into the workload.</p>
         <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px;">
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>Front Door Premium + WAF v2</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>2-instance ASE (basic HA per tier)</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>Sentinel + Defender P2 active</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>Firewall Premium · VPN Gateway</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.7);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">△</span>No DDoS Standard (Front Door edge only)</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.7);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">△</span>No 3-AZ spread · No geo-DR</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>App Service P1v3 ×2 · autoscale 1→2</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>Warm Azure SQL DB GP 2 vCore</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>Cosmos autoscale + Key Vault Premium</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-b);flex-shrink:0;">✓</span>Defender 5 plans · App Insights → central LAW</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.7);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">△</span>Edge shared from Prod sub ($0 booked here)</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.7);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">△</span>Single region · ZRS · masked UAT data only</div>
         </div>
-        <div class="plan-verdict">Best for: Post-UAT production · Months 6–18 · Proven demand</div>
-        <p style="font-size:.7rem;color:var(--ink3);font-family:var(--mono);margin-top:6px;">Upgrade path: add DDoS Standard ($2,944) + 3rd ASE instance per tier to reach Plan C</p>
+        <div class="plan-verdict">Best for: last gate before Production · UAT + load testing</div>
+        <p style="font-size:.7rem;color:var(--ink3);font-family:var(--mono);margin-top:6px;">Path: cut over to Production at the chosen sizing — dual ASE v3, edge already in place</p>
       </div>
     </div>
 
@@ -328,21 +365,21 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
     <div class="plan plan-c">
       <div class="plan-head">
         <div class="plan-letter">C</div>
-        <div class="plan-name">Full Cloud</div>
-        <div class="plan-sub">PROD v2 aggressive · full enterprise · all NFRs met</div>
+        <div class="plan-name">Production</div>
+        <div class="plan-sub">$2,433–4,955/mo · Minimal → Standard → Full</div>
       </div>
       <div class="plan-body">
-        <p class="plan-desc">The XLS PROD v2 aggressive configuration in full. 3-AZ zone-redundant ASE (3 frontend + 4 backend), DDoS Standard, SQL MI GP 16 vCore with 1yr RI, Cosmos autoscale 50k RU/s, Service Bus Premium 1MU with geo-DR, AI Search S2 ×2, full Sentinel + Purview 8CU. All locked items active.</p>
+        <p class="plan-desc">The live citizen environment, in three sizings. <strong>Minimal</strong> ($2,433): dual ASE v3 single-instance, serverless SQL, LRS. <strong>Standard</strong> ($3,419): 2× ASE per tier (HA), warm SQL, ZRS. <strong>Full</strong> ($4,955): adds Front Door Premium, APIM Standard v2, zone-redundant 4-vCore SQL, GRS + DR region. All edge (Firewall Standard, App Gateway, Front Door, APIM) lives here and is shared by every environment.</p>
         <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px;">
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>3-AZ zone-redundant ASE (7 instances)</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>DDoS Standard + Sentinel SOAR P2</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>SQL MI GP 16vCore RI + Cosmos 50k RU/s</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>Service Bus Premium + geo-DR</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>Full NFR-01–08 · RTO &lt;5min · 99.9%+ SLA</div>
-          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.7);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">△</span>Aggressive for 50k population at launch</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>Dual ASE v3 I1v2 (1× Min · 2× Std/Full HA)</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>Azure Firewall Standard (shared) + Sentinel</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>Azure SQL DB GP + Cosmos + WORM blob</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>Front Door + App Gateway WAF v2 + APIM</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink2);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--plan-c);flex-shrink:0;">✓</span>ISO 27001 · GDPR · PCI-DSS (e-Payment)</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.7);display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">△</span>Full adds GRS + DR region (netherlandsnorth)</div>
         </div>
-        <div class="plan-verdict">Best for: Scale-up trigger · High-volume validated · 18+ months</div>
-        <p style="font-size:.7rem;color:var(--ink3);font-family:var(--mono);margin-top:6px;">ADR required: ADR-011 (SQL MI GP) · ADR-005 update (KV Premium vs MHSM) · QSA sign-off</p>
+        <div class="plan-verdict">Best for: live citizen environment · size on demand</div>
+        <p style="font-size:.7rem;color:var(--ink3);font-family:var(--mono);margin-top:6px;">Sizing path: Minimal (launch) → Standard (HA) → Full (DR). ADRs: external-LLM removal · eID supersedes Entra · shared-edge isolation</p>
       </div>
     </div>
 
@@ -388,14 +425,14 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
   <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:.4rem;">
     <span style="font-family:var(--mono);font-size:3rem;font-weight:500;color:var(--plan-a);line-height:1;">A</span>
     <div>
-      <div class="eyebrow" style="margin-bottom:2px;">Plan A · Minimal Cloud</div>
-      <h2 style="font-size:1.5rem;">Start here. Get citizens online. Spend only what you need.</h2>
+      <div class="eyebrow" style="margin-bottom:2px;">Plan A · Dev Sandbox · $273/mo</div>
+      <h2 style="font-size:1.5rem;">Build and test the whole platform — cheaply, with no citizen data.</h2>
     </div>
   </div>
 
   <div class="analogy" style="margin-bottom:1.2rem;">
     <div class="analogy-eyebrow">Non-technical analogy</div>
-    <div class="analogy-text">Think of Plan A as <em>renting a reliable car</em> — not buying a fleet. It gets you everywhere Sint Maarten's 50,000 citizens need to go. If demand grows and you need more, you upgrade. You don't buy the fleet before you know the routes.</div>
+    <div class="analogy-text">Think of Plan A as the <em>workshop garage</em> — where you build and road-test the vehicle before it ever carries a passenger. It mirrors the real thing closely, but runs on a test track with crash-test dummies, not citizens. Cheap to run, safe to break.</div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;">
@@ -405,9 +442,9 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
       <div class="storybox" style="background:rgba(34,199,146,.05);border-color:rgba(34,199,146,.2);">
         <div class="storybox-icon">🚪</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--plan-a);">The front door</div>
-          <div class="storybox-title">Azure Front Door Standard + App Gateway</div>
-          <div class="storybox-text">Citizens reach the GoSXM portal through a global content delivery network with basic security rules. <strong>Think of it as a secure reception desk</strong> — it checks everyone at the door, handles the queue, and routes them to the right service. The Standard tier includes protection against the most common web attacks.</div>
+          <div class="storybox-label" style="color:var(--plan-a);">The front door (shared)</div>
+          <div class="storybox-title">Reaches the portal through the shared Prod edge</div>
+          <div class="storybox-text">Dev doesn't pay for its own front door. It reaches the portal through the same Front Door / App Gateway / APIM edge hosted once in the Production subscription. <strong>Think of it as a shared reception desk</strong> for all three environments — host-header and path rules keep Dev traffic separated from real citizen traffic. $0 edge cost is booked to Dev.</div>
         </div>
       </div>
 
@@ -415,8 +452,8 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
         <div class="storybox-icon">⚙️</div>
         <div class="storybox-body">
           <div class="storybox-label" style="color:var(--plan-a);">The engine room</div>
-          <div class="storybox-title">1 server per tier — all 6 registries connected</div>
-          <div class="storybox-text">One server handles the front-end, one handles the back-end processing. <strong>No backup server</strong> — if this server has a problem, there is a brief outage. For 50,000 citizens at launch, a single reliable server is the right call. All six government registries (Civil, Commerce, Tax, TEATT, Permits, Land) are connected and live.</div>
+          <div class="storybox-title">App Service P0v3 ×2 — all 6 registries wired</div>
+          <div class="storybox-text">Two small App Service plans — one front-end, one back-end — run the full request path end-to-end. <strong>No high-availability and no ASE stamp</strong>: Dev only needs to prove the wiring works, not survive an outage. All six government registries (Civil, Commerce, Tax, TEATT, Permits, Land) are connected against test endpoints.</div>
         </div>
       </div>
 
@@ -424,8 +461,8 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
         <div class="storybox-icon">🗄️</div>
         <div class="storybox-body">
           <div class="storybox-label" style="color:var(--plan-a);">The data safe</div>
-          <div class="storybox-title">SQL Database + Smart Cache + Audit Log</div>
-          <div class="storybox-text">Citizen data is stored securely in a SQL database with a 4-core processor. A smart cache means most portal requests are answered in milliseconds — not by calling the registry every time. <strong>Every action is permanently logged for 7 years</strong> (legal requirement), and citizen identities are stored as scrambled codes — never as plain names.</div>
+          <div class="storybox-title">Azure SQL DB serverless + Cosmos cache + Audit Log</div>
+          <div class="storybox-text">Data lives in a serverless SQL database that auto-pauses when idle — you pay only for the hours it runs. A Cosmos cache answers most requests in milliseconds instead of calling the registry every time. The 7-year audit-log mechanism and SHA-256 identity scrambling are wired exactly as in Prod — but in Dev they hold <strong>synthetic data only, never real citizens</strong>.</div>
         </div>
       </div>
 
@@ -433,8 +470,8 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
         <div class="storybox-icon">🔒</div>
         <div class="storybox-body">
           <div class="storybox-label" style="color:var(--plan-a);">Security baseline</div>
-          <div class="storybox-title">Firewall + Identity + Secrets Vault</div>
-          <div class="storybox-text">A network firewall blocks all uninvited traffic. Citizens log in with the national eID via a secure identity service (Entra). All system passwords and API keys are stored in a locked vault — <strong>no credentials are ever hardcoded or visible</strong>. Security event logs are monitored via Azure Defender.</div>
+          <div class="storybox-title">Identity + Secrets Vault + Defender</div>
+          <div class="storybox-text">Sign-in uses the <strong>national eID</strong> directly (external OIDC/SAML — no Azure identity service to pay for). All secrets and API keys live in Key Vault, reached only by managed identity — <strong>never hardcoded</strong>. Microsoft Defender for Cloud watches the App Service, SQL and Key Vault; the shared firewall in the Prod subscription handles network filtering.</div>
         </div>
       </div>
     </div>
@@ -445,9 +482,9 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
       <div class="storybox" style="background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.15);margin-bottom:8px;">
         <div class="storybox-icon">🛡️</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--rose);">No DDoS Standard protection</div>
-          <div class="storybox-title">Front Door edge protection is sufficient at launch</div>
-          <div class="storybox-text">DDoS Standard costs <strong>$2,944/month</strong> and protects the entire network perimeter. For a 50,000-citizen government portal at launch, the Azure Front Door edge protection (included in Standard tier) handles realistic attack scenarios. DDoS Standard becomes important when Sint Maarten's digital services are a high-value target — not at Go-Live.</div>
+          <div class="storybox-label" style="color:var(--rose);">No dedicated edge or firewall</div>
+          <div class="storybox-title">Shared from the Production subscription</div>
+          <div class="storybox-text">Dev has no Front Door, App Gateway or firewall of its own — these are shared services hosted once in Production and consumed by every environment. <strong>This is why Dev costs $273, not thousands.</strong> The one thing to confirm at design time is that host-header / path routing keeps non-prod traffic cleanly separated on the shared edge.</div>
         </div>
       </div>
 
@@ -464,30 +501,30 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
         <div class="storybox-icon">⚖️</div>
         <div class="storybox-body">
           <div class="storybox-label" style="color:var(--rose);">No high-availability failover</div>
-          <div class="storybox-title">Single server — single point of failure</div>
-          <div class="storybox-text">If the single server has a problem, there is a brief service interruption. For a portal serving 50,000 citizens with moderate usage patterns, this risk is acceptable at launch. <strong>A brief outage during the first year — while you gather real usage data — is less costly than over-spending on infrastructure that may never be needed.</strong></div>
+          <div class="storybox-title">Single instance — fine for a test environment</div>
+          <div class="storybox-text">Dev runs one instance per tier with no failover. If it restarts, developers wait a moment — no citizen is affected, because no citizen uses Dev. <strong>Paying for high-availability in a sandbox would be spending money to protect crash-test dummies.</strong> HA arrives in Staging and is standard in Production.</div>
         </div>
       </div>
 
-      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--amber);margin-bottom:8px;margin-top:1rem;">When to upgrade from Plan A</div>
-      <div class="utrigger"><div class="utrigger-icon">📈</div><div class="utrigger-text"><strong>Portal traffic grows beyond projections</strong> — response times slow, or the server CPU is consistently above 70%</div></div>
-      <div class="utrigger"><div class="utrigger-icon">⚖️</div><div class="utrigger-text"><strong>Regulator mandates DDoS Standard</strong> — this is the single biggest cost jump; only commit when required</div></div>
-      <div class="utrigger"><div class="utrigger-icon">🔐</div><div class="utrigger-text"><strong>A security incident occurs</strong> that requires Sentinel's advanced threat hunting capability</div></div>
-      <div class="utrigger"><div class="utrigger-icon">🏛️</div><div class="utrigger-text"><strong>GoSXM establishes a dedicated SOC</strong> — then Sentinel becomes valuable, not noise</div></div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--amber);margin-bottom:8px;margin-top:1rem;">When to promote Dev → Staging</div>
+      <div class="utrigger"><div class="utrigger-icon">✅</div><div class="utrigger-text"><strong>All 6 adapters pass integration tests</strong> against the registry endpoints</div></div>
+      <div class="utrigger"><div class="utrigger-icon">📈</div><div class="utrigger-text"><strong>App Service CPU and Cosmos RU/s stay within budget</strong> under representative load</div></div>
+      <div class="utrigger"><div class="utrigger-icon">🔐</div><div class="utrigger-text"><strong>Security scan + Defender baseline clean</strong> on the candidate build</div></div>
+      <div class="utrigger"><div class="utrigger-icon">📋</div><div class="utrigger-text"><strong>Masked UAT data ready</strong> — cut a Staging release with the same Bicep modules</div></div>
     </div>
   </div>
 
   <div class="pill-grid" style="margin-top:1rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.07);">
     <span style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);align-self:center;margin-right:4px;">Plan A includes:</span>
     <span class="pill pill-on">All 6 registry adapters</span>
-    <span class="pill pill-on">APIM 8-stage pipeline</span>
-    <span class="pill pill-on">eID login via Entra</span>
+    <span class="pill pill-on">APIM 8-stage pipeline (shared)</span>
+    <span class="pill pill-on">eID login (external)</span>
     <span class="pill pill-on">7yr audit log</span>
-    <span class="pill pill-on">CMF data cache</span>
+    <span class="pill pill-on">Cosmos data cache</span>
     <span class="pill pill-on">Service Bus events</span>
-    <span class="pill pill-on">Terraform IaC</span>
+    <span class="pill pill-on">Bicep IaC</span>
     <span class="pill pill-on">Secrets vault</span>
-    <span class="pill pill-off">DDoS Standard</span>
+    <span class="pill pill-off">Dedicated edge</span>
     <span class="pill pill-off">Sentinel</span>
     <span class="pill pill-off">HA failover</span>
     <span class="pill pill-off">Zone-redundancy</span>
@@ -502,53 +539,53 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
   <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:.4rem;">
     <span style="font-family:var(--mono);font-size:3rem;font-weight:500;color:var(--plan-b);line-height:1;">B</span>
     <div>
-      <div class="eyebrow" style="margin-bottom:2px;">Plan B · Standard Cloud</div>
-      <h2 style="font-size:1.5rem;">Proven demand. Production-ready. Balanced investment.</h2>
+      <div class="eyebrow" style="margin-bottom:2px;">Plan B · Staging / UAT · $679/mo</div>
+      <h2 style="font-size:1.5rem;">The last gate before Production — prove it under load, on safe data.</h2>
     </div>
   </div>
 
   <div class="analogy" style="margin-bottom:1.2rem;">
     <div class="analogy-eyebrow">Non-technical analogy</div>
-    <div class="analogy-text">Plan B is like <em>upgrading from one checkout lane to two</em> in a supermarket — you can handle twice the queue without turning anyone away. You've proven the shop is popular. Now you invest in the second lane, better security cameras, and a manager watching the floor.</div>
+    <div class="analogy-text">Plan B is the <em>dress rehearsal on the real stage</em> — same script, same set, a full run-through with stand-ins instead of the public. You warm up the database, rehearse the failover, and prove every cue works before opening night in Production.</div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;">
     <div>
-      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--plan-b);margin-bottom:8px;">What Plan B adds over Plan A</div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--plan-b);margin-bottom:8px;">What Staging adds over Dev</div>
 
       <div class="storybox" style="background:rgba(96,165,250,.05);border-color:rgba(96,165,250,.2);">
         <div class="storybox-icon">🔁</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--plan-b);">Basic high-availability</div>
-          <div class="storybox-title">2 servers per tier — if one fails, the other takes over</div>
-          <div class="storybox-text">Plan B runs <strong>two servers instead of one</strong> at each tier. If one has a problem, the other continues without interruption. This is the minimum for a government service that citizens are relying on daily. The switchover is automatic — citizens notice nothing.</div>
+          <div class="storybox-label" style="color:var(--plan-b);">Autoscale headroom</div>
+          <div class="storybox-title">App Service P1v3 — scales 1→2 under load</div>
+          <div class="storybox-text">Staging steps up to P1v3 plans — twice the cores and RAM of Dev — that <strong>autoscale from one instance to two</strong> when a load test pushes them. This is where you prove the platform holds up under realistic citizen traffic, before it ever sees a real citizen.</div>
         </div>
       </div>
 
       <div class="storybox" style="background:rgba(96,165,250,.05);border-color:rgba(96,165,250,.2);">
-        <div class="storybox-icon">🛡️</div>
+        <div class="storybox-icon">🗄️</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--plan-b);">Upgraded security inspection</div>
-          <div class="storybox-title">Firewall Premium — reads inside encrypted traffic</div>
-          <div class="storybox-text">Plan B upgrades to a Premium firewall with IDPS — it can inspect encrypted (HTTPS) traffic for threats, not just the outside of the packet. <strong>Think of it as upgrading from a metal detector at the door to an X-ray machine</strong> — it sees what's inside. Required to validate security rules before deploying to the full production environment.</div>
+          <div class="storybox-label" style="color:var(--plan-b);">Warm, load-testable database</div>
+          <div class="storybox-title">Azure SQL DB — provisioned 2 vCore, always warm</div>
+          <div class="storybox-text">Dev's database auto-pauses to save money; Staging's is <strong>provisioned and always warm</strong>, so load tests measure real performance with no cold-start surprises. It's the same engine that runs in Production — just sized for UAT.</div>
+        </div>
+      </div>
+
+      <div class="storybox" style="background:rgba(96,165,250,.05);border-color:rgba(96,165,250,.2);">
+        <div class="storybox-icon">🔑</div>
+        <div class="storybox-body">
+          <div class="storybox-label" style="color:var(--plan-b);">Production-parity data tier</div>
+          <div class="storybox-title">Cosmos autoscale + Key Vault Premium (HSM keys)</div>
+          <div class="storybox-text">The Cosmos cache moves to <strong>autoscale</strong> — it bills only for the busiest hour — and Key Vault upgrades to <strong>Premium with HSM-backed keys</strong>, the same key-protection standard Production uses. Staging now mirrors Prod's data and secrets behaviour exactly.</div>
         </div>
       </div>
 
       <div class="storybox" style="background:rgba(96,165,250,.05);border-color:rgba(96,165,250,.2);">
         <div class="storybox-icon">📡</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--plan-b);">Security monitoring activated</div>
-          <div class="storybox-title">Microsoft Sentinel — threat detection and alerting</div>
-          <div class="storybox-text">Plan B turns on Microsoft Sentinel — a security intelligence platform that monitors all activity and flags suspicious patterns. <strong>It's the difference between a security camera that records and one that alerts the guard when it sees something unusual.</strong> At advisory mode initially — alerts are reviewed by the Orangebd team before automated responses are activated.</div>
-        </div>
-      </div>
-
-      <div class="storybox" style="background:rgba(96,165,250,.05);border-color:rgba(96,165,250,.2);">
-        <div class="storybox-icon">🔗</div>
-        <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--plan-b);">Premium WAF + secure origin connections</div>
-          <div class="storybox-title">Front Door Premium — encrypted private connections to servers</div>
-          <div class="storybox-text">Plan B upgrades the front door to Premium tier, which allows the CDN to connect to backend servers via private encrypted links (not public internet). <strong>Citizen data never travels over the public internet between the front door and the servers.</strong> Also enables advanced WAF rules for sophisticated attack patterns.</div>
+          <div class="storybox-label" style="color:var(--plan-b);">Broader threat protection</div>
+          <div class="storybox-title">Microsoft Defender — 5 plans active</div>
+          <div class="storybox-text">Staging widens Microsoft Defender for Cloud from three plans to <strong>five</strong> — adding Storage and Containers to App Service, SQL and Key Vault. Telemetry still flows to the central Log Analytics workspace shared by all environments, so there's no separate SIEM cost here.</div>
         </div>
       </div>
     </div>
@@ -559,7 +596,7 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
         <div class="storybox-icon">✅</div>
         <div class="storybox-body">
           <div class="storybox-label" style="color:var(--ink3);">Unchanged components</div>
-          <div class="storybox-text">All 6 registry connections work identically. The citizen login process (eID + Entra) is unchanged. The 7-year audit log and SHA-256 identity scrambling are unchanged. The CMF data cache, Service Bus message system, and Terraform infrastructure-as-code pipelines are identical. <strong>Only the scale and security tier change — not the architecture.</strong></div>
+          <div class="storybox-text">All 6 registry connections work identically. The citizen login (national eID) is unchanged. The 7-year audit log and SHA-256 identity scrambling are unchanged. The Cosmos cache, Service Bus message system, and Bicep infrastructure-as-code pipelines are identical. <strong>Only the scale and data tier change — not the architecture.</strong></div>
         </div>
       </div>
 
@@ -568,8 +605,8 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
       <div class="storybox" style="background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.15);margin-bottom:6px;">
         <div class="storybox-icon">⚡</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--rose);">No DDoS Standard — quarterly drill only</div>
-          <div class="storybox-text">DDoS Standard is still not deployed continuously. Instead, it is activated for a 4-hour window each quarter to validate the configuration — then switched off to avoid the $2,944/month cost. <strong>This is a conscious decision, not an oversight.</strong> The regulator must mandate continuous DDoS Standard before it becomes a fixed cost.</div>
+          <div class="storybox-label" style="color:var(--rose);">No dedicated edge — shared from Prod</div>
+          <div class="storybox-text">Like Dev, Staging has no Front Door, App Gateway or firewall of its own; it rides the shared edge in the Production subscription. <strong>This keeps the whole $679 budget in the workload</strong> — where UAT actually exercises it — instead of in edge appliances that already exist in Prod.</div>
         </div>
       </div>
 
@@ -584,29 +621,29 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
       <div class="storybox" style="background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.15);">
         <div class="storybox-icon">🏗️</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--rose);">No 3-zone spread</div>
-          <div class="storybox-text">Azure data centres are divided into availability zones (physically separate buildings with separate power and cooling). Plan B runs 2 servers but does not guarantee they are in separate zones. Plan C guarantees 3 separate zones — Plan B's 2 servers may share a zone.</div>
+          <div class="storybox-label" style="color:var(--rose);">No production data, no zone spread</div>
+          <div class="storybox-text">Staging carries only masked or synthetic UAT data — never real citizen records — so PCI-DSS and full-ISO controls stay scoped to Production. It also runs in a single zone; zone-redundancy is a Production (Full) feature, not a Staging one.</div>
         </div>
       </div>
 
-      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--amber);margin-bottom:8px;margin-top:1rem;">When to upgrade from Plan B to Plan C</div>
-      <div class="utrigger"><div class="utrigger-icon">📊</div><div class="utrigger-text"><strong>Load data from Plan A shows</strong> sustained high CPU, database queries, or cache misses over 3+ months</div></div>
-      <div class="utrigger"><div class="utrigger-icon">⚖️</div><div class="utrigger-text"><strong>Formal RTO/RPO SLA commitment</strong> to the Government requires &lt;5 minute recovery time objective</div></div>
-      <div class="utrigger"><div class="utrigger-icon">🔐</div><div class="utrigger-text"><strong>PCI-DSS scope confirmed</strong> — triggers Key Vault Premium HSM + ADR-005 update + QSA sign-off</div></div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--amber);margin-bottom:8px;margin-top:1rem;">When to cut over Staging → Production</div>
+      <div class="utrigger"><div class="utrigger-icon">✅</div><div class="utrigger-text"><strong>UAT sign-off complete</strong> and load tests pass at the target citizen volume</div></div>
+      <div class="utrigger"><div class="utrigger-icon">📋</div><div class="utrigger-text"><strong>Production sizing chosen</strong> — Minimal (launch), Standard (HA) or Full (DR + geo)</div></div>
+      <div class="utrigger"><div class="utrigger-icon">🔐</div><div class="utrigger-text"><strong>PCI-DSS scope confirmed</strong> for e-Payment · eID degraded-mode plan signed off</div></div>
     </div>
   </div>
 
   <div class="pill-grid" style="margin-top:1rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.07);">
     <span style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);align-self:center;margin-right:4px;">Plan B adds:</span>
-    <span class="pill pill-on-b">2 servers per tier (basic HA)</span>
-    <span class="pill pill-on-b">Front Door Premium + WAF</span>
-    <span class="pill pill-on-b">Firewall Premium + IDPS</span>
-    <span class="pill pill-on-b">Sentinel monitoring</span>
-    <span class="pill pill-on-b">Defender P2 all plans</span>
-    <span class="pill pill-on-b">VPN Gateway (on-prem link)</span>
-    <span class="pill pill-on-b">Bastion Standard</span>
-    <span class="pill pill-off">DDoS Standard (quarterly drill)</span>
-    <span class="pill pill-off">3-AZ zone spread</span>
+    <span class="pill pill-on-b">App Service P1v3 · autoscale 1→2</span>
+    <span class="pill pill-on-b">Warm SQL DB 2 vCore</span>
+    <span class="pill pill-on-b">Cosmos autoscale</span>
+    <span class="pill pill-on-b">Key Vault Premium (HSM)</span>
+    <span class="pill pill-on-b">Defender 5 plans</span>
+    <span class="pill pill-on-b">ZRS storage</span>
+    <span class="pill pill-off">Dedicated edge (shared)</span>
+    <span class="pill pill-off">Sentinel (central)</span>
+    <span class="pill pill-off">Zone spread</span>
     <span class="pill pill-off">Geo-DR</span>
   </div>
 </div>
@@ -618,20 +655,20 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
   <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:.4rem;">
     <span style="font-family:var(--mono);font-size:3rem;font-weight:500;color:var(--plan-c);line-height:1;">C</span>
     <div>
-      <div class="eyebrow" style="margin-bottom:2px;">Plan C · Full Cloud</div>
-      <h2 style="font-size:1.5rem;">The full enterprise stack — when the data says you need it.</h2>
+      <div class="eyebrow" style="margin-bottom:2px;">Plan C · Production · $2,433–4,955/mo</div>
+      <h2 style="font-size:1.5rem;">The live citizen environment — sized Minimal, Standard, or Full.</h2>
     </div>
   </div>
 
   <div class="analogy" style="margin-bottom:1.2rem;">
     <div class="analogy-eyebrow">Non-technical analogy</div>
-    <div class="analogy-text">Plan C is like <em>opening three checkout lanes, each in a separate building, with a full security operations team, an armoured van, and a backup warehouse in another city.</em> It is what a national bank or a high-traffic e-commerce platform would deploy. Sint Maarten may need this — but only once the traffic data justifies it.</div>
+    <div class="analogy-text">Plan C is <em>opening day at the real venue</em> — the doors open to all 50,000 citizens. You can open with one stage (Minimal), add a second for resilience (Standard), or run a full house with a backup venue in another city (Full). You grow the room as the crowd grows — you don't build the whole stadium on day one.</div>
   </div>
 
   <div style="background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.25);border-radius:8px;padding:10px 16px;margin-bottom:1.2rem;display:flex;gap:10px;align-items:flex-start;">
     <span style="font-size:1.2rem;flex-shrink:0;">⚠️</span>
     <div style="font-size:.8rem;color:rgba(232,228,220,.7);line-height:1.65;">
-      <strong style="color:var(--amber);">Important for decision-makers:</strong> Plan C requires two formal Architecture Decision Records (ADR-011 and ADR-005 update) and a QSA (security auditor) sign-off before the SQL and Key Vault changes can be committed. These are not optional — they are compliance obligations. Plan C is not a simple upgrade; it is a formal commitment.
+      <strong style="color:var(--amber);">Important for decision-makers:</strong> Production carries real citizen data, so it depends on four blocking gates being cleared first — shared-edge traffic isolation, the firewall-tier decision for PCI e-Payment, external-LLM PII / DPIA clearance, and the national-eID SLA / degraded-mode plan. These are compliance obligations, not optional polish.
     </div>
   </div>
 
@@ -642,36 +679,36 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
       <div class="storybox" style="background:rgba(155,135,245,.05);border-color:rgba(155,135,245,.2);">
         <div class="storybox-icon">🏛️</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--plan-c);">3-zone availability — three physically separate buildings</div>
-          <div class="storybox-title">7 servers across 3 Azure availability zones</div>
-          <div class="storybox-text">Plan C runs 3 frontend servers and 4 backend servers, each in a <strong>physically separate building</strong> within the same Azure region — separate power, separate cooling, separate network. If one entire building has a problem, the other two continue without any citizen noticing. This is the foundation of the 99.9%+ SLA commitment.</div>
+          <div class="storybox-label" style="color:var(--plan-c);">Production compute — dual ASE v3</div>
+          <div class="storybox-title">Frontend + Backend stamps, scaled to the chosen sizing</div>
+          <div class="storybox-text">Production runs the <strong>dual App Service Environment</strong> topology — a dedicated, network-isolated frontend stamp and backend stamp. Minimal runs one instance each; Standard and Full run two each for <strong>automatic high-availability</strong>; Full spreads across availability zones. Same architecture throughout — you just add instances as the crowd grows.</div>
         </div>
       </div>
 
       <div class="storybox" style="background:rgba(155,135,245,.05);border-color:rgba(155,135,245,.2);">
         <div class="storybox-icon">🛡️</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--plan-c);">DDoS Standard — full network perimeter protection</div>
-          <div class="storybox-title">Always-on attack absorption for the entire network</div>
-          <div class="storybox-text"><strong>This is the most expensive single addition</strong> ($2,944/month). DDoS Standard protects the entire Azure VNet from volumetric attacks — not just the front door. A DDoS attack at scale could flood Sint Maarten's network perimeter, not just the website. Required once the platform is a high-value regulatory target.</div>
+          <div class="storybox-label" style="color:var(--plan-c);">The shared edge lives here</div>
+          <div class="storybox-title">Azure Firewall Standard + Front Door + App Gateway + APIM</div>
+          <div class="storybox-text">All edge and network — <strong>Azure Firewall Standard ($912/mo, the single biggest line), Front Door, Application Gateway WAF v2 and API Management</strong> — is hosted once in Production and shared by every environment. Front Door and APIM step up to Premium / Standard v2 only in the Full sizing.</div>
         </div>
       </div>
 
       <div class="storybox" style="background:rgba(155,135,245,.05);border-color:rgba(155,135,245,.2);">
         <div class="storybox-icon">🔑</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--plan-c);">Hardware security module (HSM) for encryption keys</div>
-          <div class="storybox-title">Key Vault Premium — government-grade key protection</div>
-          <div class="storybox-text">Plan C uses a <strong>hardware security module</strong> (FIPS 140-2 Level 2) to protect encryption keys. This is a physical chip that generates and stores keys — they can never be exported, even by Microsoft engineers. Required if PCI-DSS scope is confirmed for Sint Maarten's payment flows. Needs QSA sign-off.</div>
+          <div class="storybox-label" style="color:var(--plan-c);">Hardware-protected encryption keys</div>
+          <div class="storybox-title">Key Vault Premium — HSM-backed keys</div>
+          <div class="storybox-text">Production protects encryption keys in a <strong>hardware security module</strong> (FIPS 140-2 Level 2) — keys are generated and stored in tamper-resistant hardware and can never be exported, even by Microsoft engineers. This replaces a far costlier dedicated Managed HSM, and is the key-protection standard required if PCI-DSS scope is confirmed for the e-Payment flow.</div>
         </div>
       </div>
 
       <div class="storybox" style="background:rgba(155,135,245,.05);border-color:rgba(155,135,245,.2);">
         <div class="storybox-icon">🌐</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--plan-c);">Service Bus Premium — dedicated messaging lane</div>
-          <div class="storybox-title">Dedicated message queue — no shared infrastructure</div>
-          <div class="storybox-text">Plans A and B share messaging infrastructure with other Azure customers. Plan C gets a <strong>dedicated lane</strong> — guaranteed throughput, no noisy neighbours. Also enables geographic disaster recovery for the message queue: if the primary region fails, messages fail over to a backup queue automatically within minutes.</div>
+          <div class="storybox-label" style="color:var(--plan-c);">Tamper-proof 7-year archive</div>
+          <div class="storybox-title">WORM immutable blob storage</div>
+          <div class="storybox-text">Documents and the audit trail are written to <strong>WORM (write-once, read-many) immutable storage</strong> with a 7-year retention lock — a legal compliance requirement that cannot be downgraded. Storage redundancy grows with the sizing: LRS (Minimal) → ZRS (Standard) → GRS with a DR region (Full).</div>
         </div>
       </div>
     </div>
@@ -682,69 +719,68 @@ canvas.bgc{position:absolute;inset:0;pointer-events:none;opacity:.4;}
       <div class="storybox" style="background:rgba(245,166,35,.05);border-color:rgba(245,166,35,.2);margin-bottom:8px;">
         <div class="storybox-icon">📋</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--amber);">ADR-011 — database architecture change</div>
-          <div class="storybox-title">SQL Managed Instance General Purpose · load test required</div>
-          <div class="storybox-text">The XLS baseline used SQL Database Business Critical. Plan C uses SQL Managed Instance General Purpose — a different product with <strong>significantly lower cost but different performance characteristics</strong>. It handles Sint Maarten's expected workload comfortably, but this must be validated with a load test before the Reserved Instance (annual cost commitment) is signed. ADR-011 documents this decision formally.</div>
+          <div class="storybox-label" style="color:var(--amber);">ADR — external-LLM removal</div>
+          <div class="storybox-title">Azure OpenAI + AI Search removed · chatbot is external</div>
+          <div class="storybox-text">The chatbot LLM and its search / RAG index are now an <strong>external, out-of-scope provider</strong> — no Azure-side AI is funded in any environment. This supersedes the previously locked AI tier and needs a formal ADR, plus PII / DPIA clearance before any citizen data reaches the external model.</div>
         </div>
       </div>
 
       <div class="storybox" style="background:rgba(245,166,35,.05);border-color:rgba(245,166,35,.2);margin-bottom:8px;">
         <div class="storybox-icon">📋</div>
         <div class="storybox-body">
-          <div class="storybox-label" style="color:var(--amber);">ADR-005 update — key management change</div>
-          <div class="storybox-title">Managed HSM removed · Key Vault Premium replaces it · QSA review</div>
-          <div class="storybox-text">The XLS baseline included a dedicated Managed HSM ($3,320/month). Plan C replaces it with Key Vault Premium's HSM-backed keys — <strong>same security standard, far lower cost</strong>. This change requires a formal update to ADR-005 and a sign-off from the QSA (Qualified Security Assessor) if PCI-DSS compliance is in scope.</div>
+          <div class="storybox-label" style="color:var(--amber);">ADR — eID supersedes Entra (ADR-004)</div>
+          <div class="storybox-title">National eID replaces Entra External ID · $0 CIAM</div>
+          <div class="storybox-text">Citizens authenticate through the <strong>national eID</strong> (federated OIDC / SAML) — Entra External ID is removed, so there is no Azure identity cost. This supersedes ADR-004 and makes the eID's SLA and a degraded-mode fallback plan a launch blocker for go-live.</div>
         </div>
       </div>
 
       <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--rose);margin-bottom:8px;margin-top:.5rem;">Items locked in Plan C — cannot be removed</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
         <div style="border-radius:6px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);padding:8px 10px;">
-          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 DDoS Standard</div>
-          <div style="font-size:.72rem;color:var(--ink2);">Regulatory requirement. Cannot be removed without regulator sign-off.</div>
+          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 WORM 7-yr storage</div>
+          <div style="font-size:.72rem;color:var(--ink2);">Write-once immutable archive. Legal compliance. Cannot downgrade.</div>
         </div>
         <div style="border-radius:6px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);padding:8px 10px;">
-          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 Front Door Premium</div>
-          <div style="font-size:.72rem;color:var(--ink2);">Private backend connections required for citizen data SLA.</div>
+          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 7-yr audit log (LTR)</div>
+          <div style="font-size:.72rem;color:var(--ink2);">Append-only audit trail, 7-year retention. EA Ordinance requirement.</div>
         </div>
         <div style="border-radius:6px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);padding:8px 10px;">
-          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 ASE HA footprint</div>
-          <div style="font-size:.72rem;color:var(--ink2);">Once Reserved Instance committed, 3-instance minimum is contractual.</div>
+          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 Azure Firewall Standard</div>
+          <div style="font-size:.72rem;color:var(--ink2);">Shared edge security boundary. PCI scope for e-Payment.</div>
         </div>
         <div style="border-radius:6px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);padding:8px 10px;">
-          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 Storage GZRS + WORM</div>
-          <div style="font-size:.72rem;color:var(--ink2);">7-year immutable storage. Legal compliance. Cannot downgrade.</div>
+          <div style="font-family:var(--mono);font-size:.6rem;color:var(--rose);margin-bottom:3px;">🔒 Front Door + WAF v2</div>
+          <div style="font-size:.72rem;color:var(--ink2);">Public-facing WAF on the citizen entry path. Cannot disable.</div>
         </div>
       </div>
 
       <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.13em;color:var(--plan-c);margin-bottom:8px;margin-top:1rem;">Plan C delivers</div>
       <div style="display:flex;flex-direction:column;gap:5px;">
-        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>99.9%+ platform uptime SLA</div>
-        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>RTO &lt;5 minutes on server failure</div>
-        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>DDoS attack absorption at network level</div>
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>HA from Standard · zone-redundant at Full</div>
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>GRS + DR region (netherlandsnorth) at Full</div>
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>Shared edge: Firewall + WAF + APIM</div>
         <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>FIPS 140-2 L2 hardware key protection</div>
         <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>7-year WORM compliance storage</div>
-        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>Full Sentinel SOAR (P2 → P3 phasing)</div>
-        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>All NFR-01 through NFR-08 met</div>
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>Sentinel (cost-optimized) + Defender</div>
+        <div style="display:flex;gap:8px;font-size:.78rem;color:var(--ink2);"><span style="color:var(--plan-c);">✓</span>ISO 27001 · GDPR · PCI-DSS (e-Payment)</div>
       </div>
     </div>
   </div>
 
   <div class="pill-grid" style="margin-top:1rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.07);">
     <span style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);align-self:center;margin-right:4px;">Plan C adds:</span>
-    <span class="pill pill-on-c">3-AZ zone-redundancy</span>
-    <span class="pill pill-on-c">DDoS Standard 🔒</span>
-    <span class="pill pill-on-c">7 ASE instances RI</span>
-    <span class="pill pill-on-c">SQL MI 16vCore + geo-replica</span>
-    <span class="pill pill-on-c">Cosmos 50k RU/s</span>
-    <span class="pill pill-on-c">Service Bus Premium</span>
-    <span class="pill pill-on-c">KV Premium HSM 🔒</span>
-    <span class="pill pill-on-c">GZRS + WORM 🔒</span>
-    <span class="pill pill-on-c">Sentinel 40 GB/day</span>
-    <span class="pill pill-on-c">Purview 8 CU</span>
-    <span class="pill pill-warn">ADR-011 required</span>
-    <span class="pill pill-warn">ADR-005 update</span>
-    <span class="pill pill-warn">QSA sign-off</span>
+    <span class="pill pill-on-c">Dual ASE v3 (HA from Standard)</span>
+    <span class="pill pill-on-c">Azure Firewall Standard 🔒</span>
+    <span class="pill pill-on-c">Front Door + App Gateway WAF v2</span>
+    <span class="pill pill-on-c">Azure SQL DB GP (2–6 vCore)</span>
+    <span class="pill pill-on-c">Cosmos serverless / autoscale</span>
+    <span class="pill pill-on-c">KV Premium HSM</span>
+    <span class="pill pill-on-c">WORM 7-yr 🔒</span>
+    <span class="pill pill-on-c">Sentinel (optimized) + Defender</span>
+    <span class="pill pill-on-c">GRS + DR region (Full)</span>
+    <span class="pill pill-warn">ADR: external-LLM</span>
+    <span class="pill pill-warn">ADR: eID (ADR-004)</span>
+    <span class="pill pill-warn">PCI scope sign-off</span>
   </div>
 </div>
 </section>
@@ -1056,44 +1092,37 @@ var NODES = [
   {id:'coci',     cluster:'adapters', label:'CociAdapter (.NET 8)',    azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. REST/JSON to Chamber of Commerce (Qualogy). Issues CRIB numbers. Runs on ASE.'},
   {id:'siah',     cluster:'adapters', label:'SiahAdapter (.NET 8)',    azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. OData v4 to Tax CRM — §16.2 OIDC citizen token enforced before every query. Runs on ASE.'},
   {id:'bliss',    cluster:'adapters', label:'BlissAdapter (.NET 8)',   azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. OData v4 to TEATT Dynamics 365 licensing tenant. Runs on ASE.'},
-  {id:'vromi',    cluster:'adapters', label:'VromiAdapter (.NET 8)',   azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. ArcGIS REST to VROMI permits. ArcGIS tokens auto-refreshed from Redis every 90 min. Runs on ASE.'},
+  {id:'vromi',    cluster:'adapters', label:'VromiAdapter (.NET 8)',   azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. ArcGIS REST to VROMI permits. ArcGIS tokens auto-refreshed in-process every 90 min. Runs on the App Service / ASE compute.'},
   {id:'kadaster', cluster:'adapters', label:'KadasterAdapter (.NET 8)',azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. ⚠ OI-08 BLOCKED. APIM mock policy returns stub data. Config swap on resolution — zero code change.'},
-  {id:'ase-a',    cluster:'adapters', label:'App Service Env v3  I1v2 ×2',  azure:true, plans:['A'],     locked:false, desc:'1 frontend + 1 backend I1v2 instance. Hosts all .NET 8 adapter Function Apps. No HA, no zone spread. Shutdown saves 65%.'},
-  {id:'ase-b',    cluster:'adapters', label:'App Service Env v3  I2v2 ×4',  azure:true, plans:['B'],     locked:false, desc:'2 frontend + 2 backend I2v2. Basic HA — automatic failover between instances. No 3-AZ zone spread.'},
-  {id:'ase-c',    cluster:'adapters', label:'App Service Env v3  I4v2 ×7',  azure:true, plans:['C'],     locked:true,  desc:'3 frontend + 4 backend I4v2 across 3 availability zones. 1-year Reserved Instance. LOCKED — cannot reduce after RI commit.'},
+  {id:'ase-a',    cluster:'adapters', label:'App Service  P0v3 ×2 (Dev)',   azure:true, plans:['A'],     locked:false, desc:'Multi-tenant App Service — 1 frontend + 1 backend P0v3 plan. Hosts all .NET 8 adapter apps. No ASE stamp, no HA. Synthetic data only.'},
+  {id:'ase-b',    cluster:'adapters', label:'App Service  P1v3 ×2 (Staging)',azure:true, plans:['B'],     locked:false, desc:'P1v3 plans, autoscale 1→2. Twice the cores/RAM of Dev. Load-testable HA headroom for UAT. No ASE stamp.'},
+  {id:'ase-c',    cluster:'adapters', label:'Dual ASE v3  I1v2 (Prod)',     azure:true, plans:['C'],     locked:false, desc:'Production dual App Service Environment — isolated frontend + backend stamps. 1 instance each (Minimal) → 2 each, HA (Standard/Full). Linux I1v2.'},
 
   // ── Orchestration ─── mixed
   {id:'outbox',   cluster:'orch',     label:'Outbox Relay (DGTP code)',azure:false, plans:['A','B','C'], locked:false, desc:'DGTP application. Timer-triggered Azure Function. Picks up PENDING rows from dbo.OutboxMessages and publishes to Service Bus.'},
   {id:'sb-std',   cluster:'orch',     label:'Azure Service Bus Standard',   azure:true, plans:['A','B'], locked:false, desc:'Shared messaging infrastructure. Hosts dgtp.registry.events topic with 2 active subscriptions. 10M ops/mo included.'},
-  {id:'sb-prem',  cluster:'orch',     label:'Azure Service Bus Premium 1MU',azure:true, plans:['C'],     locked:false, desc:'Dedicated messaging unit. VNet-integrated, zone-redundant. Geo-DR via Standard backup namespace. Phase 2 workflow topic added.'},
+  {id:'sb-prem',  cluster:'orch',     label:'Service Bus Standard (Prod)',  azure:true, plans:['C'],     locked:false, desc:'Production Service Bus Standard. Outbox relay + dgtp.registry.events; dgtp.service-requests topic added for the Phase 2 workflow engine. Premium (geo-DR) only if a future RTO SLA requires it.'},
   {id:'eventgrid',cluster:'orch',     label:'Azure Event Grid',             azure:true, plans:['A','B','C'], locked:false, desc:'Consumption-based event fan-out and routing. Plan A: 10M events/mo. Plan B: 50M. Plan C: 200M.'},
   {id:'logicapps-cons',cluster:'orch',label:'Azure Logic Apps Consumption',  azure:true, plans:['A'],     locked:false, desc:'Pay-per-execution workflow orchestration. No VNet integration. Suitable for low-volume dev flows.'},
   {id:'logicapps-std', cluster:'orch',label:'Azure Logic Apps Standard WS1', azure:true, plans:['B','C'], locked:false, desc:'Always-on hosting plan. VNet integration required to reach private endpoints in staging and prod.'},
 
   // ── Data ─── all Azure native
-  {id:'sql-a',    cluster:'data',     label:'Azure SQL MI  GP 4vCore',      azure:true, plans:['A'],     locked:false, desc:'Full SQL Server surface area. Hosts dbo.OutboxMessages, dbo.AuditLog (7yr LTR), dbo.ReferenceCode. Dev/Test + AHB ~58% saving.'},
-  {id:'sql-b',    cluster:'data',     label:'Azure SQL MI  GP 8vCore',      azure:true, plans:['B'],     locked:false, desc:'Double the vCores vs Plan A. Staging-grade IOPS. Same Dev/Test + AHB pricing model.'},
-  {id:'sql-c',    cluster:'data',     label:'Azure SQL MI  GP 16vCore RI',  azure:true, plans:['C'],     locked:false, desc:'Production grade. ZRS + geo-replica. 1-yr Reserved Instance + AHB. ADR-011 required. Load-test before committing RI.'},
+  {id:'sql-a',    cluster:'data',     label:'Azure SQL DB  GP serverless',  azure:true, plans:['A'],     locked:false, desc:'Serverless, auto-pause. Hosts dbo.OutboxMessages, dbo.AuditLog (7yr LTR), dbo.ReferenceCode. Dev pays only for active hours.'},
+  {id:'sql-b',    cluster:'data',     label:'Azure SQL DB  GP 2 vCore',     azure:true, plans:['B'],     locked:false, desc:'Provisioned 2 vCore, always warm. Staging-grade, load-testable with no cold-start. Same schema as Dev.'},
+  {id:'sql-c',    cluster:'data',     label:'Azure SQL DB  GP 2–6 vCore',   azure:true, plans:['C'],     locked:false, desc:'Production: 6 vCore serverless cap (Minimal) · 2 vCore provisioned (Standard) · 4 vCore zone-redundant (Full). 7yr audit LTR.'},
   {id:'cosmos-sv',cluster:'data',     label:'Azure Cosmos DB  Serverless',  azure:true, plans:['A'],     locked:false, desc:'CMF cache. citizen-profiles 15min TTL, business-records 5min, address-cache 24h. Bills per RU — optimal for Go-Live traffic.'},
   {id:'cosmos-b', cluster:'data',     label:'Azure Cosmos DB  Autoscale 10k',azure:true, plans:['B'],   locked:false, desc:'Autoscale 1k→10k RU/s. Bills for max-burst hour only. Single region. Same TTL schema as Plan A.'},
   {id:'cosmos-c', cluster:'data',     label:'Azure Cosmos DB  Autoscale 50k',azure:true, plans:['C'],   locked:false, desc:'Autoscale 10k→50k RU/s. Single-write + multi-region reads. 7-day continuous backup.'},
-  {id:'redis',    cluster:'data',     label:'Azure Cache for Redis  C1',    azure:true, plans:['A','B','C'], locked:false, desc:'ArcGIS tokens (2h TTL), refdata (1h TTL), APIM rate-limit counters. ⚠ NO citizen PII stored here — ever.'},
-  {id:'kv-std',   cluster:'data',     label:'Azure Key Vault  Standard',    azure:true, plans:['A','B'], locked:false, desc:'All adapter secrets and API keys via Managed Identity only. CASBES 90d rotation, ArcGIS tokens 2h auto-refresh.'},
-  {id:'kv-prem',  cluster:'data',     label:'Azure Key Vault  Premium HSM', azure:true, plans:['C'],     locked:false, desc:'FIPS 140-2 Level 2 HSM-backed keys. Replaces Managed HSM ($3,320/mo saved). ADR-005 update + QSA sign-off required.'},
+  {id:'kv-std',   cluster:'data',     label:'Azure Key Vault  Standard',    azure:true, plans:['A'],     locked:false, desc:'All adapter secrets and API keys via Managed Identity only (Dev + Prod-Minimal). CASBES 90d rotation, ArcGIS tokens 2h auto-refresh.'},
+  {id:'kv-prem',  cluster:'data',     label:'Azure Key Vault  Premium HSM', azure:true, plans:['B','C'], locked:false, desc:'FIPS 140-2 Level 2 HSM-backed keys (Staging + Prod Standard/Full). Replaces a dedicated Managed HSM at far lower cost. Required for PCI-DSS scope on e-Payment.'},
   {id:'storage-lrs',cluster:'data',   label:'Azure Storage  LRS',           azure:true, plans:['A','B'], locked:false, desc:'Locally-redundant storage. WORM policy validation for non-production environments.'},
-  {id:'storage-gzrs',cluster:'data',  label:'Azure Storage  GZRS + WORM',   azure:true, plans:['C'],     locked:true,  desc:'Geo-zone-redundant. 7-year WORM immutability. LOCKED — compliance obligation under EA Ordinance and GDPR.'},
+  {id:'storage-gzrs',cluster:'data',  label:'Azure Storage  WORM (LRS→GRS)', azure:true, plans:['C'],     locked:true,  desc:'7-year WORM immutability. Redundancy grows with sizing: LRS (Minimal) → ZRS (Standard) → GRS + DR region (Full). LOCKED — compliance obligation under EA Ordinance and GDPR.'},
 
-  // ── Identity & AI ─── all Azure native
-  {id:'entra-free',cluster:'identity',label:'Entra External ID  Free 50k MAU', azure:true, plans:['A','B'], locked:false, desc:'OIDC federation hub with national eID. Issues JWT with citizen scopes. §16.2 enforced at adapter level. 50k MAU fits free tier.'},
-  {id:'entra-paid',cluster:'identity',label:'Entra External ID  150k MAU',     azure:true, plans:['C'],     locked:false, desc:'Billed tier for 150k MAU headroom — covers population growth and staff/admin accounts.'},
-  {id:'openai',   cluster:'identity', label:'Azure OpenAI  gpt-4o + embedding',azure:true, plans:['A','B','C'], locked:false, desc:'Powers citizen chatbot. PAYG: Plan A 1M tokens, Plan B 5M, Plan C 50M. Re-evaluate PTU if >150M tokens/mo sustained.'},
-  {id:'aisearch-free',cluster:'identity',label:'Azure AI Search  Free tier',   azure:true, plans:['A'],     locked:false, desc:'RAG index for dev chatbot prototype. Limit: 10k docs, 50 MB, 3 indexes. Upgrade to S2 when production chatbot goes live.'},
-  {id:'aisearch-s2', cluster:'identity',label:'Azure AI Search  S2',           azure:true, plans:['B','C'], locked:false, desc:'Plan B: S2 ×1 replica. Plan C: S2 ×2 replicas (HA pair). Add 3rd replica if QPS sustained >2,000.'},
+  // ── Identity ─── external national eID (not an Azure resource)
+  {id:'eid',      cluster:'identity', label:'National eID (external)',         azure:false, plans:['A','B','C'], locked:false, desc:'Citizens authenticate via the national eID, federated into the apps over OIDC/SAML. Issues citizen tokens; §16.2 enforced at adapter level. No Azure CIAM cost — supersedes ADR-004 / Entra External ID. The chatbot LLM and its search/RAG index are likewise external providers — no Azure-side AI is funded in any environment.'},
 
   // ── Platform ─── all Azure native
-  {id:'fw-basic', cluster:'platform', label:'Azure Firewall  Basic',          azure:true, plans:['A'],     locked:false, desc:'Stateful L4 filtering + basic threat intelligence. No IDPS, no TLS inspection. Same UDR routing as B/C — topology parity.'},
-  {id:'fw-prem',  cluster:'platform', label:'Azure Firewall  Premium',        azure:true, plans:['B','C'], locked:true,  desc:'IDPS + TLS deep-packet inspection. Required to validate IDPS rules before production rollout. Cannot downgrade.'},
-  {id:'ddos',     cluster:'platform', label:'Azure DDoS Protection  Standard',azure:true, plans:['C'],     locked:true,  desc:'Always-on VNet perimeter DDoS absorption. LOCKED — regulatory requirement for public-facing production VNet.'},
+  {id:'fw-basic', cluster:'platform', label:'Azure Firewall  Standard (shared)',azure:true, plans:['A','B','C'], locked:true, desc:'ONE shared Azure Firewall Standard instance ($912/mo) hosted in the Production subscription and used by every environment. Stateful L4 filtering + threat intelligence. The single largest line in the estimate.'},
   {id:'bastion-b',cluster:'platform', label:'Azure Bastion  Basic',           azure:true, plans:['A'],     locked:false, desc:'Browser-based RDP/SSH to VMs and ASE hosts. No public IPs required on any compute resource.'},
   {id:'bastion-std',cluster:'platform',label:'Azure Bastion  Standard',       azure:true, plans:['B','C'], locked:true,  desc:'Native client + file transfer for UAT admin support sessions. LOCKED — required admin access pattern.'},
   {id:'vpn',      cluster:'platform', label:'Azure VPN Gateway',              azure:true, plans:['B','C'], locked:false, desc:'On-premises connectivity for registry integration testing and admin access. Plan B: VpnGw1 single. Plan C: ×2 active-active.'},
@@ -1103,7 +1132,7 @@ var NODES = [
   {id:'sentinel', cluster:'platform', label:'Microsoft Sentinel',             azure:true, plans:['B','C'],     locked:false, desc:'Threat detection and SIEM. Plan B: 10 GB/day advisory mode. Plan C: 40 GB/day. Phases: monitor → SOAR advisory → GoSXM handover.'},
   {id:'purview',  cluster:'platform', label:'Microsoft Purview',              azure:true, plans:['A','B','C'], locked:false, desc:'Data classification and sensitivity labelling. Plan A: 1 CU. Plan B: 4 CU. Plan C: 8 CU.'},
   {id:'dns',      cluster:'platform', label:'Azure Private DNS Zones  ×12',   azure:true, plans:['A','B','C'], locked:false, desc:'12 private DNS zones for all private endpoint name resolution. Required by every service. Unchanged across all plans.'},
-  {id:'terraform',cluster:'platform', label:'Azure DevOps  + Terraform IaC',  azure:true, plans:['A','B','C'], locked:false, desc:'CI/CD pipelines for app and infra. Terraform + Bicep. 2-person prod gate. Zero manual portal clicks in staging/prod (NFR-07).'},
+  {id:'terraform',cluster:'platform', label:'Azure DevOps  + Bicep IaC',     azure:true, plans:['A','B','C'], locked:false, desc:'CI/CD pipelines for app and infra. Bicep is the canonical IaC. 2-person prod gate. Zero manual portal clicks in staging/prod (NFR-07).'},
 ];
 
 var EDGES = [
@@ -1129,18 +1158,15 @@ var EDGES = [
   {s:'sb-std',t:'cosmos-sv',w:2},{s:'sb-std',t:'cosmos-b',w:2},{s:'sb-prem',t:'cosmos-c',w:2},
   {s:'eventgrid',t:'sb-std',w:1},{s:'eventgrid',t:'sb-prem',w:1},
   {s:'logicapps-cons',t:'eventgrid',w:1},{s:'logicapps-std',t:'eventgrid',w:1},
-  {s:'entra-free',t:'portal',w:3},{s:'entra-paid',t:'portal',w:3},
-  {s:'entra-free',t:'siah',w:2},{s:'entra-paid',t:'siah',w:2},
+  {s:'eid',t:'portal',w:3},
+  {s:'eid',t:'siah',w:2},
   {s:'sql-a',t:'outbox',w:1},{s:'sql-b',t:'outbox',w:1},{s:'sql-c',t:'outbox',w:1},
-  {s:'redis',t:'vromi',w:2},{s:'redis',t:'apim-dev',w:1},{s:'redis',t:'apim-std',w:1},{s:'redis',t:'apim-prem',w:1},
   {s:'kv-std',t:'casbes',w:1},{s:'kv-std',t:'coci',w:1},{s:'kv-prem',t:'casbes',w:1},{s:'kv-prem',t:'coci',w:1},
-  {s:'fw-basic',t:'apim-dev',w:1},{s:'fw-prem',t:'apim-std',w:1},{s:'fw-prem',t:'apim-prem',w:1},
+  {s:'fw-basic',t:'apim-dev',w:1},{s:'fw-basic',t:'apim-std',w:1},{s:'fw-basic',t:'apim-prem',w:1},
   {s:'law',t:'appins',w:1},{s:'law',t:'sentinel',w:1},
   {s:'appins',t:'casbes',w:1},{s:'appins',t:'coci',w:1},{s:'appins',t:'siah',w:1},
   {s:'defender',t:'law',w:1},
   {s:'dns',t:'apim-dev',w:1},{s:'dns',t:'apim-std',w:1},{s:'dns',t:'apim-prem',w:1},
-  {s:'openai',t:'aisearch-free',w:1},{s:'openai',t:'aisearch-s2',w:1},
-  {s:'aisearch-s2',t:'portal',w:1},
   {s:'terraform',t:'ase-a',w:1},{s:'terraform',t:'ase-b',w:1},{s:'terraform',t:'ase-c',w:1},
 ];
 
@@ -1748,7 +1774,7 @@ function buildLegend(plan){
     });
   }
 
-  var planLabels = {A:'Plan A — Minimal', B:'Plan B — Standard adds', C:'Plan C — Full Cloud adds'};
+  var planLabels = {A:'Plan A — Dev', B:'Plan B — Staging adds', C:'Plan C — Production adds'};
   var planColors2 = {A:'#22c792', B:'#60a5fa', C:'#9b87f5'};
 
   var html2 = '';
@@ -1832,27 +1858,23 @@ window.addEventListener('resize', function(){
       <div class="layer-body">
         <div class="layer-inner">
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
-            <div class="lc-component">Azure Front Door Standard</div>
-            <div class="lc-note">Core CDN + basic WAF core rules. Dev traffic pattern. No WAF Premium, no private link origins. Adequate for 50k citizens at Go-Live.</div>
-            <div class="lc-component" style="margin-top:6px;">App Gateway Standard v2 ×1</div>
-            <div class="lc-note">No WAF, TLS termination + routing. Single instance, no zone spread.</div>
-            <div class="lc-tradeoff">△ Basic WAF only · No private origin · No zone-redundancy</div>
+            <div class="lc-plan lc-plan-a">Plan A — Dev</div>
+            <div class="lc-component">Edge shared from Prod sub ($0)</div>
+            <div class="lc-note">Dev reaches the portal through the shared Front Door + App Gateway hosted in Production. Host-header / path routing isolates non-prod traffic. No edge cost booked to Dev.</div>
+            <div class="lc-tradeoff">△ Confirm shared-edge traffic isolation</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
-            <div class="lc-component">Azure Front Door Premium</div>
-            <div class="lc-note">WAF Premium + private link origins. Full OWASP rule set. 500 GB/mo transfer. Required to validate prod WAF policies.</div>
-            <div class="lc-component" style="margin-top:6px;">App Gateway WAF v2 ×1 medium</div>
-            <div class="lc-note">WAF enabled, single medium instance. No 3-AZ spread.</div>
-            <div class="lc-tradeoff">△ No zone-redundant AppGw · 1 instance</div>
+            <div class="lc-plan lc-plan-b">Plan B — Staging</div>
+            <div class="lc-component">Edge shared from Prod sub ($0)</div>
+            <div class="lc-note">Same shared edge as Dev and Production. UAT validates routing and WAF policy on the shared front door before go-live.</div>
+            <div class="lc-tradeoff">△ Shared edge fronts all three environments</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
-            <div class="lc-component">Azure Front Door Premium <span class="badge-locked">LOCKED</span></div>
-            <div class="lc-note">5 TB transfer. WAF Premium + private link origins. Cannot reduce further — prod SLA requires Premium.</div>
-            <div class="lc-component" style="margin-top:6px;">App Gateway WAF v2 ×3 medium (zone-redundant)</div>
-            <div class="lc-note">3 instances across 3 AZs. Full zone-redundancy. Load-test validated.</div>
+            <div class="lc-plan lc-plan-c">Plan C — Production</div>
+            <div class="lc-component">Azure Front Door + App Gateway WAF v2 <span class="badge-locked">LOCKED</span></div>
+            <div class="lc-note">Front Door Standard (Minimal/Standard) → Premium (Full). App Gateway WAF v2 with OWASP rules. Hosted once here and shared by every environment.</div>
+            <div class="lc-component" style="margin-top:6px;">Front Door Premium added at Full sizing</div>
+            <div class="lc-note">Premium adds private-link origins + edge DDoS for the Full sizing.</div>
           </div>
         </div>
       </div>
@@ -1868,21 +1890,21 @@ window.addEventListener('resize', function(){
       <div class="layer-body">
         <div class="layer-inner">
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
-            <div class="lc-component">Azure APIM Developer tier</div>
-            <div class="lc-note">Full 8-stage policy pipeline. All 6 adapter routes. JWT validate · Scope · Rate limit · IP · Request validate · CorrelID · MI auth · Route. No SLA, single unit. Sufficient for 50k citizens at Go-Live.</div>
-            <div class="lc-tradeoff">△ No SLA · Single gateway unit · No zone-redundancy</div>
+            <div class="lc-plan lc-plan-a">Plan A — Dev</div>
+            <div class="lc-component">Shared APIM (Prod sub) · $0</div>
+            <div class="lc-note">The full 8-stage policy pipeline (JWT validate · Scope · Rate limit · IP · Request validate · CorrelID · MI auth · Route) runs on the shared gateway. Dev consumes it; no cost booked here.</div>
+            <div class="lc-tradeoff">△ Shared with all envs · routing isolation required</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
-            <div class="lc-component">Azure APIM Standard v2</div>
-            <div class="lc-note">99.95% SLA. Auto-scale 1–5 units. VNet integration for private endpoint access. Same 8-stage pipeline. Handles UAT load + staging traffic patterns.</div>
-            <div class="lc-tradeoff">△ No zone-redundancy across AZs</div>
+            <div class="lc-plan lc-plan-b">Plan B — Staging</div>
+            <div class="lc-component">Shared APIM (Prod sub) · $0</div>
+            <div class="lc-note">Same shared gateway and 8-stage pipeline. UAT validates the policies and OI-04 scope strings on the shared APIM before go-live.</div>
+            <div class="lc-tradeoff">△ Shared gateway — no separate Staging APIM</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
-            <div class="lc-component">Azure APIM Premium v2</div>
-            <div class="lc-note">Multi-region deployment possible. Zone-redundant. Auto-scale 1–10 units. Full VNet integration + private DNS. 99.99% SLA. All policies identical to lower plans.</div>
+            <div class="lc-plan lc-plan-c">Plan C — Production</div>
+            <div class="lc-component">Azure APIM Basic v2 → Standard v2 (Full)</div>
+            <div class="lc-note">Basic v2 for Minimal/Standard; Standard v2 (99.95% SLA) at the Full sizing. Hosts the 8-stage pipeline for every environment. Private endpoint access to the adapters.</div>
           </div>
         </div>
       </div>
@@ -1892,27 +1914,27 @@ window.addEventListener('resize', function(){
     <div class="layer" id="l2" style="--lc:#6ee7b7;--lbg:rgba(34,199,146,.04);">
       <div class="layer-head" onclick="toggleLayer('l2')">
         <div class="layer-num">L2</div>
-        <div class="layer-title">Registry Adapters — .NET 8 Azure Functions · ASE v3 · 6 Adapters</div>
+        <div class="layer-title">Registry Adapters — .NET 8 apps · App Service / ASE v3 · 6 Adapters</div>
         <div class="layer-arr">▶</div>
       </div>
       <div class="layer-body">
         <div class="layer-inner">
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
-            <div class="lc-component">ASE v3 I1v2 ×1 frontend + ×1 backend</div>
-            <div class="lc-note">2 total ASE instances (1 vCore, 3.5 GB RAM each). ILB mode. No HA, no zone spread. All 6 adapter Function Apps deploy here: CASBES · COCI · SIAH · BLISS · VROMI · KadasterMock. Scheduled shutdown 65% saving eligible.</div>
-            <div class="lc-tradeoff">△ No HA · Single AZ · No failover · Dev/Test pricing</div>
+            <div class="lc-plan lc-plan-a">Plan A — Dev</div>
+            <div class="lc-component">App Service P0v3 ×2 (frontend + backend)</div>
+            <div class="lc-note">Multi-tenant App Service — no ASE stamp. All 6 adapter apps deploy here: CASBES · COCI · SIAH · BLISS · VROMI · KadasterMock. No HA. Synthetic data only.</div>
+            <div class="lc-tradeoff">△ No HA · single instance · no ASE isolation</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
-            <div class="lc-component">ASE v3 I2v2 ×2 frontend + ×2 backend</div>
-            <div class="lc-note">4 total instances (2 vCore, 8 GB each). Basic HA — 2 instances per tier validates failover. ILB topology unchanged. No 3-AZ spread but basic availability preserved.</div>
-            <div class="lc-tradeoff">△ 2-instance HA only · No 3-AZ zone spread</div>
+            <div class="lc-plan lc-plan-b">Plan B — Staging</div>
+            <div class="lc-component">App Service P1v3 ×2 · autoscale 1→2</div>
+            <div class="lc-note">Twice the cores/RAM of Dev, autoscaling to 2 instances under load test. Same 6 adapter apps. Load-testable HA headroom for UAT.</div>
+            <div class="lc-tradeoff">△ Autoscale HA · no ASE isolation stamp</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
-            <div class="lc-component">ASE v3 I4v2 ×3 frontend + ×4 backend <span class="badge-locked">LOCKED</span></div>
-            <div class="lc-note">7 total instances across 3 AZs. 1-year Reserved Instance applied (~35% saving). Full zone-redundancy. 4 vCore, 16 GB RAM per instance. Cannot reduce further — HA SLA requires 3-instance minimum.</div>
+            <div class="lc-plan lc-plan-c">Plan C — Production</div>
+            <div class="lc-component">Dual ASE v3 I1v2 — frontend + backend stamps</div>
+            <div class="lc-note">Network-isolated App Service Environment. 1 instance each (Minimal) → 2 each for HA (Standard/Full); Full spreads across availability zones. Linux I1v2.</div>
           </div>
         </div>
       </div>
@@ -1928,26 +1950,25 @@ window.addEventListener('resize', function(){
       <div class="layer-body">
         <div class="layer-inner">
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
+            <div class="lc-plan lc-plan-a">Plan A — Dev</div>
             <div class="lc-component">Service Bus Standard</div>
-            <div class="lc-note">Shared infrastructure. 10M operations/mo included. No dedicated MU. Outbox Pattern fully operational: dgtp.registry.events · audit-log-sub · cmf-cache-invalidation-sub. No Premium features (geo-DR, sessions, transactions).</div>
-            <div class="lc-component" style="margin-top:5px;">Event Grid · Logic Apps Consumption</div>
-            <div class="lc-note">Pay-per-execution. No VNet integration.</div>
-            <div class="lc-tradeoff">△ No geo-DR · No sessions/transactions · Shared infra</div>
+            <div class="lc-note">10M operations/mo included. Outbox Pattern fully operational: dgtp.registry.events · audit-log-sub · cmf-cache-invalidation-sub.</div>
+            <div class="lc-component" style="margin-top:5px;">Event Grid · low volume</div>
+            <div class="lc-note">Consumption-based event fan-out.</div>
+            <div class="lc-tradeoff">△ Standard-tier messaging</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
-            <div class="lc-component">Service Bus Standard (+ quarterly Premium drill)</div>
-            <div class="lc-note">Standard tier day-to-day. One-week Premium namespace per major release cycle to validate geo-DR pairing, sessions, and transactions. Same Outbox topology. Logic Apps Standard WS1 for VNet integration.</div>
-            <div class="lc-component" style="margin-top:5px;">Event Grid 50M events + Logic Apps Standard WS1</div>
-            <div class="lc-tradeoff">△ Premium features not continuously active</div>
+            <div class="lc-plan lc-plan-b">Plan B — Staging</div>
+            <div class="lc-component">Service Bus Standard</div>
+            <div class="lc-note">Same Outbox topology as Dev. Moderate event volume. DLQ monitor 15min.</div>
+            <div class="lc-component" style="margin-top:5px;">Event Grid · moderate volume</div>
+            <div class="lc-tradeoff">△ Standard tier — no Premium isolation</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
-            <div class="lc-component">Service Bus Premium 1MU</div>
-            <div class="lc-note">Dedicated messaging unit. VNet-integrated. Zone-redundant in prod. Geo-DR via Standard backup namespace (manual failover ~30 min). dgtp.service-requests topic added for Phase 2 workflow engine.</div>
-            <div class="lc-component" style="margin-top:5px;">Event Grid 200M events + Logic Apps Standard WS1</div>
-            <div class="lc-tradeoff">△ ADR required: SB 2MU→1MU active geo-DR change</div>
+            <div class="lc-plan lc-plan-c">Plan C — Production</div>
+            <div class="lc-component">Service Bus Standard + Event Grid</div>
+            <div class="lc-note">Outbox relay + dgtp.registry.events. dgtp.service-requests topic added for the Phase 2 workflow engine. Event Grid fan-out scales with sizing.</div>
+            <div class="lc-tradeoff">△ Premium (geo-DR) only if a future RTO SLA requires it</div>
           </div>
         </div>
       </div>
@@ -1957,34 +1978,34 @@ window.addEventListener('resize', function(){
     <div class="layer" id="l4" style="--lc:#fbbf24;--lbg:rgba(245,166,35,.04);">
       <div class="layer-head" onclick="toggleLayer('l4')">
         <div class="layer-num">L4</div>
-        <div class="layer-title">Data Tier — Azure SQL MI · Cosmos DB · Redis · Storage · Key Vault</div>
+        <div class="layer-title">Data Tier — Azure SQL DB · Cosmos DB · Storage · Key Vault</div>
         <div class="layer-arr">▶</div>
       </div>
       <div class="layer-body">
         <div class="layer-inner">
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
-            <div class="lc-component">SQL MI GP 4 vCore Dev/Test + AHB</div>
-            <div class="lc-note">Full SQL Server surface area (Outbox, AuditLog 7yr LTR, ReferenceCode). Dev/Test pricing + Azure Hybrid Benefit ~58% cheaper. No ZRS, no geo-replica.</div>
-            <div class="lc-component" style="margin-top:5px;">Cosmos DB Serverless · Redis Standard C1 · Key Vault Standard · Storage LRS</div>
-            <div class="lc-note">Serverless Cosmos optimal for low-traffic dev patterns. KV Standard (no HSM). LRS storage.</div>
-            <div class="lc-tradeoff">△ Dev/Test pricing (prod commit: upgrade to GP RI) · No geo-DR · No HSM</div>
+            <div class="lc-plan lc-plan-a">Plan A — Dev</div>
+            <div class="lc-component">Azure SQL DB GP serverless (auto-pause)</div>
+            <div class="lc-note">Full SQL surface area (Outbox, AuditLog 7yr LTR, ReferenceCode). Pays only for active hours. No ZRS, no geo-replica.</div>
+            <div class="lc-component" style="margin-top:5px;">Cosmos DB Serverless · Key Vault Standard · Storage LRS</div>
+            <div class="lc-note">Serverless Cosmos optimal for low dev traffic. KV Standard (no HSM). Synthetic data only.</div>
+            <div class="lc-tradeoff">△ No geo-DR · No HSM · LRS</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
-            <div class="lc-component">SQL MI GP 8 vCore Dev/Test + AHB</div>
-            <div class="lc-note">Double the vCores vs Plan A. Same surface area. Staging-grade IOPS.</div>
-            <div class="lc-component" style="margin-top:5px;">Cosmos DB Autoscale 1k→10k RU/s · Redis C1 · Key Vault Standard · Storage LRS</div>
-            <div class="lc-note">Autoscale Cosmos bills only for max-burst hour. Multi-region reads disabled.</div>
-            <div class="lc-tradeoff">△ No HSM-backed keys · LRS storage · No geo-replica</div>
+            <div class="lc-plan lc-plan-b">Plan B — Staging</div>
+            <div class="lc-component">Azure SQL DB GP provisioned 2 vCore (warm)</div>
+            <div class="lc-note">Always-warm, load-testable with no cold-start. Same schema as Dev. UAT-grade IOPS.</div>
+            <div class="lc-component" style="margin-top:5px;">Cosmos DB Autoscale ~1.5k RU/s · Key Vault Premium (HSM) · Storage ZRS</div>
+            <div class="lc-note">Autoscale Cosmos bills only for the busiest hour. KV Premium = prod key parity.</div>
+            <div class="lc-tradeoff">△ Single region · masked UAT data only</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
-            <div class="lc-component">SQL MI GP 16 vCore + ZRS + geo-replica + 1yr RI + AHB</div>
-            <div class="lc-note">Production-grade. Zone-redundant storage. Geo-replica for DR. 1-yr RI saves ~35%. Requires ADR-011.</div>
-            <div class="lc-component" style="margin-top:5px;">Cosmos DB Autoscale 10k→50k RU/s single-write · Redis C1 · Key Vault Premium (FIPS 140-2 L2) · Storage GZRS + WORM</div>
-            <div class="lc-locked">🔒 GZRS Storage + WORM 7yr — compliance locked</div>
-            <div class="lc-tradeoff">△ ADR-005 update: MHSM→KV Premium · QSA sign-off needed</div>
+            <div class="lc-plan lc-plan-c">Plan C — Production</div>
+            <div class="lc-component">Azure SQL DB GP 2–6 vCore (zone-redundant at Full)</div>
+            <div class="lc-note">6 vCore serverless cap (Minimal) · 2 vCore provisioned (Standard) · 4 vCore zone-redundant (Full). 7yr audit LTR.</div>
+            <div class="lc-component" style="margin-top:5px;">Cosmos serverless / autoscale · Key Vault Premium (FIPS 140-2 L2) · Storage LRS→ZRS→GRS + WORM</div>
+            <div class="lc-locked">🔒 WORM 7yr immutable — compliance locked</div>
+            <div class="lc-tradeoff">△ Full adds GRS + DR region (netherlandsnorth)</div>
           </div>
         </div>
       </div>
@@ -1994,35 +2015,33 @@ window.addEventListener('resize', function(){
     <div class="layer" id="l5" style="--lc:#f87171;--lbg:rgba(248,113,113,.04);">
       <div class="layer-head" onclick="toggleLayer('l5')">
         <div class="layer-num">L5</div>
-        <div class="layer-title">Identity &amp; AI — Entra External ID · OpenAI · AI Search · §16.2</div>
+        <div class="layer-title">Identity — National eID · §16.2 (chatbot LLM + search are external)</div>
         <div class="layer-arr">▶</div>
       </div>
       <div class="layer-body">
         <div class="layer-inner">
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
-            <div class="lc-component">Entra External ID — free tier (50k MAU)</div>
-            <div class="lc-note">Free tier covers 50k MAU. OIDC federation with national eID. §16.2 SIAH constraint enforced in adapter. JWT scopes via OI-04.</div>
-            <div class="lc-component" style="margin-top:5px;">AI Search — Free tier (10k docs, 50 MB)</div>
-            <div class="lc-note">Dev RAG prototype only. Azure OpenAI gpt-4o 1M tokens + text-embedding 1M tokens PAYG.</div>
-            <div class="lc-tradeoff">△ AI Search free = 10k doc limit · No chatbot at scale</div>
+            <div class="lc-plan lc-plan-a">Plan A — Dev</div>
+            <div class="lc-component">National eID (external OIDC/SAML)</div>
+            <div class="lc-note">Citizens authenticate via the national eID, federated into the apps. §16.2 SIAH constraint enforced in the adapter. No Azure CIAM cost.</div>
+            <div class="lc-component" style="margin-top:5px;">Chatbot LLM + search — external</div>
+            <div class="lc-note">No Azure OpenAI, no AI Search. The chatbot and its RAG index are an external provider — $0 Azure-side AI.</div>
+            <div class="lc-tradeoff">△ External-LLM PII/DPIA clearance required before go-live</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
-            <div class="lc-component">Entra External ID — free tier (50k MAU)</div>
-            <div class="lc-note">Same free tier — 50k population fits within free MAU threshold.</div>
-            <div class="lc-component" style="margin-top:5px;">AI Search S2 ×1 replica</div>
-            <div class="lc-note">S2 tier for prod-like storage + throughput. Single replica — HA pattern validated but not fully redundant.</div>
-            <div class="lc-note" style="margin-top:4px;">Azure OpenAI gpt-4o 5M tokens + text-embedding PAYG.</div>
-            <div class="lc-tradeoff">△ Single AI Search replica (N+1 HA only)</div>
+            <div class="lc-plan lc-plan-b">Plan B — Staging</div>
+            <div class="lc-component">National eID (external) — same federation</div>
+            <div class="lc-note">Identical sign-in path on masked test identities. OI-04 scope strings validated in UAT.</div>
+            <div class="lc-component" style="margin-top:5px;">Chatbot LLM + search — external</div>
+            <div class="lc-note">No Azure-side AI funded — same as Dev and Production.</div>
+            <div class="lc-tradeoff">△ Confirm eID broker pattern for non-prod identities</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
-            <div class="lc-component">Entra External ID — 150k MAU billed</div>
-            <div class="lc-note">Billed tier for 150k MAU headroom. Provider-agnostic OIDC federation. §16.2 enforced.</div>
-            <div class="lc-component" style="margin-top:5px;">AI Search S2 ×2 replicas (HA pair)</div>
-            <div class="lc-note">N+1 HA. Add 3rd replica if QPS sustained &gt;2,000. 1 replica removed from XLS baseline (S2×3→S2×2).</div>
-            <div class="lc-note" style="margin-top:4px;">Azure OpenAI gpt-4o 50M tokens + text-embedding. Re-evaluate PTU at 6 months.</div>
+            <div class="lc-plan lc-plan-c">Plan C — Production</div>
+            <div class="lc-component">National eID (external) — production federation</div>
+            <div class="lc-note">Provider-agnostic OIDC/SAML. §16.2 enforced. The eID's SLA + degraded-mode plan is a launch blocker.</div>
+            <div class="lc-component" style="margin-top:5px;">Chatbot LLM + search — external</div>
+            <div class="lc-note">Supersedes the locked AI tier (needs ADR). No Azure OpenAI / AI Search cost in any environment.</div>
           </div>
         </div>
       </div>
@@ -2038,27 +2057,26 @@ window.addEventListener('resize', function(){
       <div class="layer-body">
         <div class="layer-inner">
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-a">Plan A — Minimal</div>
-            <div class="lc-component">Azure Firewall Basic</div>
-            <div class="lc-note">Stateful L4 filtering + basic threat intelligence. No IDPS, no TLS deep inspection. Same UDR routing — topology parity maintained. Upgrades to Premium without topology change.</div>
-            <div class="lc-component" style="margin-top:5px;">Bastion Basic · No VPN · LAW 2 GB/day · App Insights 1 GB/day · Defender Server P1 · Purview 1 CU · No Sentinel · No DDoS Standard</div>
-            <div class="lc-note">Security investigations via LAW saved queries + Defender alerts. Sentinel connectors validated when upgrading to Plan B.</div>
-            <div class="lc-tradeoff">△ No IDPS · No DDoS VNet protection · No Sentinel · No on-prem VPN</div>
+            <div class="lc-plan lc-plan-a">Plan A — Dev</div>
+            <div class="lc-component">Edge shared from Prod sub ($0)</div>
+            <div class="lc-note">No dedicated Front Door / App Gateway / firewall. App Insights → central Log Analytics. Defender 3 plans (App Svc + SQL + KV).</div>
+            <div class="lc-component" style="margin-top:5px;">No Sentinel · investigations via central LAW + Defender alerts</div>
+            <div class="lc-note">Telemetry ships to the shared central workspace in the management subscription.</div>
+            <div class="lc-tradeoff">△ No Sentinel · no dedicated edge</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-b">Plan B — Standard</div>
-            <div class="lc-component">Azure Firewall Premium</div>
-            <div class="lc-note">IDPS + TLS deep-packet inspection. Required to validate IDPS rules before prod. LAW 10 GB/day + Sentinel 10 GB/day (reduced detection coverage maintained). App Insights 4 GB/day. Purview 4 CU. Defender P2. VPN GW VpnGw1 single tunnel. No DDoS Standard — Front Door Premium edge DDoS only.</div>
-            <div class="lc-locked" style="margin-top:6px;">🔒 Firewall Premium</div>
-            <div class="lc-tradeoff">△ No DDoS Standard (quarterly drill window only)</div>
+            <div class="lc-plan lc-plan-b">Plan B — Staging</div>
+            <div class="lc-component">Edge shared from Prod sub ($0)</div>
+            <div class="lc-note">App Insights → central LAW (richer telemetry). Defender 5 plans (+ Storage + Containers). No separate Sentinel — central in Prod.</div>
+            <div class="lc-locked" style="margin-top:6px;">Edge + SIEM both shared</div>
+            <div class="lc-tradeoff">△ Shared from Prod / management subscriptions</div>
           </div>
           <div class="lc-cell">
-            <div class="lc-plan lc-plan-c">Plan C — Full Cloud</div>
-            <div class="lc-component">Azure Firewall Premium <span class="badge-locked">LOCKED</span></div>
-            <div class="lc-component" style="margin-top:5px;">DDoS Protection Standard <span class="badge-locked">LOCKED</span></div>
-            <div class="lc-component" style="margin-top:5px;">Bastion Standard <span class="badge-locked">LOCKED</span></div>
-            <div class="lc-note" style="margin-top:4px;">LAW 40 GB/day + Sentinel 40 GB/day (100 GB/day commitment tier). App Insights 10 GB/day (11 apps). Purview 8 CU. Defender P2 all plans. VPN VpnGw1 ×2 active-active. Private DNS 12 zones. Terraform + Bicep IaC all environments.</div>
-            <div class="lc-locked">🔒 DDoS Standard · Firewall Premium · Bastion Standard · Defender P2 · Storage GZRS</div>
+            <div class="lc-plan lc-plan-c">Plan C — Production</div>
+            <div class="lc-component">Azure Firewall Standard (shared) <span class="badge-locked">LOCKED</span></div>
+            <div class="lc-component" style="margin-top:5px;">Front Door + App Gateway WAF v2 + APIM (Basic v2 → Standard v2 at Full)</div>
+            <div class="lc-note" style="margin-top:4px;">Central Log Analytics + Sentinel (cost-optimized: free connectors + DCR). Defender full plans. Bastion Basic (Standard) / Std (Full) · VPN Gateway at Full (DR). Private DNS · Bicep IaC all environments.</div>
+            <div class="lc-locked">🔒 Firewall Standard · WORM storage · 7yr audit LTR</div>
           </div>
         </div>
       </div>
@@ -2079,51 +2097,51 @@ window.addEventListener('resize', function(){
 
   <div class="lld-map" style="margin-top:1.2rem;font-size:.72rem;">
     <div class="lm-head">LLD Component</div>
-    <div class="lm-head ha">Plan A · Minimal</div>
-    <div class="lm-head hb">Plan B · Standard</div>
-    <div class="lm-head hc">Plan C · Full Cloud</div>
+    <div class="lm-head ha">Plan A · Dev</div>
+    <div class="lm-head hb">Plan B · Staging</div>
+    <div class="lm-head hc">Plan C · Production</div>
 
     <div class="lm-grp">CONSUMER + GATEWAY (L0 + L1)</div>
     <div class="lm-component">GoSXM BFF + Portal</div>
-    <div class="lm-cell a">ASE v3 I1v2 ×1 · Static Web App (Portal)</div>
-    <div class="lm-cell b">ASE v3 I2v2 ×2 · Static Web App Premium</div>
-    <div class="lm-cell c">ASE v3 I4v2 ×3 zone-redundant · Static Web App Standard</div>
+    <div class="lm-cell a">App Service P0v3 ×2 (FE+BE)</div>
+    <div class="lm-cell b">App Service P1v3 ×2 · autoscale 1→2</div>
+    <div class="lm-cell c">Dual ASE v3 I1v2 (1× Min · 2× Std/Full)</div>
 
     <div class="lm-component">APIM 8-Stage Pipeline</div>
-    <div class="lm-cell a">APIM Developer (no SLA)</div>
-    <div class="lm-cell b">APIM Standard v2 (99.95% SLA)</div>
-    <div class="lm-cell c">APIM Premium v2 (99.99% SLA)</div>
+    <div class="lm-cell a">Shared APIM (Prod sub)</div>
+    <div class="lm-cell b">Shared APIM (Prod sub)</div>
+    <div class="lm-cell c">APIM Basic v2 (Min/Std) → Standard v2 (Full)</div>
 
-    <div class="lm-component">WAF + CDN</div>
-    <div class="lm-cell a">Front Door Standard + AppGw Standard v2 ×1</div>
-    <div class="lm-cell b">Front Door Premium + AppGw WAF v2 ×1</div>
-    <div class="lm-cell c">Front Door Premium 🔒 + AppGw WAF v2 ×3 AZ</div>
+    <div class="lm-component">WAF + CDN (shared edge)</div>
+    <div class="lm-cell a">Shared from Prod sub ($0)</div>
+    <div class="lm-cell b">Shared from Prod sub ($0)</div>
+    <div class="lm-cell c">Front Door + App Gateway WAF v2 🔒 (FD Premium at Full)</div>
 
-    <div class="lm-grp">REGISTRY ADAPTERS (L2) — .NET 8 Azure Functions</div>
+    <div class="lm-grp">REGISTRY ADAPTERS (L2) — .NET 8 apps</div>
     <div class="lm-component">CasbesAdapter · SOAP/StUF-BG</div>
-    <div class="lm-cell a">Function App on ASE I1v2 · Key Vault Standard · 10 req/s enforced client-side</div>
-    <div class="lm-cell b">Function App on ASE I2v2 · KV Standard · retry policy active</div>
-    <div class="lm-cell c">Function App on ASE I4v2 AZ · KV Premium (FIPS L2) · 1yr RI</div>
+    <div class="lm-cell a">App Service P0v3 · Key Vault Standard · 10 req/s enforced client-side</div>
+    <div class="lm-cell b">App Service P1v3 · KV Premium · retry policy active</div>
+    <div class="lm-cell c">Dual ASE v3 · KV Std (Min) / Premium (Std/Full) · 10 req/s</div>
 
     <div class="lm-component">CociAdapter · REST/JSON</div>
-    <div class="lm-cell a">Function App · KV Standard · Managed Identity auth</div>
-    <div class="lm-cell b">Function App · KV Standard · circuit breaker active</div>
-    <div class="lm-cell c">Function App AZ · KV Premium · geo-redundant config</div>
+    <div class="lm-cell a">App Service · KV Standard · Managed Identity auth</div>
+    <div class="lm-cell b">App Service · KV Premium · circuit breaker active</div>
+    <div class="lm-cell c">ASE v3 · KV Premium · Managed Identity</div>
 
     <div class="lm-component">SiahAdapter · OData v4 CRM · §16.2</div>
-    <div class="lm-cell a">Function App · OIDC check enforced · KV Standard SP credentials</div>
-    <div class="lm-cell b">Function App · §16.2 enforced · SIAH Managed Identity</div>
-    <div class="lm-cell c">Function App AZ · §16.2 enforced · Managed Identity · full audit</div>
+    <div class="lm-cell a">App Service · OIDC check enforced · KV SP credentials</div>
+    <div class="lm-cell b">App Service · §16.2 enforced · SIAH Managed Identity</div>
+    <div class="lm-cell c">ASE v3 · §16.2 enforced · Managed Identity · full audit</div>
 
     <div class="lm-component">BlissAdapter · OData v4 TEATT</div>
-    <div class="lm-cell a">Function App · separate TEATT SP in KV Standard</div>
-    <div class="lm-cell b">Function App · separate TEATT SP · Managed Identity</div>
-    <div class="lm-cell c">Function App AZ · TEATT tenant isolated · KV Premium</div>
+    <div class="lm-cell a">App Service · separate TEATT SP in Key Vault</div>
+    <div class="lm-cell b">App Service · separate TEATT SP · Managed Identity</div>
+    <div class="lm-cell c">ASE v3 · TEATT tenant isolated · KV Premium</div>
 
     <div class="lm-component">VromiAdapter · ArcGIS REST</div>
-    <div class="lm-cell a">Function App · Redis arcgis:token · 90min refresh timer</div>
-    <div class="lm-cell b">Function App · Redis C1 · token refresh · alert on 2× fail</div>
-    <div class="lm-cell c">Function App AZ · Redis C1 · S1 alert on token fail</div>
+    <div class="lm-cell a">App Service · ArcGIS token cache · 90min refresh timer</div>
+    <div class="lm-cell b">App Service · in-process token cache · alert on 2× fail</div>
+    <div class="lm-cell c">ASE v3 · in-process token cache · alert on token fail</div>
 
     <div class="lm-component">KadasterAdapter · ArcGIS ⚠ OI-08</div>
     <div class="lm-cell a">APIM mock policy · KadasterAdapter stub in code · not called at runtime</div>
@@ -2132,50 +2150,50 @@ window.addEventListener('resize', function(){
 
     <div class="lm-grp">ORCHESTRATION + DATA (L3 + L4)</div>
     <div class="lm-component">CMF Outbox Pattern</div>
-    <div class="lm-cell a">dbo.OutboxMessages in SQL MI GP · timer relay Function · Service Bus Standard</div>
-    <div class="lm-cell b">dbo.OutboxMessages · relay Function · Service Bus Standard + quarterly Premium drill</div>
-    <div class="lm-cell c">dbo.OutboxMessages · relay Function · Service Bus Premium 1MU VNet-integrated</div>
+    <div class="lm-cell a">dbo.OutboxMessages in Azure SQL DB · timer relay · Service Bus Standard</div>
+    <div class="lm-cell b">dbo.OutboxMessages · relay · Service Bus Standard</div>
+    <div class="lm-cell c">dbo.OutboxMessages · relay · Service Bus Standard</div>
 
     <div class="lm-component">dgtp.registry.events topic</div>
     <div class="lm-cell a">Service Bus Standard · 3 subscriptions · DLQ monitor</div>
     <div class="lm-cell b">Service Bus Standard · same topology · DLQ monitor 15min</div>
-    <div class="lm-cell c">Service Bus Premium · dgtp.service-requests added (Phase 2) · geo-DR backup ns</div>
+    <div class="lm-cell c">Service Bus Standard · dgtp.service-requests (Phase 2) · Event Grid fan-out</div>
 
     <div class="lm-component">Cosmos DB — CMF cache</div>
     <div class="lm-cell a">Serverless · citizen-profiles 15min · business-records 5min · address-cache 24h</div>
-    <div class="lm-cell b">Autoscale 1k→10k RU/s · same TTLs · single region</div>
-    <div class="lm-cell c">Autoscale 10k→50k RU/s · single-write multi-region reads · continuous backup</div>
+    <div class="lm-cell b">Autoscale ~1.5k RU/s · same TTLs · single region</div>
+    <div class="lm-cell c">Serverless (Min) / autoscale (Std/Full) · same TTLs · continuous backup</div>
 
-    <div class="lm-component">Azure SQL MI — dbo.AuditLog</div>
-    <div class="lm-cell a">SQL MI GP 4vCore · 7yr LTR · append-only · SHA-256 CitizenSubjectId</div>
-    <div class="lm-cell b">SQL MI GP 8vCore · 7yr LTR · same compliance model</div>
-    <div class="lm-cell c">SQL MI GP 16vCore + ZRS + geo-replica · 7yr LTR · 1yr RI + AHB 🔒</div>
+    <div class="lm-component">Azure SQL DB — dbo.AuditLog</div>
+    <div class="lm-cell a">SQL DB GP serverless · 7yr LTR · append-only · SHA-256 CitizenSubjectId</div>
+    <div class="lm-cell b">SQL DB GP 2 vCore warm · 7yr LTR · same compliance model</div>
+    <div class="lm-cell c">SQL DB GP 2–6 vCore · ZRS / GRS (Full) · 7yr LTR 🔒</div>
 
-    <div class="lm-component">Redis C1 — token + refdata cache</div>
-    <div class="lm-cell a">Standard C1 · ArcGIS tokens 2h · refdata 1h · rate-limit counters · NO PII</div>
-    <div class="lm-cell b">Standard C1 · same · no change</div>
-    <div class="lm-cell c">Standard C1 · same · no change · private endpoint</div>
+    <div class="lm-component">Token + refdata cache</div>
+    <div class="lm-cell a">In-process · ArcGIS tokens 2h · refdata 1h · NO PII</div>
+    <div class="lm-cell b">In-process · same · no change</div>
+    <div class="lm-cell c">In-process · same · no change</div>
 
     <div class="lm-grp">IDENTITY + SECURITY + OBSERVABILITY (L5 + L6)</div>
-    <div class="lm-component">Entra External ID · eID OIDC</div>
-    <div class="lm-cell a">Free tier (50k MAU included) · OIDC federation · JWT scopes · §16.2</div>
-    <div class="lm-cell b">Free tier (50k MAU) · same · OI-04 scope strings Sprint 1</div>
-    <div class="lm-cell c">Billed tier 150k MAU headroom · same OIDC federation</div>
+    <div class="lm-component">National eID · OIDC/SAML</div>
+    <div class="lm-cell a">External federation · citizen tokens · §16.2 · no Azure CIAM cost</div>
+    <div class="lm-cell b">External federation · same · OI-04 scope strings Sprint 1</div>
+    <div class="lm-cell c">External federation · eID SLA + degraded-mode plan required</div>
 
     <div class="lm-component">Key Vault — secrets + keys</div>
-    <div class="lm-cell a">KV Standard · Managed Identity only · no HSM · CASBES 90d · COCI API key 90d · ArcGIS 2h auto</div>
-    <div class="lm-cell b">KV Standard · same rotation schedule · private endpoint</div>
-    <div class="lm-cell c">KV Premium FIPS 140-2 L2 HSM-backed · all PCI keys · ADR-005 update required</div>
+    <div class="lm-cell a">KV Standard · Managed Identity only · CASBES 90d · COCI API key 90d</div>
+    <div class="lm-cell b">KV Premium (HSM) · same rotation schedule · private endpoint</div>
+    <div class="lm-cell c">KV Std (Min) / Premium FIPS 140-2 L2 (Std/Full) · PCI keys</div>
 
     <div class="lm-component">Sentinel + Defender</div>
-    <div class="lm-cell a">No Sentinel · Defender Server P1 · LAW 2 GB/day · investigations via LAW queries</div>
-    <div class="lm-cell b">Sentinel 10 GB/day + Defender P2 · LAW 10 GB/day · advisory mode</div>
-    <div class="lm-cell c">Sentinel 40 GB/day + Defender P2 all plans · Purview 8 CU · 100 GB/day commitment</div>
+    <div class="lm-cell a">No Sentinel · Defender 3 plans · App Insights → central LAW</div>
+    <div class="lm-cell b">No separate Sentinel · Defender 5 plans · central LAW</div>
+    <div class="lm-cell c">Central Sentinel (optimized: free connectors + DCR) + Defender full</div>
 
     <div class="lm-component">CI/CD · IaC</div>
-    <div class="lm-cell a">Azure DevOps · Terraform + Bicep · same pipeline (5-stage app + 4-stage infra) · 2-person prod gate</div>
-    <div class="lm-cell b">Same · Staging validates all prod patterns · NRD review gate</div>
-    <div class="lm-cell c">Same pipeline · 22 subscriptions full topology · Bicep what-if + TF plan artifacts</div>
+    <div class="lm-cell a">Azure DevOps · Bicep IaC · 2-person prod gate</div>
+    <div class="lm-cell b">Same · Staging validates all prod patterns · review gate</div>
+    <div class="lm-cell c">Same pipeline · 4 subscriptions (dev/staging/prod/mgmt) · Bicep what-if artifacts</div>
   </div>
   <div class="sfooter" style="margin-top:1rem;">Scroll → Decision Matrix</div>
 </div>
@@ -2191,75 +2209,75 @@ window.addEventListener('resize', function(){
 
   <div class="dmatrix" style="margin-top:1.2rem;">
     <div class="dm-h">Component</div>
-    <div class="dm-h ha"><span class="dot-a"></span>Plan A · Minimal</div>
-    <div class="dm-h hb"><span class="dot-b"></span>Plan B · Standard</div>
-    <div class="dm-h hc"><span class="dot-c"></span>Plan C · Full Cloud</div>
+    <div class="dm-h ha"><span class="dot-a"></span>Plan A · Dev</div>
+    <div class="dm-h hb"><span class="dot-b"></span>Plan B · Staging</div>
+    <div class="dm-h hc"><span class="dot-c"></span>Plan C · Production</div>
 
     <div class="dm-row">
-      <div class="dm-cat">Front Door</div>
-      <div class="dm-cell a">Standard · basic WAF core rules<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: WAF Premium policy validation needed</span></div>
-      <div class="dm-cell b">Premium · full WAF + private origins<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: multi-region failover required</span></div>
-      <div class="dm-cell c">Premium 🔒 · cannot reduce<br/>Regulatory/SLA requirement</div>
+      <div class="dm-cat">Front Door (shared)</div>
+      <div class="dm-cell a">Shared from Prod sub · $0<br/><span style="color:var(--amber);font-size:.65rem;">Dev rides the shared edge</span></div>
+      <div class="dm-cell b">Shared from Prod sub · $0<br/><span style="color:var(--amber);font-size:.65rem;">Staging rides the shared edge</span></div>
+      <div class="dm-cell c">Standard (Min/Std) → Premium (Full)</div>
     </div>
     <div class="dm-row">
-      <div class="dm-cat">ASE v3</div>
-      <div class="dm-cell a">1×I1v2 per tier · no HA<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: P95 latency &gt;2s or error rate &gt;5%</span></div>
-      <div class="dm-cell b">2×I2v2 per tier · basic HA<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: require 3-AZ zone-redundancy</span></div>
-      <div class="dm-cell c">3F+4B I4v2 · 3-AZ HA 🔒<br/>Cannot reduce once RI committed</div>
+      <div class="dm-cat">Compute</div>
+      <div class="dm-cell a">App Service P0v3 ×2 · no HA<br/><span style="color:var(--amber);font-size:.65rem;">Promote when: integration tests pass</span></div>
+      <div class="dm-cell b">App Service P1v3 ×2 · autoscale 1→2<br/><span style="color:var(--amber);font-size:.65rem;">Cut over when: UAT + load tests pass</span></div>
+      <div class="dm-cell c">Dual ASE v3 I1v2 · 1× (Min) → 2× HA (Std/Full)</div>
     </div>
     <div class="dm-row">
-      <div class="dm-cat">APIM</div>
-      <div class="dm-cell a">Developer · no SLA<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: SLA required or &gt;100k API calls/day</span></div>
-      <div class="dm-cell b">Standard v2 · 99.95% SLA<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: multi-region or 99.99% SLA needed</span></div>
-      <div class="dm-cell c">Premium v2 · 99.99% SLA</div>
+      <div class="dm-cat">APIM (shared)</div>
+      <div class="dm-cell a">Shared from Prod sub · $0<br/><span style="color:var(--amber);font-size:.65rem;">8-stage pipeline applies to all envs</span></div>
+      <div class="dm-cell b">Shared from Prod sub · $0<br/><span style="color:var(--amber);font-size:.65rem;">Same shared gateway</span></div>
+      <div class="dm-cell c">Basic v2 (Min/Std) → Standard v2 (Full)</div>
     </div>
     <div class="dm-row">
-      <div class="dm-cat">SQL MI</div>
-      <div class="dm-cell a">GP 4vCore · Dev/Test + AHB<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: sustained CPU &gt;70% or IOPS limit hit</span></div>
-      <div class="dm-cell b">GP 8vCore · Dev/Test + AHB<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: prod commit + geo-replica needed</span></div>
-      <div class="dm-cell c">GP 16vCore + ZRS + geo-replica + RI<br/>ADR-011 required</div>
+      <div class="dm-cat">Azure SQL DB</div>
+      <div class="dm-cell a">GP serverless (auto-pause)<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: cold-start hurts tests</span></div>
+      <div class="dm-cell b">GP provisioned 2 vCore (warm)<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: load test needs more vCore</span></div>
+      <div class="dm-cell c">GP 2–6 vCore · zone-redundant (Full)</div>
     </div>
     <div class="dm-row">
       <div class="dm-cat">Cosmos DB</div>
-      <div class="dm-cell a">Serverless · pay per RU<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: sustained &gt;400 RU/s average or &gt;$50/mo Cosmos bill</span></div>
-      <div class="dm-cell b">Autoscale 1k→10k RU/s<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: sustained peak &gt;10k RU/s</span></div>
-      <div class="dm-cell c">Autoscale 10k→50k RU/s · single-write multi-region reads</div>
+      <div class="dm-cell a">Serverless · pay per RU<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: sustained &gt;400 RU/s average</span></div>
+      <div class="dm-cell b">Autoscale ~1.5k RU/s<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: sustained peak rises</span></div>
+      <div class="dm-cell c">Serverless (Min) / autoscale (Std/Full)</div>
     </div>
     <div class="dm-row">
       <div class="dm-cat">Service Bus</div>
-      <div class="dm-cell a">Standard · shared infra<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: sessions/transactions needed or &gt;10M msgs/mo</span></div>
-      <div class="dm-cell b">Standard + quarterly Premium drill<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: active geo-DR RTO &lt;5min required</span></div>
-      <div class="dm-cell c">Premium 1MU · geo-DR backup namespace</div>
+      <div class="dm-cell a">Standard · 3 subscriptions<br/><span style="color:var(--amber);font-size:.65rem;">Outbox + DLQ monitor</span></div>
+      <div class="dm-cell b">Standard · same topology<br/><span style="color:var(--amber);font-size:.65rem;">DLQ monitor 15min</span></div>
+      <div class="dm-cell c">Standard + Event Grid fan-out · Phase 2 topic</div>
     </div>
     <div class="dm-row">
       <div class="dm-cat">Firewall</div>
-      <div class="dm-cell a">Basic · L4 stateful only<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: IDPS required or TLS inspection needed</span></div>
-      <div class="dm-cell b">Premium 🔒 · IDPS + TLS inspection<br/>Cannot downgrade — ADR requirement</div>
-      <div class="dm-cell c">Premium 🔒 · same · locked</div>
+      <div class="dm-cell a">Shared Standard (Prod sub) · $0<br/><span style="color:var(--amber);font-size:.65rem;">One instance fronts all envs</span></div>
+      <div class="dm-cell b">Shared Standard (Prod sub) · $0<br/><span style="color:var(--amber);font-size:.65rem;">Same shared instance</span></div>
+      <div class="dm-cell c">Azure Firewall Standard 🔒 · $912 · shared</div>
     </div>
     <div class="dm-row">
-      <div class="dm-cat">DDoS Standard</div>
-      <div class="dm-cell a">Not deployed · Front Door DDoS only<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: regulatory sign-off or public-facing VNet required</span></div>
-      <div class="dm-cell b">Not deployed · quarterly drill only<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: regulator requires continuous VNet DDoS protection</span></div>
-      <div class="dm-cell c">DDoS Standard 🔒 · locked · regulatory requirement</div>
+      <div class="dm-cat">Storage</div>
+      <div class="dm-cell a">LRS · synthetic data<br/><span style="color:var(--amber);font-size:.65rem;">No WORM in Dev</span></div>
+      <div class="dm-cell b">ZRS · masked UAT data<br/><span style="color:var(--amber);font-size:.65rem;">WORM validated in UAT</span></div>
+      <div class="dm-cell c">LRS→ZRS→GRS + WORM 🔒 (7yr immutable)</div>
     </div>
     <div class="dm-row">
       <div class="dm-cat">Sentinel</div>
-      <div class="dm-cell a">Not deployed · LAW + Defender<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: SOC established or SOAR automation needed</span></div>
-      <div class="dm-cell b">Sentinel 10 GB/day · advisory mode<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: alert quality validated, SOAR automation ready</span></div>
-      <div class="dm-cell c">Sentinel 40 GB/day · Purview 8 CU · SOAR P2→P3 phasing</div>
+      <div class="dm-cell a">None · Defender + central LAW<br/><span style="color:var(--amber);font-size:.65rem;">Telemetry to shared workspace</span></div>
+      <div class="dm-cell b">None · Defender 5 plans + central LAW<br/><span style="color:var(--amber);font-size:.65rem;">SIEM is central in Prod</span></div>
+      <div class="dm-cell c">Central Sentinel (optimized: free connectors + DCR)</div>
     </div>
     <div class="dm-row">
-      <div class="dm-cat">AI Search</div>
-      <div class="dm-cell a">Free tier · 10k docs<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: document set &gt;10k or production chatbot goes live</span></div>
-      <div class="dm-cell b">S2 ×1 replica<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: QPS &gt;2,000 sustained or P95 latency degrades</span></div>
-      <div class="dm-cell c">S2 ×2 replicas HA pair · add 3rd at QPS &gt;2,000</div>
+      <div class="dm-cat">Identity</div>
+      <div class="dm-cell a">National eID (external) · $0<br/><span style="color:var(--amber);font-size:.65rem;">Synthetic test identities</span></div>
+      <div class="dm-cell b">National eID (external) · $0<br/><span style="color:var(--amber);font-size:.65rem;">Masked test identities</span></div>
+      <div class="dm-cell c">National eID · SLA + degraded-mode plan required</div>
     </div>
     <div class="dm-row">
       <div class="dm-cat">Key Vault</div>
-      <div class="dm-cell a">Standard · no HSM<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: PCI-DSS scope requires HSM-backed keys</span></div>
-      <div class="dm-cell b">Standard · same<br/><span style="color:var(--amber);font-size:.65rem;">Upgrade when: QSA confirms KV Premium FIPS L2 acceptable</span></div>
-      <div class="dm-cell c">Premium FIPS 140-2 L2 · ADR-005 + QSA sign-off</div>
+      <div class="dm-cell a">Standard · no HSM<br/><span style="color:var(--amber);font-size:.65rem;">Synthetic secrets only</span></div>
+      <div class="dm-cell b">Premium (HSM-backed)<br/><span style="color:var(--amber);font-size:.65rem;">Prod key parity for UAT</span></div>
+      <div class="dm-cell c">Std (Min) / Premium FIPS 140-2 L2 (Std/Full)</div>
     </div>
   </div>
   <div class="sfooter" style="margin-top:1rem;">Scroll → Locked Items</div>
@@ -2272,56 +2290,56 @@ window.addEventListener('resize', function(){
   <span class="stag stag-violet">Locked Items</span>
   <div class="rule" style="background:var(--rose);"></div>
   <h2>Components That Cannot Be Reduced Further</h2>
-  <p class="lead">Seven components are locked in Plan C — and must remain locked regardless of optimisation pressure. Any attempt to remove or downgrade these requires a formal ADR and in most cases regulatory sign-off.</p>
+  <p class="lead">Seven components are locked in Production — they must remain regardless of optimisation pressure. Removing or downgrading any of them requires a formal ADR and, in most cases, regulatory or compliance sign-off.</p>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:1.4rem;">
 
     <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
-      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 DDoS Protection Standard</div>
-      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Regulatory requirement for production public-facing VNet. Front Door edge DDoS protection only is insufficient when the VNet itself is the regulatory boundary. Cannot be removed without regulator sign-off.</p>
-      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Available in: Plan C only · Not in Plan A or B (quarterly drill only)</div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 WORM 7-year Immutable Storage</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Documents and the audit archive are written to write-once, read-many (WORM) blob storage with a 7-year retention lock — required for audit compliance under the EA Ordinance and GDPR. Removing WORM or shortening retention is a compliance violation.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Production only · redundancy LRS→ZRS→GRS by sizing</div>
     </div>
 
     <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
-      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Azure Firewall Premium</div>
-      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">IDPS (Intrusion Detection and Prevention System) + TLS deep-packet inspection are Premium-only. Required to validate IDPS rules before prod rollout (Plan B+) and locked in Plan C. Plan A uses Basic for topology parity without IDPS.</p>
-      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Available in: Plan B and C · Plan A uses Firewall Basic</div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 7-year Audit Log (SQL LTR)</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">dbo.AuditLog is append-only with a 7-year long-term retention policy and SHA-256 scrambled citizen identifiers. The retention window and append-only behaviour are legal requirements that cannot be relaxed.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">All environments wire it · only Production holds real records</div>
     </div>
 
     <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
-      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Azure Front Door Premium</div>
-      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">WAF Premium (OWASP + custom rules) + private link origins for backend pools. Standard tier cannot connect to private endpoints — citizen data flows through public origin. Required for prod SLA. Plan A uses Standard.</p>
-      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Available in: Plan B and C · Plan A uses Front Door Standard</div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Azure Firewall Standard (shared)</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">One shared Azure Firewall Standard ($912/mo) is the network security boundary for every environment. It is in scope for the PCI-DSS e-Payment assessment, so its tier and rules cannot be reduced without a firewall-tier ADR and security sign-off.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Hosted in Prod sub · shared by Dev / Staging / Production</div>
     </div>
 
     <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
-      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Storage GZRS + WORM 7-year</div>
-      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Geo-zone-redundant storage required for citizen data geo-redundancy SLA. 7-year WORM immutability required for audit log compliance (EA Ordinance). Downgrading to LRS/ZRS or removing WORM is a compliance violation.</p>
-      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Available in: Plan C only · Plans A/B use LRS (non-compliance environments)</div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Front Door + App Gateway WAF v2</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">The public citizen entry path runs through Front Door and an Application Gateway WAF v2 with the OWASP rule set. Disabling the WAF on a public government portal is not permitted. Front Door steps up to Premium in the Full sizing.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Production edge · shared by all environments</div>
     </div>
 
     <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
-      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 ASE v3 HA Footprint (Plan C)</div>
-      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">3 frontend + 4 backend I4v2 instances across 3 AZs is the minimum for the 99.9% HA SLA under the 1-year Reserved Instance commitment. Once the RI is committed, reducing instances below 3 per tier breaks the HA contract. Reserved Instances apply savings.</p>
-      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Cannot reduce after RI commitment · Plans A/B have no RI commitment</div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Key Vault HSM-backed Keys</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Key Vault Premium provides FIPS 140-2 Level 2 HSM-backed keys for the e-Payment and citizen-data flows. If PCI-DSS scope is confirmed, the HSM key-protection standard is mandatory and cannot drop to software-protected keys.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Staging + Prod Standard/Full · Dev / Prod-Minimal use KV Standard</div>
     </div>
 
     <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
-      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Bastion Standard</div>
-      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Native client support + file transfer required for admin operations (RDP/SSH without public IP). Standard SKU is the admin access pattern — no public IPs on any DGTP compute. Plan A uses Bastion Basic (browser only).</p>
-      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Available in: Plan B and C · Plan A uses Bastion Basic</div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Defender for Cloud Baseline</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Security baseline per ADR-009: Defender for App Service, SQL, Storage and Key Vault. Production runs the full plan set; it cannot be downgraded without an ADR-009 revision and security-team sign-off.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Dev 3 plans · Staging 5 plans · Production full</div>
     </div>
 
     <div style="border:1.5px solid rgba(248,113,113,.3);border-radius:10px;background:rgba(248,113,113,.04);padding:16px;">
-      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 Defender for Cloud P2</div>
-      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Security baseline per ADR-009. All P2 plans required: Defender for Servers P2 (JIT VM access), Defender for App Service, Defender for Storage, Defender for SQL. Cannot be downgraded without ADR-009 revision and security team sign-off.</p>
-      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">Plan A uses Server P1 only · Plans B and C require full P2</div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--rose);margin-bottom:12px;">🔒 National eID Degraded-Mode Plan</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;">Citizens sign in only through the national eID. Because there is no fallback Azure identity service, a documented eID SLA and a degraded-mode plan (what happens when eID is unavailable) is a launch blocker that cannot be skipped.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(248,113,113,.65);">External dependency · supersedes ADR-004 (Entra removed)</div>
     </div>
 
     <div style="border:1.5px solid rgba(245,166,35,.25);border-radius:10px;background:rgba(245,166,35,.04);padding:16px;">
-      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);margin-bottom:12px;">⚠ ADR Changes Required for Plan C</div>
-      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;"><strong style="color:var(--ink);">ADR-011 (new):</strong> SQL DB Business Critical → SQL MI General Purpose. GP delivers 8,000 IOPS @ 16 vCore. Validate with load test before RI commit.<br/><br/><strong style="color:var(--ink);">ADR-005 (update):</strong> Managed HSM → Key Vault Premium FIPS 140-2 L2. Multi-tenant HSM vs sole-tenant. QSA sign-off required for PCI-DSS attestation.</p>
-      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.65);">Also: SB geo-DR RTO change (~30min vs &lt;5min) · Cosmos single-write write RTO · VPN GW zone-redundancy removed</div>
+      <div style="font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);margin-bottom:12px;">⚠ ADRs Required Before Production</div>
+      <p style="font-size:.8rem;color:var(--ink2);line-height:1.65;margin-bottom:8px;"><strong style="color:var(--ink);">ADR — external-LLM removal:</strong> Azure OpenAI + AI Search removed; chatbot LLM + search are external. Supersedes the locked AI tier; needs PII / DPIA clearance.<br/><br/><strong style="color:var(--ink);">ADR — eID supersedes Entra (ADR-004):</strong> national eID replaces Entra External ID. <strong style="color:var(--ink);">ADR-011:</strong> shared-edge traffic isolation across Dev / Staging / Prod.</p>
+      <div style="font-family:var(--mono);font-size:.65rem;color:rgba(245,166,35,.65);">Also: PCI-DSS scope sign-off for e-Payment · firewall-tier (Standard vs Premium) decision</div>
     </div>
 
   </div>
@@ -2335,39 +2353,39 @@ window.addEventListener('resize', function(){
 <div class="si">
   <span class="stag stag-teal">Recommendation</span>
   <div class="rule" style="background:var(--teal);"></div>
-  <h2>Start with Plan A.<br/><em style="font-style:italic;color:var(--teal);">Upgrade on signal — not on schedule.</em></h2>
+  <h2>Deploy Dev → Staging → Production.<br/><em style="font-style:italic;color:var(--teal);">Size Production on signal — not on schedule.</em></h2>
 
   <div class="g2" style="margin-top:1.4rem;gap:1.6rem;">
     <div>
-      <p class="lead" style="margin-bottom:1.2rem;">Sint Maarten has 50,000 citizens. The XLS PROD v2 baseline was designed for scale that hasn't been proven yet. Plan A gives you a live, auditable, secure platform at a fraction of the cost. Every Plan A component has a direct upgrade path to Plan B and Plan C — independently, without topology changes.</p>
+      <p class="lead" style="margin-bottom:1.2rem;">Sint Maarten has 50,000 citizens. The full three-environment estimate lands at <strong>$3,385–5,907/mo</strong> — a fraction of the earlier baseline — by sharing the edge, removing Azure-side AI, and using the national eID. Stand up Dev and Staging first, then launch Production at the Minimal sizing and grow to Standard (HA) and Full (DR) only as real load justifies it.</p>
 
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div style="border-radius:8px;background:rgba(34,199,146,.06);border:1px solid rgba(34,199,146,.2);padding:12px 14px;">
-          <div style="font-family:var(--mono);font-size:.62rem;color:var(--plan-a);margin-bottom:5px;text-transform:uppercase;letter-spacing:.1em;">Phase 1 Go-Live · Plan A</div>
-          <p style="font-size:.8rem;color:var(--ink2);line-height:1.6;">Deploy Plan A. All 6 adapters live. Outbox + Service Bus Standard. SQL MI GP 4vCore. Cosmos Serverless. Firewall Basic. No Sentinel, no DDoS. Collect 3 months of production data — CPU, IOPS, request rates, Cosmos RU/s.</p>
+          <div style="font-family:var(--mono);font-size:.62rem;color:var(--plan-a);margin-bottom:5px;text-transform:uppercase;letter-spacing:.1em;">Phase 1 · Dev + Staging</div>
+          <p style="font-size:.8rem;color:var(--ink2);line-height:1.6;">Stand up Dev ($273) and Staging ($679) first. All 6 adapters live on App Service, Azure SQL DB, Cosmos and Service Bus. Validate the full request path and the shared edge on synthetic, then masked, data. Bicep modules are identical to Production.</p>
         </div>
         <div style="border-radius:8px;background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);padding:12px 14px;">
-          <div style="font-family:var(--mono);font-size:.62rem;color:var(--plan-b);margin-bottom:5px;text-transform:uppercase;letter-spacing:.1em;">Post-UAT · Upgrade to Plan B</div>
-          <p style="font-size:.8rem;color:var(--ink2);line-height:1.6;">When UAT passes and citizen volume is confirmed: swap Front Door Standard → Premium, add 2nd ASE instance per tier, activate Sentinel, upgrade Firewall Basic → Premium, activate VPN Gateway. Each upgrade is a Terraform change — no architecture redesign.</p>
+          <div style="font-family:var(--mono);font-size:.62rem;color:var(--plan-b);margin-bottom:5px;text-transform:uppercase;letter-spacing:.1em;">Phase 2 · Production — Minimal</div>
+          <p style="font-size:.8rem;color:var(--ink2);line-height:1.6;">Launch Production at the Minimal sizing ($2,433): dual ASE v3 single-instance, serverless SQL, shared Firewall Standard + Front Door + APIM. Go live for 50k citizens, then collect real load — CPU, RU/s, request rates — for 3 months.</p>
         </div>
         <div style="border-radius:8px;background:rgba(155,135,245,.06);border:1px solid rgba(155,135,245,.2);padding:12px 14px;">
-          <div style="font-family:var(--mono);font-size:.62rem;color:var(--plan-c);margin-bottom:5px;text-transform:uppercase;letter-spacing:.1em;">Months 18+ · Plan C on Evidence</div>
-          <p style="font-size:.8rem;color:var(--ink2);line-height:1.6;">Commit to Plan C only when load data justifies it: sustained P95 &gt;2s on Plan B, Cosmos RU/s sustained &gt;10k, citizen volume validated &gt;30k active users. Draft ADR-011 + ADR-005, get QSA sign-off, then commit SQL MI RI + DDoS Standard + zone-redundant ASE.</p>
+          <div style="font-family:var(--mono);font-size:.62rem;color:var(--plan-c);margin-bottom:5px;text-transform:uppercase;letter-spacing:.1em;">Phase 3 · Production — Standard → Full</div>
+          <p style="font-size:.8rem;color:var(--ink2);line-height:1.6;">Grow only when the data justifies it: move to Standard ($3,419) for 2-instance HA and warm SQL, then to Full ($4,955) for Front Door Premium, APIM Standard v2, zone-redundant SQL and GRS + a DR region. Each step is a parameter change — no redesign.</p>
         </div>
       </div>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:12px;">
       <div style="border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:16px;">
-        <div style="font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);margin-bottom:10px;">Upgrade Triggers — Monitor These</div>
+        <div style="font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);margin-bottom:10px;">Sizing triggers — monitor these</div>
         <div style="display:flex;flex-direction:column;gap:7px;">
-          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">ASE CPU sustained &gt;70% for 7 days → add instance</span></div>
-          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">Cosmos RU/s sustained &gt;400/s average → upgrade to autoscale</span></div>
-          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">SQL MI CPU &gt;70% or IOPS limit hit → upgrade vCores</span></div>
-          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">APIM P95 &gt;2s consistently → investigate + upgrade tier</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">ASE CPU sustained &gt;70% for 7 days → Minimal → Standard (2× per tier)</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">Cosmos RU/s sustained high → serverless → autoscale</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">SQL DB CPU &gt;70% or IOPS limit → raise vCore / provisioned</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">Formal RTO/RPO SLA required → Standard → Full (GRS + DR region)</span></div>
           <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--amber);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">△</span><span style="font-size:.78rem;color:var(--ink2);">Service Bus DLQ &gt;10 msgs/day → validate consumer health</span></div>
-          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--rose);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">⚠</span><span style="font-size:.78rem;color:var(--ink2);">Regulator mandates DDoS Standard → Plan C only, cannot defer</span></div>
-          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--rose);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">⚠</span><span style="font-size:.78rem;color:var(--ink2);">PCI-DSS scope confirmed → KV Premium + ADR-005 + QSA</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--rose);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">⚠</span><span style="font-size:.78rem;color:var(--ink2);">PCI-DSS scope confirmed → Key Vault Premium HSM on e-Payment</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--rose);font-family:var(--mono);font-size:.65rem;flex-shrink:0;margin-top:1px;">⚠</span><span style="font-size:.78rem;color:var(--ink2);">eID SLA / degraded-mode plan unsigned → blocks go-live</span></div>
         </div>
       </div>
 
@@ -2379,9 +2397,9 @@ window.addEventListener('resize', function(){
           <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">§16.2 SIAH constraint</span>
           <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">SHA-256 AuditLog</span>
           <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">7yr LTR retention</span>
-          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">Redis NO-PII rule</span>
-          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">Entra OIDC federation</span>
-          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">Terraform IaC pipelines</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">No-PII cache rule</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">National eID OIDC</span>
+          <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">Bicep IaC pipelines</span>
           <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">2-person prod gate</span>
           <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">Private DNS 12 zones</span>
           <span style="font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:3px;background:rgba(34,199,146,.08);border:1px solid rgba(34,199,146,.15);color:rgba(34,199,146,.75);">NFR-03 &lt;15min CMF</span>
@@ -2390,16 +2408,313 @@ window.addEventListener('resize', function(){
       </div>
 
       <div class="mrow" style="margin-top:0;">
-        <div class="met"><span class="mv mv-teal">A</span><div class="ml">Start here · Go-Live</div></div>
-        <div class="met"><span class="mv mv-blue">B</span><div class="ml">Post-UAT · HA</div></div>
-        <div class="met"><span class="mv mv-violet">C</span><div class="ml">Evidence-based</div></div>
+        <div class="met"><span class="mv mv-teal">$273</span><div class="ml">Dev / mo</div></div>
+        <div class="met"><span class="mv mv-blue">$679</span><div class="ml">Staging / mo</div></div>
+        <div class="met"><span class="mv mv-violet">$2.4–5k</span><div class="ml">Production / mo</div></div>
         <div class="met"><span class="mv mv-rose">7</span><div class="ml">Locked items</div></div>
-        <div class="met"><span class="mv mv-amber">2</span><div class="ml">ADRs for Plan C</div></div>
+        <div class="met"><span class="mv mv-amber">3</span><div class="ml">ADRs before Prod</div></div>
       </div>
     </div>
   </div>
 
-  <div class="sfooter" style="margin-top:1.4rem;">DGTP-LLD-001 v1.0 · Part 2 Cloud Architecture · Government of Sint Maarten · Orangebd · May 2026</div>
+  <div class="sfooter" style="margin-top:1.4rem;">DGTP-LLD-001 v1.0 · Part 2 Cloud Architecture · Government of Sint Maarten · Orangebd · June 2026 · costs refreshed 2026-06-01</div>
+</div>
+</section>
+
+<!-- ══════════════ SLIDE 11 — COST MODEL ══════════════ -->
+<section class="slide" id="scost" style="background:linear-gradient(145deg,rgba(34,199,146,.04) 0%,var(--bg) 50%,rgba(245,166,35,.04) 100%);">
+<div class="si">
+  <span class="stag stag-teal">Financial Summary</span>
+  <div class="rule" style="background:var(--amber);"></div>
+  <h2>Environment Cost Model</h2>
+  <p class="lead">Azure Retail <strong>list</strong> pricing per environment — East US, validated 2026-06-01. All edge + network is a shared service in the Production subscription, so Dev and Staging carry <strong>$0 edge</strong>. Running all three environments together costs <strong>$3,385–5,907/mo</strong> depending on the Production sizing chosen.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:1.2rem;">
+
+    <!-- DEV / Plan A -->
+    <div class="cost-card cost-card-a">
+      <div class="cost-card-head">
+        <div style="display:flex;align-items:baseline;gap:10px;">
+          <span style="font-family:var(--mono);font-size:2.2rem;font-weight:500;color:var(--plan-a);line-height:1;">A</span>
+          <div>
+            <div style="font-family:var(--mono);font-size:.57rem;text-transform:uppercase;letter-spacing:.12em;color:var(--plan-a);">Dev Environment</div>
+            <div style="font-family:var(--serif);font-size:.95rem;color:var(--ink);">Dev Sandbox</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <div style="font-family:var(--serif);font-size:2rem;line-height:1;color:var(--plan-a);">$273<span style="font-size:.72rem;color:var(--ink3);">/mo</span></div>
+          <div style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);margin-top:2px;">~$3,276 / year · ▼ under $450–500 band</div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:1px;padding:5px 9px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+            <span style="font-family:var(--serif);font-size:.88rem;color:var(--plan-a);">$0.005</span>
+            <span style="font-family:var(--mono);font-size:.47rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">per citizen/mo</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px;padding:5px 9px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+            <span style="font-family:var(--serif);font-size:.88rem;color:var(--teal);">P0v3</span>
+            <span style="font-family:var(--mono);font-size:.47rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">App Service ×2</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px;padding:5px 9px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+            <span style="font-family:var(--serif);font-size:.88rem;color:var(--rose);">None</span>
+            <span style="font-family:var(--mono);font-size:.47rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">HA / DR</span>
+          </div>
+        </div>
+      </div>
+      <div class="cost-card-body">
+        <div style="font-family:var(--mono);font-size:.53rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);margin-bottom:8px;">Cost Breakdown</div>
+        <div class="cbar-row"><span class="cbar-lbl">Compute (App Service P0v3)</span><div class="cbar-track"><div class="cbar" style="width:42%;background:var(--plan-a);"></div></div><span class="cbar-val">$114</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Data (SQL+Cosmos+Blob+KV)</span><div class="cbar-track"><div class="cbar" style="width:38%;background:var(--blue);"></div></div><span class="cbar-val">$105</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Security &amp; Obs (Defender)</span><div class="cbar-track"><div class="cbar" style="width:15%;background:var(--violet);"></div></div><span class="cbar-val">$42</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Integration (SB+Event Grid)</span><div class="cbar-track"><div class="cbar" style="width:4%;background:var(--amber);"></div></div><span class="cbar-val">$12</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Edge &amp; Network</span><div class="cbar-track"><div class="cbar" style="width:0%;background:var(--rose);"></div></div><span class="cbar-val">$0</span></div>
+        <div style="font-family:var(--mono);font-size:.58rem;border-radius:5px;padding:5px 10px;margin-top:10px;background:rgba(34,199,146,.08);color:var(--plan-a);border:1px solid rgba(34,199,146,.2);">Phase 1 Go-Live · First 6–12 months</div>
+        <div style="font-family:var(--mono);font-size:.56rem;color:var(--ink3);margin-top:6px;line-height:1.5;">App Service P0v3 · SQL serverless (auto-pause) · edge shared in Prod sub · no Sentinel</div>
+      </div>
+    </div>
+
+    <!-- STAGING / Plan B -->
+    <div class="cost-card cost-card-b">
+      <div class="cost-card-head">
+        <div style="display:flex;align-items:baseline;gap:10px;">
+          <span style="font-family:var(--mono);font-size:2.2rem;font-weight:500;color:var(--plan-b);line-height:1;">B</span>
+          <div>
+            <div style="font-family:var(--mono);font-size:.57rem;text-transform:uppercase;letter-spacing:.12em;color:var(--plan-b);">Staging Environment</div>
+            <div style="font-family:var(--serif);font-size:.95rem;color:var(--ink);">Staging / UAT</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <div style="font-family:var(--serif);font-size:2rem;line-height:1;color:var(--plan-b);">$679<span style="font-size:.72rem;color:var(--ink3);">/mo</span></div>
+          <div style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);margin-top:2px;">~$8,148 / year · ✓ in $650–750 band</div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:1px;padding:5px 9px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+            <span style="font-family:var(--serif);font-size:.88rem;color:var(--plan-b);">$0.014</span>
+            <span style="font-family:var(--mono);font-size:.47rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">per citizen/mo</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px;padding:5px 9px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+            <span style="font-family:var(--serif);font-size:.88rem;color:var(--blue);">P1v3</span>
+            <span style="font-family:var(--mono);font-size:.47rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">autoscale 1→2</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px;padding:5px 9px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+            <span style="font-family:var(--serif);font-size:.88rem;color:var(--teal);">5 plans</span>
+            <span style="font-family:var(--mono);font-size:.47rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">Defender</span>
+          </div>
+        </div>
+      </div>
+      <div class="cost-card-body">
+        <div style="font-family:var(--mono);font-size:.53rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);margin-bottom:8px;">Cost Breakdown</div>
+        <div class="cbar-row"><span class="cbar-lbl">Data (SQL 2vCore+Cosmos)</span><div class="cbar-track"><div class="cbar" style="width:51%;background:var(--blue);"></div></div><span class="cbar-val">$347</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Compute (App Service P1v3)</span><div class="cbar-track"><div class="cbar" style="width:33%;background:var(--plan-b);"></div></div><span class="cbar-val">$226</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Security &amp; Obs (5 Defender)</span><div class="cbar-track"><div class="cbar" style="width:13%;background:var(--violet);"></div></div><span class="cbar-val">$90</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Integration (SB+Event Grid)</span><div class="cbar-track"><div class="cbar" style="width:2%;background:var(--amber);"></div></div><span class="cbar-val">$16</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Edge &amp; Network</span><div class="cbar-track"><div class="cbar" style="width:0%;background:var(--rose);"></div></div><span class="cbar-val">$0</span></div>
+        <div style="font-family:var(--mono);font-size:.58rem;border-radius:5px;padding:5px 10px;margin-top:10px;background:rgba(96,165,250,.08);color:var(--plan-b);border:1px solid rgba(96,165,250,.2);">Pre-Prod / UAT · Months 6–18</div>
+        <div style="font-family:var(--mono);font-size:.56rem;color:var(--ink3);margin-top:6px;line-height:1.5;">Warm SQL 2-vCore + Cosmos autoscale + KV Premium · edge shared in Prod sub</div>
+      </div>
+    </div>
+
+    <!-- PRODUCTION / Plan C -->
+    <div class="cost-card cost-card-c">
+      <div class="cost-card-head">
+        <div style="display:flex;align-items:baseline;gap:10px;">
+          <span style="font-family:var(--mono);font-size:2.2rem;font-weight:500;color:var(--plan-c);line-height:1;">C</span>
+          <div>
+            <div style="font-family:var(--mono);font-size:.57rem;text-transform:uppercase;letter-spacing:.12em;color:var(--plan-c);">Production Environment</div>
+            <div style="font-family:var(--serif);font-size:.95rem;color:var(--ink);">Production</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <div style="font-family:var(--serif);font-size:2rem;line-height:1;color:var(--plan-c);">$2,433–4,955<span style="font-size:.72rem;color:var(--ink3);">/mo</span></div>
+          <div style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);margin-top:2px;">Minimal $2,433 · Standard $3,419 · Full $4,955 /mo</div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:1px;padding:5px 9px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+            <span style="font-family:var(--serif);font-size:.88rem;color:var(--plan-c);">$0.05–0.10</span>
+            <span style="font-family:var(--mono);font-size:.47rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">per citizen/mo</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px;padding:5px 9px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+            <span style="font-family:var(--serif);font-size:.88rem;color:var(--violet);">Dual</span>
+            <span style="font-family:var(--mono);font-size:.47rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">ASE v3 (HA)</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px;padding:5px 9px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+            <span style="font-family:var(--serif);font-size:.88rem;color:var(--teal);">WORM</span>
+            <span style="font-family:var(--mono);font-size:.47rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">7-yr immutable</span>
+          </div>
+        </div>
+      </div>
+      <div class="cost-card-body">
+        <div style="font-family:var(--mono);font-size:.53rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);margin-bottom:8px;">Cost Breakdown</div>
+        <div style="font-family:var(--mono);font-size:.5rem;color:var(--ink3);margin-bottom:6px;">Breakdown shown for <strong style="color:var(--plan-c);">Standard ($3,419)</strong> — the representative middle sizing</div>
+        <div class="cbar-row"><span class="cbar-lbl">Edge &amp; Network (shared)</span><div class="cbar-track"><div class="cbar" style="width:47%;background:var(--rose);"></div></div><span class="cbar-val">$1,596</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Compute (dual ASE v3 ×4)</span><div class="cbar-track"><div class="cbar" style="width:33%;background:var(--plan-c);"></div></div><span class="cbar-val">$1,128</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Data (SQL+Cosmos+Blob+KV)</span><div class="cbar-track"><div class="cbar" style="width:11%;background:var(--blue);"></div></div><span class="cbar-val">$392</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Security &amp; Obs (LAW+Sentinel)</span><div class="cbar-track"><div class="cbar" style="width:8%;background:var(--violet);"></div></div><span class="cbar-val">$275</span></div>
+        <div class="cbar-row"><span class="cbar-lbl">Integration (SB+Event Grid)</span><div class="cbar-track"><div class="cbar" style="width:1%;background:var(--amber);"></div></div><span class="cbar-val">$28</span></div>
+        <div style="font-family:var(--mono);font-size:.58rem;border-radius:5px;padding:5px 10px;margin-top:10px;background:rgba(155,135,245,.08);color:var(--plan-c);border:1px solid rgba(155,135,245,.2);">Live citizen environment · Minimal → Standard → Full</div>
+        <div style="font-family:var(--mono);font-size:.56rem;color:var(--ink3);margin-top:6px;line-height:1.5;">Firewall Standard $912 = single largest line · edge hosts all 3 envs · ASE RI would cut compute 35–40%</div>
+      </div>
+    </div>
+
+  </div><!-- end cost grid -->
+
+  <!-- Cost-optimisation decisions banner -->
+  <div style="background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.18);border-radius:8px;padding:12px 18px;margin-top:1.2rem;display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+    <div>
+      <div style="font-family:var(--mono);font-size:.56rem;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);margin-bottom:3px;">Cost-optimisation decisions baked in</div>
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+        <span style="font-family:var(--serif);font-size:1.05rem;color:var(--ink2);">AI removed · eID identity · MHSM → KV Premium · edge shared</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:1px;height:32px;background:rgba(255,255,255,.1);flex-shrink:0;"></div>
+      <div>
+        <div style="font-family:var(--serif);font-size:1.2rem;color:var(--teal);">$0 AI</div>
+        <div style="font-family:var(--mono);font-size:.56rem;color:var(--ink3);">OpenAI + AI Search external · eID = no CIAM cost</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:1px;height:32px;background:rgba(255,255,255,.1);flex-shrink:0;"></div>
+      <div>
+        <div style="font-family:var(--serif);font-size:1.2rem;color:var(--teal);">−15–40%</div>
+        <div style="font-family:var(--mono);font-size:.56rem;color:var(--ink3);">real spend after EA/MCA discount (list shown)</div>
+      </div>
+    </div>
+    <div style="margin-left:auto;font-family:var(--mono);font-size:.55rem;color:var(--ink3);text-align:right;max-width:340px;line-height:1.6;">All edge + central LAW/Sentinel hosted once in the Prod subscription (ADR-011) — Dev/Staging carry $0 edge. ASE Reserved Instances would cut Prod compute a further 35–40% (not applied).</div>
+  </div>
+
+  <!-- All-env total row -->
+  <div style="display:flex;gap:12px;margin-top:1rem;align-items:center;flex-wrap:wrap;">
+    <span style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);">All 3 environments (Dev + Staging + Production):</span>
+    <span style="font-family:var(--serif);font-size:1.1rem;color:var(--ink);">$3,385–5,907/mo</span>
+    <span style="font-family:var(--mono);font-size:.62rem;color:var(--ink3);">·</span>
+    <span style="font-family:var(--mono);font-size:.62rem;color:var(--ink3);">$40,620–70,884/yr</span>
+    <span style="font-family:var(--mono);font-size:.6rem;color:var(--ink3);">(Prod = Minimal $3,385 · Standard $4,371 · Full $5,907 /mo)</span>
+    <span style="font-family:var(--mono);font-size:.6rem;padding:2px 8px;border-radius:4px;background:rgba(34,199,146,.07);border:1px solid rgba(34,199,146,.2);color:var(--teal);">Deploy Dev → Staging → Production, sized on demand</span>
+  </div>
+
+  <div class="sfooter">Azure Retail LIST prices · East US · major SKUs live-validated 2026-06-01 (prices.azure.com) · No EA/MCA discount · RI not applied · usage-driven lines (LA/Sentinel/Defender GB, Cosmos RU) are estimates</div>
+</div>
+</section>
+
+<!-- ══════════════ SLIDE 12 — ENVIRONMENT ARCHITECTURE ══════════════ -->
+<section class="slide" id="sdiag" style="background:linear-gradient(140deg,rgba(96,165,250,.04) 0%,var(--bg) 55%,rgba(155,135,245,.04) 100%);">
+<div class="si">
+  <span class="stag stag-blue">Architecture</span>
+  <div class="rule" style="background:var(--blue);"></div>
+  <h2>Environment Architecture Diagrams</h2>
+  <p class="lead">The same logical architecture — hub-and-spoke, dual ASE, APIM gateway, 6 registry adapters — at three different scale and security levels. Select an environment to see its data-flow diagram and specifications.</p>
+
+  <!-- Tab selector -->
+  <div class="env-tabs">
+    <button class="env-tab ta on" onclick="showEnvTab('dev',this)">Dev — Plan A</button>
+    <button class="env-tab tb" onclick="showEnvTab('stg',this)">Staging — Plan B</button>
+    <button class="env-tab tc" onclick="showEnvTab('prd',this)">Production — Plan C</button>
+    <span style="margin-left:auto;font-family:var(--mono);font-size:.56rem;color:var(--ink3);">LR = left-to-right flow · dotted = monitoring/protection lanes</span>
+  </div>
+
+  <!-- DEV pane -->
+  <div class="env-pane on" id="env-pane-dev">
+    <div class="mwrap" id="mwrap-dev">
+      <span style="font-family:var(--mono);font-size:.65rem;color:var(--ink3);">Rendering diagram…</span>
+    </div>
+    <div class="diag-meta">
+      <div>
+        <div style="font-family:var(--mono);font-size:.56rem;text-transform:uppercase;letter-spacing:.12em;color:var(--plan-a);margin-bottom:2px;">Dev — Plan A</div>
+        <div style="font-family:var(--serif);font-size:1.85rem;color:var(--plan-a);line-height:1;">$273<span style="font-size:.75rem;color:var(--ink3);">/mo</span></div>
+        <div style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);">$0.005 / citizen / month · ▼ under band</div>
+      </div>
+      <div style="border:1px solid rgba(255,255,255,.08);border-radius:8px;overflow:hidden;margin-top:4px;">
+        <div style="background:rgba(255,255,255,.04);padding:6px 12px;font-family:var(--mono);font-size:.54rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">Specifications</div>
+        <div style="padding:0 12px 4px;">
+          <div class="diag-spec-row"><span class="diag-spec-key">SLA</span><span class="diag-spec-val" style="color:var(--amber);">Best-effort · no SLA</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">HA Level</span><span class="diag-spec-val" style="color:var(--rose);">None — single instance</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Redundancy</span><span class="diag-spec-val" style="color:var(--rose);">No AZ · no geo-DR · LRS</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Edge / Firewall</span><span class="diag-spec-val">Shared in Prod sub ($0)</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Monitoring</span><span class="diag-spec-val">App Insights → central LAW · Defender ×3</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Compute</span><span class="diag-spec-val" style="color:var(--plan-a);">App Service P0v3 ×2 (FE+BE)</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Azure SQL DB</span><span class="diag-spec-val" style="color:var(--plan-a);">GP serverless · auto-pause</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Cosmos DB</span><span class="diag-spec-val" style="color:var(--plan-a);">Serverless · pay/RU</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">APIM</span><span class="diag-spec-val" style="color:var(--amber);">Shared (Prod sub)</span></div>
+          <div class="diag-spec-row" style="border-bottom:none;"><span class="diag-spec-key">Compliance</span><span class="diag-spec-val">Synthetic data · pre-prod</span></div>
+        </div>
+      </div>
+      <div class="diag-analogy">"Renting a reliable car. <em style="color:var(--plan-a);font-style:normal;">Gets every citizen to their destination.</em> If it has a problem, there's a brief wait. You don't buy a fleet until you know the routes."</div>
+      <div style="background:rgba(34,199,146,.06);border:1px solid rgba(34,199,146,.2);border-radius:6px;padding:8px 12px;">
+        <div style="font-family:var(--mono);font-size:.54rem;text-transform:uppercase;letter-spacing:.1em;color:var(--plan-a);margin-bottom:4px;">Upgrade triggers from Dev</div>
+        <div style="font-size:.72rem;color:var(--ink2);line-height:1.6;">App Service CPU &gt;70% sustained · Cosmos &gt;400 RU/s avg · integration tests pass → promote to Staging</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGING pane -->
+  <div class="env-pane" id="env-pane-stg">
+    <div class="mwrap" id="mwrap-stg">
+      <span style="font-family:var(--mono);font-size:.65rem;color:var(--ink3);">Rendering diagram…</span>
+    </div>
+    <div class="diag-meta">
+      <div>
+        <div style="font-family:var(--mono);font-size:.56rem;text-transform:uppercase;letter-spacing:.12em;color:var(--plan-b);margin-bottom:2px;">Staging — Plan B</div>
+        <div style="font-family:var(--serif);font-size:1.85rem;color:var(--plan-b);line-height:1;">$679<span style="font-size:.75rem;color:var(--ink3);">/mo</span></div>
+        <div style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);">$0.014 / citizen / month · ✓ in band</div>
+      </div>
+      <div style="border:1px solid rgba(255,255,255,.08);border-radius:8px;overflow:hidden;margin-top:4px;">
+        <div style="background:rgba(255,255,255,.04);padding:6px 12px;font-family:var(--mono);font-size:.54rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">Specifications</div>
+        <div style="padding:0 12px 4px;">
+          <div class="diag-spec-row"><span class="diag-spec-key">SLA</span><span class="diag-spec-val" style="color:var(--plan-b);">Pre-prod · uses shared edge</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">HA Level</span><span class="diag-spec-val" style="color:var(--teal);">Autoscale 1→2 (App Service)</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Redundancy</span><span class="diag-spec-val" style="color:var(--amber);">Single region · ZRS storage</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Edge / Firewall</span><span class="diag-spec-val" style="color:var(--plan-b);">Shared in Prod sub ($0)</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Monitoring</span><span class="diag-spec-val" style="color:var(--plan-b);">App Insights → central LAW · Defender ×5</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Compute</span><span class="diag-spec-val" style="color:var(--plan-b);">App Service P1v3 ×2 · autoscale 1→2</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Azure SQL DB</span><span class="diag-spec-val" style="color:var(--plan-b);">GP provisioned 2 vCore (warm)</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Cosmos DB</span><span class="diag-spec-val" style="color:var(--plan-b);">Autoscale ~1,500 RU/s</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Key Vault</span><span class="diag-spec-val" style="color:var(--plan-b);">Premium (HSM-backed keys)</span></div>
+          <div class="diag-spec-row" style="border-bottom:none;"><span class="diag-spec-key">Compliance</span><span class="diag-spec-val" style="color:var(--plan-b);">UAT · masked / synthetic data</span></div>
+        </div>
+      </div>
+      <div class="diag-analogy">"Two checkout lanes — <em style="color:var(--plan-b);font-style:normal;">if one closes, the other handles the queue.</em> Security cameras now alert the guard when they see something unusual, not just record it."</div>
+      <div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:6px;padding:8px 12px;">
+        <div style="font-family:var(--mono);font-size:.54rem;text-transform:uppercase;letter-spacing:.1em;color:var(--plan-b);margin-bottom:4px;">Upgrade triggers from Staging</div>
+        <div style="font-size:.72rem;color:var(--ink2);line-height:1.6;">UAT sign-off · cut over to Production at the chosen sizing (Minimal → Standard → Full)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTION pane -->
+  <div class="env-pane" id="env-pane-prd">
+    <div class="mwrap" id="mwrap-prd">
+      <span style="font-family:var(--mono);font-size:.65rem;color:var(--ink3);">Rendering diagram…</span>
+    </div>
+    <div class="diag-meta">
+      <div>
+        <div style="font-family:var(--mono);font-size:.56rem;text-transform:uppercase;letter-spacing:.12em;color:var(--plan-c);margin-bottom:2px;">Production — Plan C</div>
+        <div style="font-family:var(--serif);font-size:1.85rem;color:var(--plan-c);line-height:1;">$2,433–4,955<span style="font-size:.75rem;color:var(--ink3);">/mo</span></div>
+        <div style="font-family:var(--mono);font-size:.58rem;color:var(--ink3);">$0.05–0.10 / citizen / mo · Minimal → Full</div>
+      </div>
+      <div style="border:1px solid rgba(255,255,255,.08);border-radius:8px;overflow:hidden;margin-top:4px;">
+        <div style="background:rgba(255,255,255,.04);padding:6px 12px;font-family:var(--mono);font-size:.54rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);">Specifications</div>
+        <div style="padding:0 12px 4px;">
+          <div class="diag-spec-row"><span class="diag-spec-key">SLA</span><span class="diag-spec-val" style="color:var(--plan-c);">HA from Standard · zone-redundant at Full</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">HA Level</span><span class="diag-spec-val" style="color:var(--teal);">Dual ASE v3 · 1× (Min) → 2× per tier (Std/Full)</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Redundancy</span><span class="diag-spec-val" style="color:var(--teal);">LRS (Min) · ZRS (Std) · GRS + DR region (Full)</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Edge / Firewall</span><span class="diag-spec-val" style="color:var(--rose);">Azure Firewall Standard 🔒 (shared, all envs)</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Monitoring</span><span class="diag-spec-val" style="color:var(--plan-c);">Central LAW + Sentinel (optimized) · Defender</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Compute</span><span class="diag-spec-val" style="color:var(--plan-c);">Frontend + Backend ASE v3 I1v2 (Linux)</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Azure SQL DB</span><span class="diag-spec-val" style="color:var(--plan-c);">GP: 6vCore Min · 2vCore Std · 4vCore ZR Full</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">Cosmos DB</span><span class="diag-spec-val" style="color:var(--plan-c);">Serverless (Min) · autoscale (Std/Full)</span></div>
+          <div class="diag-spec-row"><span class="diag-spec-key">APIM / Front Door</span><span class="diag-spec-val" style="color:var(--plan-c);">APIM Basic v2 + FD Std · Std v2 + FD Premium (Full)</span></div>
+          <div class="diag-spec-row" style="border-bottom:none;"><span class="diag-spec-key">Compliance</span><span class="diag-spec-val" style="color:var(--plan-c);">ISO 27001 · GDPR · PCI-DSS (e-Payment)</span></div>
+        </div>
+      </div>
+      <div class="diag-analogy">"Three lanes in <em style="color:var(--plan-c);font-style:normal;">three separate buildings.</em> If an entire building goes dark, the other two continue without a single citizen noticing. A full security team monitors everything, 24/7."</div>
+      <div style="background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.2);border-radius:6px;padding:8px 12px;">
+        <div style="font-family:var(--mono);font-size:.54rem;text-transform:uppercase;letter-spacing:.1em;color:var(--rose);margin-bottom:4px;">ADRs required before committing</div>
+        <div style="font-size:.72rem;color:var(--ink2);line-height:1.6;">ADR: external-LLM removal (supersedes AI tier) · ADR: eID supersedes Entra (ADR-004) · ADR-011 shared-edge isolation · PCI scope for e-Payment</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sfooter">Architecture diagrams show logical data-flow topology · Hub VNet, Bastion, Private DNS, CI/CD pipelines omitted for clarity · All 3 envs share identical LLD component design</div>
 </div>
 </section>
 
@@ -2409,7 +2724,7 @@ var slides=document.querySelectorAll('.slide');
 var navBtns=document.querySelectorAll('nav .navbtn');
 var dots=document.querySelectorAll('.sdot');
 function goSlide(n){slides[n].scrollIntoView({behavior:'smooth'});}
-var planColors=['','','#22c792','#60a5fa','#9b87f5','#9b87f5','','','','',''];
+var planColors=['','','#22c792','#60a5fa','#9b87f5','#9b87f5','','','','','','#f5a623',''];
 var obs=new IntersectionObserver(function(entries){
   entries.forEach(function(e){
     if(e.isIntersecting&&e.intersectionRatio>0.4){
@@ -2463,7 +2778,112 @@ function initCanvas(id,colors){
 window.addEventListener('load',function(){
   initCanvas('bgc0',['#1d9e75','#6b48c8','#185fa5']);
   initCanvas('bgc6',['#1d9e75','#185fa5']);
+  showEnvTab('dev',document.querySelector('.env-tab.ta'));
 });
+
+// ── Mermaid architecture diagrams ──
+mermaid.initialize({
+  startOnLoad:false,
+  securityLevel:'loose',
+  theme:'base',
+  themeVariables:{
+    primaryColor:'#0f1b2a',
+    primaryTextColor:'#e8e4dc',
+    primaryBorderColor:'#22c792',
+    lineColor:'#60a5fa',
+    secondaryColor:'#0a1520',
+    background:'#0c1520',
+    clusterBkg:'#0a1420',
+    clusterBorder:'#1e3040',
+    titleColor:'#22c792',
+    edgeLabelBackground:'#0c1520',
+    fontFamily:'DM Mono, monospace',
+    fontSize:'12px',
+    nodeBorder:'#22c792',
+    mainBkg:'#0f1b2a'
+  }
+});
+
+var MDIAGS={
+  dev:[
+    "%%{init:{'theme':'base','themeVariables':{'primaryColor':'#0f1b2a','primaryTextColor':'#e8e4dc','primaryBorderColor':'#22c792','lineColor':'#22c792','background':'#0c1520','clusterBkg':'#0a1420','clusterBorder':'#1a4030','titleColor':'#22c792','edgeLabelBackground':'#0c1520','fontFamily':'DM Mono monospace','fontSize':'12px'}}}%%",
+    "flowchart LR",
+    "  INT([\"Internet\\n50k Citizens\"])",
+    "  FD[\"Front Door Std\\n(shared · Prod sub)\"]",
+    "  AG[\"App Gateway WAF v2\\n(shared · Prod sub)\"]",
+    "  FE[\"App Service\\nP0v3 Frontend\"]",
+    "  AP[\"APIM\\n(shared · Prod sub)\"]",
+    "  BE[\"App Service\\nP0v3 Backend\"]",
+    "  DB1[(\"Azure SQL DB\\nGP serverless\")]",
+    "  DB2[(\"Cosmos DB\\nServerless\")]",
+    "  SB[\"Service Bus\\nStandard\"]",
+    "  RA[\"6x Registry\\nAdapters\"]",
+    "  RG[(\"Civil  Commerce\\nTax  TEATT\\nLand  Permits\")]",
+    "  INT --> FD --> AG --> FE --> AP --> BE",
+    "  BE --> DB1 & DB2 & SB",
+    "  SB --> RA --> RG"
+  ].join('\n'),
+  stg:[
+    "%%{init:{'theme':'base','themeVariables':{'primaryColor':'#0f1b2a','primaryTextColor':'#e8e4dc','primaryBorderColor':'#60a5fa','lineColor':'#60a5fa','background':'#0c1520','clusterBkg':'#0a1420','clusterBorder':'#1a2540','titleColor':'#60a5fa','edgeLabelBackground':'#0c1520','fontFamily':'DM Mono monospace','fontSize':'12px'}}}%%",
+    "flowchart LR",
+    "  INT([\"Internet\\n50k Citizens\"])",
+    "  FD[\"Front Door\\n(shared · Prod sub)\"]",
+    "  AG[\"App Gateway WAF v2\\n(shared · Prod sub)\"]",
+    "  FE[\"App Service\\nP1v3 FE · 1→2\"]",
+    "  AP[\"APIM\\n(shared · Prod sub)\"]",
+    "  BE[\"App Service\\nP1v3 BE · 1→2\"]",
+    "  DB1[(\"Azure SQL DB\\nGP 2 vCore warm\")]",
+    "  DB2[(\"Cosmos DB\\nAutoscale ~1.5k\")]",
+    "  SB[\"Service Bus\\nStandard\"]",
+    "  RA[\"6x Registry\\nAdapters\"]",
+    "  RG[(\"Registries\")]",
+    "  OBS[\"App Insights\\n→ central LAW\"]",
+    "  INT --> FD --> AG --> FE --> AP --> BE",
+    "  BE --> DB1 & DB2 & SB",
+    "  SB --> RA --> RG",
+    "  OBS -.->|telemetry| BE"
+  ].join('\n'),
+  prd:[
+    "%%{init:{'theme':'base','themeVariables':{'primaryColor':'#0f1b2a','primaryTextColor':'#e8e4dc','primaryBorderColor':'#9b87f5','lineColor':'#9b87f5','background':'#0c1520','clusterBkg':'#0a1420','clusterBorder':'#1e1540','titleColor':'#9b87f5','edgeLabelBackground':'#0c1520','fontFamily':'DM Mono monospace','fontSize':'12px'}}}%%",
+    "flowchart LR",
+    "  INT([\"Internet\\n50k+ Citizens\"])",
+    "  FD[\"Front Door\\nStd / Premium\"]",
+    "  AG[\"App Gateway\\nWAF v2\"]",
+    "  FE[\"ASE v3 Frontend\\nI1v2 · 1–2x\"]",
+    "  AP[\"APIM\\nBasic / Std v2\"]",
+    "  BE[\"ASE v3 Backend\\nI1v2 · 1–2x\"]",
+    "  DB1[(\"Azure SQL DB\\nGP 2–6 vCore\\n+ WORM blob\")]",
+    "  DB2[(\"Cosmos DB\\nserverless / autoscale\")]",
+    "  SB[\"Service Bus\\nStandard\"]",
+    "  RA[\"6x Registry\\nAdapters\"]",
+    "  RG[(\"Registries\")]",
+    "  SENT[\"Sentinel\\n(optimized)\"]",
+    "  FW[\"Azure Firewall\\nStandard (shared)\"]",
+    "  INT --> FD --> AG --> FE --> AP --> BE",
+    "  BE --> DB1 & DB2 & SB",
+    "  SB --> RA --> RG",
+    "  SENT -.->|monitors| BE",
+    "  FW -.->|protects| FE"
+  ].join('\n')
+};
+
+function showEnvTab(env,btnEl){
+  if(!btnEl)return;
+  document.querySelectorAll('.env-pane').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.env-tab').forEach(function(b){b.classList.remove('on');});
+  var pane=document.getElementById('env-pane-'+env);
+  if(pane)pane.classList.add('on');
+  btnEl.classList.add('on');
+  var wrap=document.getElementById('mwrap-'+env);
+  if(!wrap||wrap.dataset.rendered)return;
+  mermaid.render('msvg-'+env,MDIAGS[env]).then(function(result){
+    wrap.innerHTML=result.svg;
+    wrap.dataset.rendered='1';
+  }).catch(function(e){
+    wrap.innerHTML='<p style="color:#f87171;font-family:monospace;font-size:.7rem;padding:20px;">Diagram render error — check browser console.</p>';
+    console.error('Mermaid error ('+env+'):',e);
+  });
+}
 </script>
 </body>
 </html>
